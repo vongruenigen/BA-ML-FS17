@@ -83,7 +83,17 @@ class Config(object):
 
         # Defines the optimizer and the hyperparameters to use
         'optimizer_name': 'AdaDelta',
-        'optimizer_parameters': {}
+        'optimizer_parameters': {},
+
+        # Defines how much of the input neurons should still be considered
+        # when applying the dropout mechanism. The value 1.0 means that all
+        # neurons are used and none is dropped.
+        'dropout_input_keep': 1.0,
+
+        # Defines how much of the output neurons should still be considered
+        # when applying the dropout mechanism. The value 1.0 means that all
+        # neurons are used and none is dropped.
+        'dropout_output_keep': 1.0,
     }
 
     def __init__(self, cfg_obj={}):

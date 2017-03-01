@@ -33,6 +33,7 @@ class Runner(object):
         else:
             raise Exception('cfg_path must be either a path or a Config object')
 
+        self.__prepare_summary_writers()
         self.__prepare_results_directory()
 
     def train(self):
@@ -160,6 +161,10 @@ class Runner(object):
                             ' %s already exists' % str(self.cfg.id))
         else:
             os.mkdir(self.curr_exp_path)
+
+    def __prepare_summary_writers(self):
+        # TODO
+        pass
 
     def __get_model_path(self, version=0):
         '''Returns the path to store the model at as a string. An
