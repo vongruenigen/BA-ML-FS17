@@ -16,7 +16,9 @@ from tensorflow.contrib import rnn, seq2seq, layers
 class Model(object):
     '''Responsible for building the tensorflow graph, i.e.
        setting up the network so that it can be used by the
-       Runner class.'''
+       Runner class. This implementation is heavily based on
+       the tensorflow tutorial found at:
+       https://github.com/ematvey/tensorflow-seq2seq-tutorials/blob/master/model_new.py'''
 
     # List of possible style of RNN cells
     CELL_FN = {
@@ -43,6 +45,29 @@ class Model(object):
     def inference(self, session, inputs):
         ''''''
         pass
+
+    def make_train_inputs(self, input_seq, target_seq):
+        '''This method is responsible for preparing the given sequences
+           so that they can be used for training the model.'''
+        inputs_, inputs_length_ = utils.batch(input_seq)
+        targets_, targets_length_ = utils.batch(target_seq)
+
+        return {
+            self.encoder_inputs: inputs_,
+            self.encoder_inputs_length: inputs_length_,
+            self.decoder_targets: targets_,
+            self.decoder_targets_length: targets_length_,
+        }
+
+    def make_inference_inputs(self, input_seq):
+        '''This method is responsible for preparing the given sequences
+           so that they can be used for inference using the model.'''
+        inputs_, inputs_length_ = utils.batch(input_seq)
+
+        return {
+            self.encoder_inputs: inputs_,
+            self.encoder_inputs_length: inputs_length_,
+        }
 
     def __build_model(self):
         '''Builds sequence-to-sequence model.'''
@@ -128,7 +153,7 @@ class Model(object):
             self.loss_weights = tf.ones([
                 batch_size,
                 tf.reduce_max(self.decoder_train_length)
-            ], dtype=tf.int32, name='loss_weights')
+            ], dtype=tf.float32, name='loss_weights')
 
     def __init_embeddings(self):
         '''Initializes the part of the model which is responsible for
@@ -141,19 +166,15 @@ class Model(object):
         elif self.cfg.get('ft_embeddings'):
             self.embeddings = self.__load_tf_embeddings()
         else:
-            self.encoder_inputs_embedded = self.encoder_inputs
-            self.decoder_train_inputs_embedded = self.decoder_train_inputs
-            return # nothing else to do here
+            sqrt3 = math.sqrt(3)
+            initializer = tf.random_uniform_initializer(-sqrt3, sqrt3)
 
-        sqrt3 = math.sqrt(3)
-        initializer = tf.random_uniform_initializer(-sqrt3, sqrt3)
-
-        self.embeddings_matrix = tf.get_variable(
-            name='embeddings_matrix',
-            shape=self.embeddings.shape,
-            initializer=init,
-            dtype=tf.float32
-        )
+            self.embeddings = tf.get_variable(
+                name='embeddings',
+                shape=[100, 10],
+                initializer=initializer,
+                dtype=tf.float32
+            )
 
         self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
         self.decoder_train_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.decoder_train_inputs)
@@ -247,42 +268,42 @@ class Model(object):
                     maximum_length=tf.reduce_max(self.encoder_inputs_length) + 3,
                     num_decoder_symbols=self.__get_vocab_size()                    
                 )
-
-                (self.decoder_outputs_train, self.decoder_state_train,
-                 self.decoder_context_state_train) = seq2seq.dynamic_rnn_decoder(
-                    cell=self.decoder_cell,
-                    decoder_fn=decoder_fn_train,
-                    inputs=self.decocer_train_inputs_embedded,
-                    sequence_length=self.decoder_train_length,
-                    time_major=True,
-                    scope=scope
-                )
-
-                self.decoder_logits_train = output_fn(self.decoder_outputs_train)
-                self.decoder_prediction_train = tf.argmax(self.decoder_logits_train, axis=-1, name='decoder_prediction_traion')
-
-                scope.reuse_variables()
-
-                (self.decoder_logits_inference, decoder_state_inference,
-                 self.decoder_context_state_inference) = seq2seq.dynamic_rnn_decoder(
-                    celL=self.decoder_cell,
-                    decoder_fn=decoder_fn_inference,
-                    time_major=True,
-                    scope=scope
-                )
-
-                self.decoder_prediction_inference = tf.argmax(self.decoder_logits_inference, axis=-1, name='decoder_prediction_inference')
             else:
                 decoder_fn_train = seq2seq.simple_decoder_fn_train(encoder_state=self.encoder_state)
                 decoder_fn_inference = seq2seq.simple_decoder_fn_inference(
                     output_fn=output_fn,
                     encoder_state=self.encoder_state,
                     embeddings=self.embeddings,
-                    start_of_sequence_id=self.EOS,
-                    end_of_sequence_id=self.EOS,
+                    start_of_sequence_id=self.EOS_TOKEN,
+                    end_of_sequence_id=self.EOS_TOKEN,
                     maximum_length=tf.reduce_max(self.encoder_inputs_length) + 3,
                     num_decoder_symbols=self.__get_vocab_size()
                 )
+
+            (self.decoder_outputs_train, self.decoder_state_train,
+                 self.decoder_context_state_train) = seq2seq.dynamic_rnn_decoder(
+                    cell=self.decoder_cell,
+                    decoder_fn=decoder_fn_train,
+                    inputs=self.decoder_train_inputs_embedded,
+                    sequence_length=self.decoder_train_length,
+                    time_major=True,
+                    scope=scope
+                )
+
+            self.decoder_logits_train = output_fn(self.decoder_outputs_train)
+            self.decoder_prediction_train = tf.argmax(self.decoder_logits_train, axis=-1, name='decoder_prediction_traion')
+
+            scope.reuse_variables()
+
+            (self.decoder_logits_inference, decoder_state_inference,
+             self.decoder_context_state_inference) = seq2seq.dynamic_rnn_decoder(
+                cell=self.decoder_cell,
+                decoder_fn=decoder_fn_inference,
+                time_major=True,
+                scope=scope
+            )
+
+            self.decoder_prediction_inference = tf.argmax(self.decoder_logits_inference, axis=-1, name='decoder_prediction_inference')
 
     def __init_optimizer(self):
         '''Initializes the optimizer which should be used for the training.'''
@@ -298,4 +319,4 @@ class Model(object):
         if not self.embeddings:
             raise Exception('__init_embeddings() must be called before using __get_vocab_size()')
         else:
-            return self.embeddings.shape[0]
+            return self.embeddings.get_shape()[0].value

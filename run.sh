@@ -1,3 +1,3 @@
 #!/bin/sh
 
-echo 'NOT IMPELMENTED'
+python 'source/run.py' $@
