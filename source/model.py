@@ -36,6 +36,14 @@ class Model(object):
         self.cell_fn = self.CELL_FN[self.cfg.get('cell_type')]
         self.__build_model()
 
+    def train(self, session, train_inputs, train_outputs):
+        '''This method is responsible for training the model.'''
+        pass
+
+    def inference(self, session, inputs):
+        ''''''
+        pass
+
     def __build_model(self):
         '''Builds sequence-to-sequence model.'''
         self.__init_cells()
@@ -50,10 +58,6 @@ class Model(object):
 
         self.__init_decoder()
         self.__init_optimizer()
-
-    def train(self, session, train_inputs, train_outputs):
-        '''This method is responsible for training the model.'''
-        pass
 
     def __init_cells(self):
         '''Initializes the encoder and decoder cells used for the model.'''

@@ -4,6 +4,8 @@
 # Description: This module contains several utility methods.
 #
 
+import numpy as np
+
 def batch(inputs, max_sequence_length=None):
     # Credits go to https://github.com/ematvey/tensorflow-seq2seq-tutorials
     sequence_lengths = [len(seq) for seq in inputs]
