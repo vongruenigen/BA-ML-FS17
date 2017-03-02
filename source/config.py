@@ -89,7 +89,17 @@ class Config(object):
         'optimizer_parameters': {},
 
         # Defines how much checkpoints should be kept at max. Defaults to 5.
-        'checkpoint_max_to_keep': 5
+        'checkpoint_max_to_keep': 5,
+
+        # Defines how much of the input neurons should still be considered
+        # when applying the dropout mechanism. The value 1.0 means that all
+        # neurons are used and none is dropped.
+        'dropout_input_keep': 1.0,
+
+        # Defines how much of the output neurons should still be considered
+        # when applying the dropout mechanism. The value 1.0 means that all
+        # neurons are used and none is dropped.
+        'dropout_output_keep': 1.0
     }
 
     def __init__(self, cfg_obj={}):

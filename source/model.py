@@ -93,6 +93,14 @@ class Model(object):
         self.encoder_cell = self.cell_fn(self.cfg.get('num_hidden_units'))
         self.decoder_cell = self.cell_fn(self.cfg.get('num_hidden_units'))
 
+        def wrap_droput(cell):
+            return rnn.DropoutWrapper(cell, input_keep_prob=self.cfg.get('dropout_input_keep'),
+                                      output_keep_prob=self.cfg.get('dropout_output_keep'))
+
+        if self.cfg.get('dropout_input_keep') < 1.0 or self.cfg.get('dropout_output_keep') < 1.0:
+            self.encoder_cell = wrap_droput(self.encoder_cell)
+            self.decoder_cell = wrap_droput(self.decoder_cell)
+
         if self.cfg.get('num_encoder_layers') > 1:
             self.encoder_cell = [self.encoder_cell] * self.cfg.get('num_encoder_layers')
 
