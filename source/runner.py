@@ -11,6 +11,7 @@ import contextlib
 import utils
 import os
 import json
+import sys
 
 from model import Model
 from config import Config
@@ -39,6 +40,7 @@ class Runner(object):
         '''This method is responsible for training a model
            with the settings defined in the config.'''
         with self.__with_model() as (session, model):
+            self.__setup_saver_and_restore_model(session)
             
             # TODO: Use real data!
             length_from=3
@@ -85,11 +87,15 @@ class Runner(object):
                                 if i >= 2:
                                     break
                             print()
+
+                            # Store model at certain checkpoints
+                            self.__store_model(session, model)
             except KeyboardInterrupt:
                 print('training interrupted')
                 # TODO: Save state when the training is interrupted?
 
             self.__store_metrics(loss_track, perplexity_track)
+
 
     def test(self):
         '''This method is responsible for evaluating a trained
@@ -133,6 +139,14 @@ class Runner(object):
            a computation.'''
         return '/gpu:0'
 
+    def __store_model(self, session, model):
+        '''Stores the given model in the current results directory.
+           This model can then later be reloaded with the __load_model()
+           method.'''
+        model_path = self.__get_model_path()
+        self.saver.save(session, model_path, global_step=model.get_global_step())
+        print('Current version of the model stored at %s' % model_path)
+
     def __store_metrics(self, loss_track, perplexity_track):
         '''This method is responsible for storing the metrics
            collected while training the model. Currently, this
@@ -146,6 +160,19 @@ class Runner(object):
         with open(metrics_path, 'w+') as f:
             json.dump({'loss': loss_track, 'perplexity': perplexity_track},
                       f, indent=4, sort_keys=True)
+
+    def __setup_saver_and_restore_model(self, session):
+        '''Sets up the Saver which is used to store the model state after
+           training. It also loads a previous model if referenced in the
+           current configuration.'''
+        model_path = self.cfg.get('model_path')
+            
+        self.saver = tf.train.Saver(max_to_keep=self.cfg.get('checkpoint_max_to_keep'))
+
+        # Load model if referenced in the config
+        if model_path is not None:
+            print('Loading model from the path %s' % model_path)
+            self.saver.restore(session, self.cfg.get('model_path'))
 
     def __prepare_results_directory(self):
         '''This method is responsible for preparing the results
@@ -167,10 +194,10 @@ class Runner(object):
            to the name of the stored file. If a model_path is set
            in the config, this will be returned and version will be
            ignored.'''
-        if self.cfg.model_path:
-            return self.cfg.model_path
+        if self.cfg.get('model_path'):
+            return self.cfg.get('model_path')
 
         if not self.curr_exp_path:
             raise Exception('__prepare_results_directory() must be called before using __get_model_path()')
 
-        return path.join(self.curr_exp_path, 'model-%s.ckpt' % str(version))
+        return path.join(self.curr_exp_path, 'model-%s.chkp' % str(version))

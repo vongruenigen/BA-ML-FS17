@@ -38,6 +38,10 @@ class Model(object):
         self.cell_fn = self.CELL_FN[self.cfg.get('cell_type')]
         self.__build_model()
 
+    def get_global_step(self):
+        '''Returns the current global step counter.'''
+        return self.global_step
+
     def train(self, session, train_inputs, train_outputs):
         '''This method is responsible for training the model.'''
         pass
@@ -309,9 +313,13 @@ class Model(object):
         '''Initializes the optimizer which should be used for the training.'''
         logits = tf.transpose(self.decoder_logits_train, [1, 0, 2])
         targets = tf.transpose(self.decoder_train_targets, [1, 0])
+
+        # Track the global step state when training
+        self.global_step = tf.Variable(0, name='global_step', trainable=False)
+
         self.loss = seq2seq.sequence_loss(logits=logits, targets=targets,
                                           weights=self.loss_weights)
-        self.train_op = tf.train.AdamOptimizer().minimize(self.loss)
+        self.train_op = tf.train.AdamOptimizer().minimize(self.loss, global_step=self.global_step)
 
     def __get_vocab_size(self):
         '''Returns the size of the vocabulary if the embeddings are

@@ -34,7 +34,10 @@ class Config(object):
         # Random seed used to initialize numpy and tensorflow rngs
         'random_seed': 1337,
 
-        # Path to the model to load (optional)
+        # Path to the model to load (optional). The path MUST point
+        # to a *.chkp file, not any of the related files (*.index, *.meta, etc.).
+        # This means that the path might be "directory/model-1.chkp-1001" even though
+        # this file does not exist on the hard drive.
         'model_path': None,
 
         # Name of the experiment (optional)
@@ -83,7 +86,10 @@ class Config(object):
 
         # Defines the optimizer and the hyperparameters to use
         'optimizer_name': 'AdaDelta',
-        'optimizer_parameters': {}
+        'optimizer_parameters': {},
+
+        # Defines how much checkpoints should be kept at max. Defaults to 5.
+        'checkpoint_max_to_keep': 5
     }
 
     def __init__(self, cfg_obj={}):
