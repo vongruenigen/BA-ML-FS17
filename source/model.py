@@ -36,11 +36,24 @@ class Model(object):
            config object to be given as the first parameter.'''
         self.cfg = cfg
         self.cell_fn = self.CELL_FN[self.cfg.get('cell_type')]
+    
+    def build(self):
+        '''Must be called after setting up the model object
+           (e.g. embeddings provided, etc) BEFORE any usage
+           in a training or inference scenario.'''
         self.__build_model()
 
     def get_global_step(self):
         '''Returns the current global step counter.'''
         return self.global_step
+
+    def get_embeddings(self):
+        '''Returns the embeddings matrix.'''
+        return self.embeddings
+
+    def set_embeddings(self, emb):
+        '''Sets the embeddings matrix for the model.'''
+        self.embeddings = emb
 
     def train(self, session, train_inputs, train_outputs):
         '''This method is responsible for training the model.'''
@@ -171,33 +184,20 @@ class Model(object):
         '''Initializes the part of the model which is responsible for
            converting an input sequence to a sequence-matrix with the
            given vector embeddings.'''
-        embeddings = None
+        if self.embeddings is not None and len(self.embeddings) > 0:
+            print('No embeddings given, initializing random embeddings')
 
-        if self.cfg.get('w2v_embeddings'):
-            self.embeddings = self.__load_w2v_embeddings()
-        elif self.cfg.get('ft_embeddings'):
-            self.embeddings = self.__load_tf_embeddings()
-        else:
-            sqrt3 = math.sqrt(3)
-            initializer = tf.random_uniform_initializer(-sqrt3, sqrt3)
+            initializer = tf.random_uniform_initializer(-1, 1)
 
             self.embeddings = tf.get_variable(
                 name='embeddings',
-                shape=[100, 10],
+                shape=[self.cfg.get('max_vocabulary_size'), 10],
                 initializer=initializer,
                 dtype=tf.float32
             )
 
         self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
         self.decoder_train_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.decoder_train_inputs)
-
-    def __load_w2v_embeddings(self):
-        '''Loads the word2vec embeddings from the path set in the config.'''
-        pass
-
-    def __load_tf_embeddings(self):
-        '''Load the fastText embeddings from the path set in the config.'''
-        pass
 
     def __init_unidirectional_encoder(self):
         '''Initializes the "simple", unidirectional encoder which is responsible
@@ -332,7 +332,7 @@ class Model(object):
     def __get_vocab_size(self):
         '''Returns the size of the vocabulary if the embeddings are
            already loaded, otherwise an error is thrown.'''
-        if not self.embeddings:
-            raise Exception('__init_embeddings() must be called before using __get_vocab_size()')
+        if not self.get_embeddings():
+            raise Exception('embeddings must be set via set_embeddings()')
         else:
             return self.embeddings.get_shape()[0].value

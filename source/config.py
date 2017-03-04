@@ -84,6 +84,10 @@ class Config(object):
         # Defines wether the debuggin environment should be activated.
         'debug': False,
 
+        # Defines how much words should be considered in the vocabulary
+        # in case no embeddings are provided.
+        'max_vocabulary_size': 5*10e5,
+
         # Defines the optimizer and the hyperparameters to use
         'optimizer_name': 'AdaDelta',
         'optimizer_parameters': {},
@@ -99,7 +103,22 @@ class Config(object):
         # Defines how much of the output neurons should still be considered
         # when applying the dropout mechanism. The value 1.0 means that all
         # neurons are used and none is dropped.
-        'dropout_output_keep': 1.0
+        'dropout_output_keep': 1.0,
+
+        # Defines which tokenizer should be used to parse the conversational
+        # texts. The default tokenizers is the 'word_tokenizer' of the ntlk
+        # module.
+        'tokenizer_name': 'word_tokenize',
+
+        # Defines which training data to load. It tries to load the conversation
+        # of the file at the given path, this file must obey the correct format
+        # described in the DataLoader class.
+        'training_data': None,
+
+        # Defines which test data to load. It tries to load the conversation
+        # of the file at the given path, this file must obey the correct format
+        # described in the DataLoader class.
+        'test_data': None
     }
 
     def __init__(self, cfg_obj={}):

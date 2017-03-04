@@ -16,6 +16,7 @@ import sys
 from model import Model
 from config import Config
 from os import path
+from data_loader import DataLoader
 
 class Runner(object):
     '''This class is responsible for the training,
@@ -36,6 +37,9 @@ class Runner(object):
 
         self.__prepare_summary_writers()
         self.__prepare_results_directory()
+        self.__load_embeddings()
+
+        self.data_loader = DataLoader(self.cfg)
 
     def train(self):
         '''This method is responsible for training a model
@@ -55,6 +59,15 @@ class Runner(object):
             batches = utils.random_sequences(length_from=length_from, length_to=length_to,
                                              vocab_lower=vocab_lower, vocab_upper=vocab_upper,
                                              batch_size=batch_size)
+
+            training_batches = []
+
+            if self.cfg.get('training_data'):
+                training_batches = self.data_loader.load_conversations(
+                    self.cfg.get('training_data'),
+                    self.vocabulary
+                )
+            #test_batches = self.data_loader.load_conversations()
 
             sum_losses = 0.0
             sum_iters = 0
@@ -112,6 +125,12 @@ class Runner(object):
         with tf.device(self.__get_device()):
             with self.__with_tf_session() as session:
                 model = Model(self.cfg)
+
+                # Set the embeddings after creating a new instance of the model...
+                model.set_embeddings(self.embeddings)
+
+                # ..and build it afterwards
+                model.build()
 
                 # We need to initialize all the stuff setup when creating
                 # the model instance. Otherwise we might get nasty error
@@ -192,6 +211,17 @@ class Runner(object):
     def __prepare_summary_writers(self):
         # TODO
         pass
+
+    def __load_embeddings(self):
+        '''Loads the embeddings with the associated vocabulary
+           and saves them for later usage in the DataLoader and
+           while training/testing.'''
+        if self.cfg.get('w2v_embeddings'):
+            self.embeddings, self.vocabulary = utils.load_w2v_embeddings(self.cfg.get('w2v_embeddings'))
+        elif self.cfg.get('ft_embeddings'):
+            self.embeddings, self.vocabulary = utils.load_w2v_embeddings(self.cfg.get('ft_embeddings'))
+        else:
+            self.embeddings, self.vocabulary = None, {}
 
     def __get_model_path(self, version=0):
         '''Returns the path to store the model at as a string. An

@@ -6,6 +6,35 @@
 
 import numpy as np
 
+from gensim.models import Word2Vec
+from data_loader import DataLoader
+
+def __add_unknown_word_embedding(embs):
+    '''Helper function which adds a column for the embedding
+       of the unknown word.'''
+    embedding_for_unknown = np.random.uniform(-1.0, 1.0, size=(1, embs.shape[1]))
+    return np.vstack([embs, embedding_for_unknown])
+
+def load_w2v_embeddings(path):
+    '''Loads the word2vec embeddings at the given path. It returns
+       the embedding matrix as a numpy ndarray and the vocabulary as
+       a dict object.'''
+    w2v_model = Word2Vec.load(path)
+
+    embeddings = w2v_model.syn0
+    embeddings = __add_unknown_word_embedding(embeddings)
+
+    vocab = {k: w.index for k, w in w2v_model.vocab.items()}
+    vocab['UNKNOWN'] = embeddings.shape[0] - 1
+
+    return embeddings, vocab
+
+def load_ft_embeddings(path):
+    '''Loads the fastTrack embeddings at the given path. It returns
+       the embedding matrix as a numpy ndarray and the vocabulary as
+       a dict object.'''
+    raise Exception('Loading of ft embeddings is not implemented yet!')
+
 def batch(inputs, max_sequence_length=None):
     sequence_lengths = [len(seq) for seq in inputs]
     batch_size = len(inputs)
