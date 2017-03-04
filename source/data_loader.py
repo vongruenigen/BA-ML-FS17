@@ -11,6 +11,8 @@ import re
 import utils
 import logger
 
+from config import Config
+
 class DataLoader(object):
     '''This class is responsible for loading and preprocessing
        the training and test data used in this project. This class
@@ -57,7 +59,7 @@ class DataLoader(object):
                 else:
                     curr_conv.append(self.__convert_line_to_indices(line, vocabulary))
 
-            logger.warning('WARNING: Went through all the data, starting from the beginning again!')
+            logger.warn('WARNING: Went through all the data, starting from the beginning again!')
 
     def __get_tokenizer(self):
         '''Creates a tokenizer based on the configuration
@@ -75,14 +77,19 @@ class DataLoader(object):
         '''Parses a single line of a conversation and returns
            it as a list of indices.'''
         line_parts = self.__preprocess_and_tokenize_line(line, vocabulary)
-        line_parts = map(lambda w: vocabulary[w] if w in vocabulary else self.UNKNOWN_WORD_IDX,
+        line_parts = map(lambda w: vocabulary[w] if w in vocabulary else Config.UNKNOWN_WORD_IDX,
                          line_parts)
 
         # reverse the input in case it's configured
         if self.cfg.get('reverse_input'):
             line_parts = reversed(line_parts)
 
-        return list(line_parts)
+        line_parts = list(line_parts)
+
+        if len(line_parts) > self.cfg.get('max_input_length'):
+            line_parts = line_parts[:self.cfg.get('max_input_length')]
+
+        return line_parts
 
     def __preprocess_and_tokenize_line(self, line, vocabulary):
         '''Preprocesses a given line (e.g. removes unwanted chars),

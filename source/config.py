@@ -21,6 +21,9 @@ class Config(object):
     CONFIG_PATH  = path.join(ROOT_PATH, 'configs')
     RESULTS_PATH = path.join(ROOT_PATH, 'results')
 
+    # Vocabulary constants
+    UNKNOWN_WORD_IDX = 0
+
     # Contains the defaults which are applied in case any config
     # parameter is missing. ALL parameters should have an entry
     # in this list. If no meaningful value can be defined beforehand,
@@ -130,7 +133,11 @@ class Config(object):
         # Defines which test data to load. It tries to load the conversation
         # of the file at the given path, this file must obey the correct format
         # described in the DataLoader class.
-        'test_data': None
+        'test_data': None,
+
+        # Defines the maximum allowed length of the input sentences. Longer inputs
+        # will be reduced to this maximum.
+        'max_input_length': 100
     }
 
     def __init__(self, cfg_obj={}):

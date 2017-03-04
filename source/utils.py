@@ -8,7 +8,6 @@ import numpy as np
 
 from os import path
 from gensim.models import Word2Vec
-from data_loader import DataLoader
 from config import Config
 
 def __add_unknown_word_embedding(embs):
@@ -32,7 +31,7 @@ def load_w2v_embeddings(path):
     #       inserted as the first row of the embeddings matrix
     #       in order to keep it simple.
     vocab = {k: w.index+1 for k, w in w2v_model.vocab.items()}
-    vocab['UNKNOWN'] = DataLoader.UNKNOWN_WORD_IDX
+    vocab['UNKNOWN'] = Config.UNKNOWN_WORD_IDX
 
     return embeddings.astype('float32'), vocab
 

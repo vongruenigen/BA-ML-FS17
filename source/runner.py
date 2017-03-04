@@ -75,6 +75,9 @@ class Runner(object):
                 for epoch in range(self.cfg.get('epochs')):
                     for batch in range(batches_per_epoch+1):
                         batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
+
+                        logger.error('LENGTH BATCH %i' % len(batch_data_x))
+
                         fd = model.make_train_inputs(batch_data_x, batch_data_y)
 
                         _, loss = session.run([model.train_op, model.loss], fd)
@@ -237,11 +240,13 @@ class Runner(object):
         data_batch_x, data_batch_y = [], []
         batch_size = self.cfg.get('batch_size')
 
-        while len(data_batch_y) < batch_size:
+        while len(data_batch_y) < batch_size and len(data_batch_x) < batch_size:
             conversation = next(all_data)
 
             for i, conv_turn in enumerate(conversation):
-                if (i % 2) == 0:
+                if i >= self.cfg.get('batch_size'): # we MUST cancel here, otherwise we might get OOM problems
+                    break
+                elif (i % 2) == 0:
                     data_batch_x.append(conv_turn)
                 else:
                     data_batch_y.append(conv_turn)
