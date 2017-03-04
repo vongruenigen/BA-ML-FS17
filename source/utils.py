@@ -27,7 +27,7 @@ def load_w2v_embeddings(path):
     vocab = {k: w.index for k, w in w2v_model.vocab.items()}
     vocab['UNKNOWN'] = embeddings.shape[0] - 1
 
-    return embeddings, vocab
+    return embeddings.astype('float32'), vocab
 
 def load_ft_embeddings(path):
     '''Loads the fastTrack embeddings at the given path. It returns
@@ -36,6 +36,8 @@ def load_ft_embeddings(path):
     raise Exception('Loading of ft embeddings is not implemented yet!')
 
 def batch(inputs, max_sequence_length=None):
+    '''Taks a list of inputs and converts them into a data batch which
+       can be used by the model for training or inference.'''
     sequence_lengths = [len(seq) for seq in inputs]
     batch_size = len(inputs)
     

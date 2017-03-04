@@ -184,7 +184,7 @@ class Model(object):
         '''Initializes the part of the model which is responsible for
            converting an input sequence to a sequence-matrix with the
            given vector embeddings.'''
-        if self.embeddings is not None and len(self.embeddings) > 0:
+        if self.embeddings is None or len(self.embeddings) == 0:
             print('No embeddings given, initializing random embeddings')
 
             initializer = tf.random_uniform_initializer(-1, 1)
@@ -332,7 +332,9 @@ class Model(object):
     def __get_vocab_size(self):
         '''Returns the size of the vocabulary if the embeddings are
            already loaded, otherwise an error is thrown.'''
-        if not self.get_embeddings():
+        embs = self.get_embeddings()
+
+        if embs is None or len(embs) == 0:
             raise Exception('embeddings must be set via set_embeddings()')
         else:
-            return self.embeddings.get_shape()[0].value
+            return embs.shape[0]

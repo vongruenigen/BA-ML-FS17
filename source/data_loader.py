@@ -7,6 +7,7 @@
 #
 
 import nltk
+import re
 
 class DataLoader(object):
     '''This class is responsible for loading and preprocessing
@@ -21,6 +22,9 @@ class DataLoader(object):
     #       changes, otherwise the DataLoader class won't be able to
     #       load the conversations correctly!
     SPLIT_CONV_SYM = '<<<<<END-CONV>>>>>'
+
+    # Regular expression which is used to filter unwanted characters
+    WHITELIST_REGEX = '[^A-Za-z0-9\.,\?\!\s]+'
 
     # Index of the embedding for the unknown word in the embedding matrix.
     UNKNOWN_WORD_IDX = 0
@@ -41,13 +45,16 @@ class DataLoader(object):
         turn_flag = False
 
         for i, line in enumerate(open(path, 'r')):
-            if line == self.SPLIT_CONV_SYM:
-                all_convs.append(curr_conv)
+            if line.strip() == self.SPLIT_CONV_SYM:
+                # TODO: How to fix the problem that a conversation of an odd
+                #       number of turns cannot be easily converted to a training sample?
+                if len(curr_conv) % 2 != 0:
+                    del curr_conv[-1]
+
+                yield curr_conv
                 curr_conv = []
             else:
-                import pdb
-                pdb.set_trace()
-                curr_conv.append(self.__convert_line_to_indices(line))
+                curr_conv.append(self.__convert_line_to_indices(line, vocabulary))
 
         return all_convs
 
@@ -66,24 +73,23 @@ class DataLoader(object):
     def __convert_line_to_indices(self, line, vocabulary):
         '''Parses a single line of a conversation and returns
            it as a list of indices.'''
-        tknz = self.__get_tokenizer()
+        line_parts = self.__preprocess_and_tokenize_line(line, vocabulary)
+        line_parts = map(lambda w: ocabulary[w] if w in vocabulary else self.UNKNOWN_WORD_IDX,
+                         line_parts)
 
-        def get_word_idx(w):
-            '''Helper function to map words to indices.'''
-            if w in vocabulary:
-                return vocabulary[w]
-            else:
-                return self.UNKNOWN_WORD_IDX
-
-        line_parts = tknz(line)
-        line_parts = map(lambda x: x.lower().strip(), line_parts)
-        line_parts = map(get_word_idx, line_parts)
+        # reverse the input in case it's configured
+        if self.cfg.get('reverse_input'):
+            line_parts = reversed(line_parts)
 
         return list(line_parts)
 
-    def __load_conversations(self, path, vocabulary):
-        '''Loads the conversations at the given path.'''
-        convs = []
+    def __preprocess_and_tokenize_line(self, line, vocabulary):
+        '''Preprocesses a given line (e.g. removes unwanted chars),
+           tokenizes it and returns it.'''
+        tknz = self.__get_tokenizer()
+        line = re.sub(self.WHITELIST_REGEX, '')
 
-        with open(path, 'r') as f:
-            pass
+        line_parts = tknz(line)
+        line_parts = map(lambda x: x.lower().strip(), line_parts)
+
+        return list(line_parts)

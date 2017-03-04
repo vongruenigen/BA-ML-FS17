@@ -46,40 +46,36 @@ class Runner(object):
            with the settings defined in the config.'''
         with self.__with_model() as (session, model):
             self.__setup_saver_and_restore_model(session)
-            
-            # TODO: Use real data!
-            length_from=3
-            length_to=8
-            vocab_lower=2
-            vocab_upper=10
-            batch_size=100
-            max_batches=5000
-            batches_in_epoch=1000
-            debug=True
-            batches = utils.random_sequences(length_from=length_from, length_to=length_to,
-                                             vocab_lower=vocab_lower, vocab_upper=vocab_upper,
-                                             batch_size=batch_size)
 
             training_batches = []
+            test_batches = []
 
             if self.cfg.get('training_data'):
                 training_batches = self.data_loader.load_conversations(
                     self.cfg.get('training_data'),
                     self.vocabulary
                 )
-            #test_batches = self.data_loader.load_conversations()
+
+            if self.cfg.get('test_data'):
+                test_batches = self.data_loader.load_conversations(
+                    self.cfg.get('test_data'),
+                    self.vocabulary
+                )
 
             sum_losses = 0.0
             sum_iters = 0
+            batches_per_epoch = self.cfg.get('batches_per_epoch')
             loss_track = []
             perplexity_track = []
 
             try:
                 for epoch in range(self.cfg.get('epochs')):
-                    for batch in range(max_batches+1):
-                        batch_data = next(batches)
-                        fd = model.make_train_inputs(batch_data, batch_data)
-                        
+                    for batch in range(batches_per_epoch+1):
+                        batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
+                        import pdb
+                        pdb.set_trace()
+                        fd = model.make_train_inputs(batch_data_x, batch_data_y)
+
                         _, l = session.run([model.train_op, model.loss], fd)
 
                         sum_losses += l
@@ -88,19 +84,19 @@ class Runner(object):
                         loss_track.append(l)
                         perplexity_track.append(np.exp(sum_losses / sum_iters))
 
-                        if batch == 0 or batch % batches_in_epoch == 0:
+                        if batch == 0 or batch % batches_per_epoch == 0:
                             print('batch {}'.format(batch))
                             print('  minibatch loss: {}'.format(session.run(model.loss, fd)))
-                            for i, (e_in, dt_pred) in enumerate(zip(
-                                    fd[model.encoder_inputs].T,
-                                    session.run(model.decoder_prediction_train, fd).T
-                                )):
-                                print('  sample {}:'.format(i + 1))
-                                print('    enc input           > {}'.format(e_in))
-                                print('    dec train predicted > {}'.format(dt_pred))
-                                if i >= 2:
-                                    break
-                            print()
+                            # for i, (e_in, dt_pred) in enumerate(zip(
+                            #         fd[model.encoder_inputs].T,
+                            #         session.run(model.decoder_prediction_train, fd).T
+                            #     )):
+                            #     print('  sample {}:'.format(i + 1))
+                            #     print('    enc input           > {}'.format(e_in))
+                            #     print('    dec train predicted > {}'.format(dt_pred))
+                            #     if i >= 2:
+                            #         break
+                            # print()
 
                             # Store model at certain checkpoints
                             self.__store_model(session, model)
@@ -236,3 +232,21 @@ class Runner(object):
             raise Exception('__prepare_results_directory() must be called before using __get_model_path()')
 
         return path.join(self.curr_exp_path, 'model-%s.chkp' % str(version))
+
+    def __prepare_data_batch(self, all_data):
+        '''Returns two lists, each of the size of the configured batch size. The first contains
+           the input sentences (sentences which the first "person" said), the latter contains the
+           list of expected answers.'''
+        data_batch_x, data_batch_y = [], []
+        batch_size = self.cfg.get('batch_size')
+
+        while len(data_batch_y) < batch_size:
+            conversation = next(all_data)
+
+            for i, conv_turn in enumerate(conversation):
+                if (i % 2) == 0:
+                    data_batch_x.append(conv_turn)
+                else:
+                    data_batch_y.append(conv_turn)
+
+        return data_batch_x, data_batch_y

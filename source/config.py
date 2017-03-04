@@ -49,13 +49,16 @@ class Config(object):
         # Batch size which will be used when training
         'batch_size': 16,
 
+        # Defines how much batches will be considered per epoch.
+        'batches_per_epoch': 100,
+
         # Number of layers (or cells) in the encoder/decoder
         # parts of the network
         'num_encoder_layers': 1,
         'num_decoder_layers': 1,
 
         # Number of hidden units in each of the layers in each cell
-        'num_hidden_units': 100,
+        'num_hidden_units': 1,
 
         # Defines the cell type which will be used, either 'RNN', 'LSTM' or 'GRU'
         'cell_type': 'LSTM',
@@ -76,6 +79,11 @@ class Config(object):
         # Defines wether the attention mechanism should be activated in the
         # decoder part of the sequence-to-sequence model.
         'use_attention': False,
+
+        # Defines wether the input sample should be reversed before it's
+        # fed to the encoder. This is a trick used in the original seq2seq
+        # paper.
+        'reverse_input': False,
 
         # Defines wether the dropout mechanism should be used to mitigate
         # the problem of overfitting.
