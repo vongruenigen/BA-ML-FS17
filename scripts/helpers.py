@@ -1,10 +1,8 @@
 #
 # BA ML FS17 - Dirk von Grünigen & Martin Weilenmann
 #
-# Description: This module contains the Model class which
-#              is responsible for creating the tensorflow
-#              graph, i.e. building the bidirectional LSTM
-#              network used in this project.
+# Description: This module contains helper functions which
+#              are used in the scripts.
 #
 
 import sys

@@ -10,9 +10,9 @@
 import sys
 import os
 import re
-import utils
+import helpers
 
-utils.expand_import_path_to_source()
+helpers.expand_import_path_to_source()
 
 from os import path
 from data_loader import DataLoader
