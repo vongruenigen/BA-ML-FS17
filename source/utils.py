@@ -6,14 +6,17 @@
 
 import numpy as np
 
+from os import path
 from gensim.models import Word2Vec
 from data_loader import DataLoader
+from config import Config
 
 def __add_unknown_word_embedding(embs):
     '''Helper function which adds a column for the embedding
        of the unknown word.'''
     embedding_for_unknown = np.random.uniform(-1.0, 1.0, size=(1, embs.shape[1]))
-    return np.vstack([embs, embedding_for_unknown])
+
+    return np.vstack([embedding_for_unknown, embs])
 
 def load_w2v_embeddings(path):
     '''Loads the word2vec embeddings at the given path. It returns
@@ -24,8 +27,12 @@ def load_w2v_embeddings(path):
     embeddings = w2v_model.syn0
     embeddings = __add_unknown_word_embedding(embeddings)
 
-    vocab = {k: w.index for k, w in w2v_model.vocab.items()}
-    vocab['UNKNOWN'] = embeddings.shape[0] - 1
+    # NOTE: The +1 when setting the index comes from the fact
+    #       that the embedding for the unknown word will be
+    #       inserted as the first row of the embeddings matrix
+    #       in order to keep it simple.
+    vocab = {k: w.index+1 for k, w in w2v_model.vocab.items()}
+    vocab['UNKNOWN'] = DataLoader.UNKNOWN_WORD_IDX
 
     return embeddings.astype('float32'), vocab
 

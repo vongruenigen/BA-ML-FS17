@@ -12,6 +12,7 @@ import utils
 import os
 import json
 import sys
+import logger
 
 from model import Model
 from config import Config
@@ -34,6 +35,8 @@ class Runner(object):
             self.cfg = cfg_path
         else:
             raise Exception('cfg_path must be either a path or a Config object')
+
+        logger.init_logger(self.cfg)
 
         self.__prepare_summary_writers()
         self.__prepare_results_directory()
@@ -72,36 +75,30 @@ class Runner(object):
                 for epoch in range(self.cfg.get('epochs')):
                     for batch in range(batches_per_epoch+1):
                         batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
-                        import pdb
-                        pdb.set_trace()
                         fd = model.make_train_inputs(batch_data_x, batch_data_y)
 
-                        _, l = session.run([model.train_op, model.loss], fd)
+                        _, loss = session.run([model.train_op, model.loss], fd)
 
-                        sum_losses += l
+                        sum_losses += loss
                         sum_iters += 1
+                        perplexity = np.exp(sum_losses / sum_iters)
                         
-                        loss_track.append(l)
-                        perplexity_track.append(np.exp(sum_losses / sum_iters))
+                        loss_track.append(loss)
+                        perplexity_track.append(perplexity)
 
-                        if batch == 0 or batch % batches_per_epoch == 0:
-                            print('batch {}'.format(batch))
-                            print('  minibatch loss: {}'.format(session.run(model.loss, fd)))
-                            # for i, (e_in, dt_pred) in enumerate(zip(
-                            #         fd[model.encoder_inputs].T,
-                            #         session.run(model.decoder_prediction_train, fd).T
-                            #     )):
-                            #     print('  sample {}:'.format(i + 1))
-                            #     print('    enc input           > {}'.format(e_in))
-                            #     print('    dec train predicted > {}'.format(dt_pred))
-                            #     if i >= 2:
-                            #         break
-                            # print()
+                        # if batch == 0 or batch % 20 == 0:
+                        #     logger.info('batch (%i) of size %i' % (batch, len(batch_data_x)))
+                        #     logger.info('  minibatch loss: %f' % loss)
+                        #     logger.info('  minibatch perplexity: %f' % perplexity)
 
-                            # Store model at certain checkpoints
-                            self.__store_model(session, model)
+                    logger.info('after epoch %i' % epoch)
+                    logger.info('  minibatch loss: %f' % loss_track[-1])
+                    logger.info('  minibatch perplexity: %f' % perplexity_track[-1])
+
+                    # Store model after one epoch
+                    self.__store_model(session, model)
             except KeyboardInterrupt:
-                print('training interrupted')
+                logger.warn('training interrupted')
                 # TODO: Save state when the training is interrupted?
 
             self.__store_metrics(loss_track, perplexity_track)
@@ -161,7 +158,7 @@ class Runner(object):
            method.'''
         model_path = self.__get_model_path()
         self.saver.save(session, model_path, global_step=model.get_global_step())
-        print('Current version of the model stored at %s' % model_path)
+        logger.info('Current version of the model stored')
 
     def __store_metrics(self, loss_track, perplexity_track):
         '''This method is responsible for storing the metrics
@@ -187,7 +184,7 @@ class Runner(object):
 
         # Load model if referenced in the config
         if model_path is not None:
-            print('Loading model from the path %s' % model_path)
+            logger.info('Loading model from the path %s' % model_path)
             self.saver.restore(session, self.cfg.get('model_path'))
 
     def __prepare_results_directory(self):

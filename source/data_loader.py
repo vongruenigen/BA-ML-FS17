@@ -8,6 +8,8 @@
 
 import nltk
 import re
+import utils
+import logger
 
 class DataLoader(object):
     '''This class is responsible for loading and preprocessing
@@ -35,28 +37,27 @@ class DataLoader(object):
         self.cfg = cfg
 
     def load_conversations(self, path, vocabulary):
-        '''Loads the conversations at the given path.
-           The files containing the conversations have
-           to obey the correct format described in the
-           module description. As a "unknown" word token,
-           we use the 0.'''
+        '''Loads the conversations and returns a generator which
+           yields one whole conversation with possibly multiple
+           turns.'''
         all_convs = []
         curr_conv = []
         turn_flag = False
 
-        for i, line in enumerate(open(path, 'r')):
-            if line.strip() == self.SPLIT_CONV_SYM:
-                # TODO: How to fix the problem that a conversation of an odd
-                #       number of turns cannot be easily converted to a training sample?
-                if len(curr_conv) % 2 != 0:
-                    del curr_conv[-1]
+        while True:
+            for i, line in enumerate(open(path, 'r')):
+                if line.strip() == self.SPLIT_CONV_SYM:
+                    # TODO: How to fix the problem that a conversation of an odd
+                    #       number of turns cannot be easily converted to a training sample?
+                    if len(curr_conv) % 2 != 0:
+                        del curr_conv[-1]
 
-                yield curr_conv
-                curr_conv = []
-            else:
-                curr_conv.append(self.__convert_line_to_indices(line, vocabulary))
+                    yield curr_conv
+                    curr_conv = []
+                else:
+                    curr_conv.append(self.__convert_line_to_indices(line, vocabulary))
 
-        return all_convs
+            logger.warning('WARNING: Went through all the data, starting from the beginning again!')
 
     def __get_tokenizer(self):
         '''Creates a tokenizer based on the configuration
@@ -74,7 +75,7 @@ class DataLoader(object):
         '''Parses a single line of a conversation and returns
            it as a list of indices.'''
         line_parts = self.__preprocess_and_tokenize_line(line, vocabulary)
-        line_parts = map(lambda w: ocabulary[w] if w in vocabulary else self.UNKNOWN_WORD_IDX,
+        line_parts = map(lambda w: vocabulary[w] if w in vocabulary else self.UNKNOWN_WORD_IDX,
                          line_parts)
 
         # reverse the input in case it's configured
@@ -87,7 +88,7 @@ class DataLoader(object):
         '''Preprocesses a given line (e.g. removes unwanted chars),
            tokenizes it and returns it.'''
         tknz = self.__get_tokenizer()
-        line = re.sub(self.WHITELIST_REGEX, '')
+        line = re.sub(self.WHITELIST_REGEX, '', line)
 
         line_parts = tknz(line)
         line_parts = map(lambda x: x.lower().strip(), line_parts)

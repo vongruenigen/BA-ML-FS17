@@ -8,8 +8,10 @@
 #
 
 import utils
+import logger
 import math
 import tensorflow as tf
+import numpy as np
 
 from tensorflow.contrib import rnn, seq2seq, layers
 
@@ -185,14 +187,13 @@ class Model(object):
            converting an input sequence to a sequence-matrix with the
            given vector embeddings.'''
         if self.embeddings is None or len(self.embeddings) == 0:
-            print('No embeddings given, initializing random embeddings')
-
-            initializer = tf.random_uniform_initializer(-1, 1)
+            logger.info('No embeddings given, initializing random embeddings')
 
             self.embeddings = tf.get_variable(
                 name='embeddings',
-                shape=[self.cfg.get('max_vocabulary_size'), 10],
-                initializer=initializer,
+                shape=[self.cfg.get('max_vocabulary_size'),
+                       self.cfg.get('max_random_embeddings_size')],
+                initializer=tf.random_uniform_initializer(-1, 1),
                 dtype=tf.float32
             )
 
@@ -334,7 +335,9 @@ class Model(object):
            already loaded, otherwise an error is thrown.'''
         embs = self.get_embeddings()
 
-        if embs is None or len(embs) == 0:
-            raise Exception('embeddings must be set via set_embeddings()')
+        if embs is None:
+            raise Exception('no embeddings set via set_embeddings() before calling __get_vocab_size()')
+        elif isinstance(embs, tf.Variable):
+            return embs.get_shape()[0].value
         else:
             return embs.shape[0]

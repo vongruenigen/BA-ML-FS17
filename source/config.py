@@ -16,6 +16,7 @@ class Config(object):
 
     # Path constants
     ROOT_PATH    = path.realpath(path.join(path.dirname(__file__), '..'))
+    LOGS_PATH    = path.join(ROOT_PATH, 'logs')
     DATA_PATH    = path.join(ROOT_PATH, 'data')
     CONFIG_PATH  = path.join(ROOT_PATH, 'configs')
     RESULTS_PATH = path.join(ROOT_PATH, 'results')
@@ -47,7 +48,7 @@ class Config(object):
         'epochs': 1,
 
         # Batch size which will be used when training
-        'batch_size': 16,
+        'batch_size': 8,
 
         # Defines how much batches will be considered per epoch.
         'batches_per_epoch': 100,
@@ -58,7 +59,7 @@ class Config(object):
         'num_decoder_layers': 1,
 
         # Number of hidden units in each of the layers in each cell
-        'num_hidden_units': 1,
+        'num_hidden_units': 100,
 
         # Defines the cell type which will be used, either 'RNN', 'LSTM' or 'GRU'
         'cell_type': 'LSTM',
@@ -94,7 +95,10 @@ class Config(object):
 
         # Defines how much words should be considered in the vocabulary
         # in case no embeddings are provided.
-        'max_vocabulary_size': 5*10e5,
+        'max_vocabulary_size': 10000,
+
+        # Defines how much dimensions should be used when using random embeddings.
+        'max_random_embeddings_size': 10,
 
         # Defines the optimizer and the hyperparameters to use
         'optimizer_name': 'AdaDelta',
