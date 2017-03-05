@@ -5,6 +5,7 @@
 #
 
 import numpy as np
+import pickle
 
 from os import path
 from gensim.models import Word2Vec
@@ -40,6 +41,19 @@ def load_ft_embeddings(path):
        the embedding matrix as a numpy ndarray and the vocabulary as
        a dict object.'''
     raise Exception('Loading of ft embeddings is not implemented yet!')
+
+def load_vocabulary(path):
+    '''Loads the vocabulary at the given path. The specification the
+       vocabulary has to obey can be found in the description of the
+       params in the Config class.'''
+    with open(path, 'rb') as f:
+        return pickle.load(f)
+
+def reverse_vocabulary(vocabulary):
+    '''Reverses the vocabulary in the sense, that the keys of the new
+       one will be the indices and the values are the words. This is
+       used to convert a list of indices to the respective sentence.'''
+    return {v: k for k, v in vocabulary.items()}
 
 def batch(inputs, max_sequence_length=None):
     '''Taks a list of inputs and converts them into a data batch which
