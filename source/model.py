@@ -194,7 +194,8 @@ class Model(object):
                 shape=[self.cfg.get('max_vocabulary_size'),
                        self.cfg.get('max_random_embeddings_size')],
                 initializer=tf.random_uniform_initializer(-1, 1),
-                dtype=tf.float32
+                dtype=tf.float32,
+                trainable=False
             )
 
         self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
@@ -209,6 +210,7 @@ class Model(object):
                 inputs=self.encoder_inputs_embedded,
                 sequence_length=self.encoder_inputs_length,
                 time_major=True,
+                swap_memory=True,
                 dtype=tf.float32
             )
 
@@ -223,6 +225,7 @@ class Model(object):
                 inputs=self.encoder_inputs_embedded,
                 sequence_length=self.encoder_inputs_length,
                 time_major=True,
+                swap_memory=True,
                 dtype=tf.float32
             )
 
@@ -328,7 +331,9 @@ class Model(object):
 
         self.loss = seq2seq.sequence_loss(logits=logits, targets=targets,
                                           weights=self.loss_weights)
-        self.train_op = tf.train.AdamOptimizer().minimize(self.loss, global_step=self.global_step)
+        self.train_op = tf.train.AdadeltaOptimizer(
+            learning_rate=1.0, rho=0.95, epsilon=1e-6
+        ).minimize(self.loss, global_step=self.global_step)
 
     def __get_vocab_size(self):
         '''Returns the size of the vocabulary if the embeddings are

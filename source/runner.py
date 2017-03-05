@@ -76,10 +76,7 @@ class Runner(object):
                     for batch in range(batches_per_epoch+1):
                         batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
 
-                        logger.error('LENGTH BATCH %i' % len(batch_data_x))
-
                         fd = model.make_train_inputs(batch_data_x, batch_data_y)
-
                         _, loss = session.run([model.train_op, model.loss], fd)
 
                         sum_losses += loss
@@ -89,10 +86,25 @@ class Runner(object):
                         loss_track.append(loss)
                         perplexity_track.append(perplexity)
 
-                        # if batch == 0 or batch % 20 == 0:
-                        #     logger.info('batch (%i) of size %i' % (batch, len(batch_data_x)))
-                        #     logger.info('  minibatch loss: %f' % loss)
-                        #     logger.info('  minibatch perplexity: %f' % perplexity)
+                        if self.cfg.get('show_predictions_while_training'):
+                            for i, (e_in, dt_exp, dt_pred) in enumerate(zip(
+                                fd[model.encoder_inputs].T,
+                                fd[model.decoder_targets].T,
+                                session.run(model.decoder_prediction_train, fd).T
+                            )):
+                                print('  sample {}:'.format(i + 1))
+
+                                text_in = self.data_loader.convert_indices_to_text(e_in, self.rev_vocabulary)
+                                text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
+                                text_out = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
+
+                                print('    input       > %s' % text_in)
+                                print('    prediction  > %s' % text_out)
+                                print('    expected    > %s' % text_exp)
+                                
+                                # don't show more than three samples per epoch
+                                if i >= 2: break
+                            print()
 
                     logger.info('after epoch %i' % epoch)
                     logger.info('  minibatch loss: %f' % loss_track[-1])
@@ -110,7 +122,14 @@ class Runner(object):
     def test(self):
         '''This method is responsible for evaluating a trained
            model with the settings defined in the config.'''
-        with self.__with_model() as model:
+        with self.__with_model() as (session, model):
+            pass
+
+    def inference(self, texts):
+        '''This method is responsible for doing inference on
+           a list of texts. It returns a single answer from the
+           machine.'''
+        with self.__with_model() as (session, model):
             pass
 
     @contextlib.contextmanager
@@ -254,11 +273,18 @@ class Runner(object):
             conversation = next(all_data)
 
             for i, conv_turn in enumerate(conversation):
-                if i >= self.cfg.get('batch_size'): # we MUST cancel here, otherwise we might get OOM problems
+                # we MUST cancel here, otherwise we might get OOM problems
+                if i >= self.cfg.get('batch_size'):
                     break
-                elif (i % 2) == 0:
+   
+                # train on copy if it is configured to do so
+                if self.cfg.get('train_on_copy'):
                     data_batch_x.append(conv_turn)
-                else:
                     data_batch_y.append(conv_turn)
+                else:
+                    if (i % 2) == 0:
+                        data_batch_x.append(conv_turn)
+                    else:
+                        data_batch_y.append(conv_turn)
 
         return data_batch_x, data_batch_y

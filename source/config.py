@@ -51,10 +51,15 @@ class Config(object):
         'epochs': 1,
 
         # Batch size which will be used when training
-        'batch_size': 8,
+        'batch_size': 1,
 
         # Defines how much batches will be considered per epoch.
-        'batches_per_epoch': 100,
+        'batches_per_epoch': 1000,
+
+        # Defines wether we should train on actual sequence learning or rather
+        # just learn to copy the input sequences to the output. This flag can
+        # be used to debug the model and see if it still works as expected.
+        'train_on_copy': False,
 
         # Number of layers (or cells) in the encoder/decoder
         # parts of the network
@@ -70,6 +75,10 @@ class Config(object):
         # Defines the used vocabulary. This has to be a pickle file containing
         # a dictionary which maps words to indices in the embeddings matrix.
         'vocabulary': None,
+
+        # Defines wether there should be examples printed to the console
+        # of the input and respective output of the model as clear text.
+        'show_predictions_while_training': False,
 
         # Defines the path to the word2vec embeddings to load (if used)
         'w2v_embeddings': None,

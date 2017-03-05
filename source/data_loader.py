@@ -57,7 +57,17 @@ class DataLoader(object):
                     yield curr_conv
                     curr_conv = []
                 else:
-                    curr_conv.append(self.__convert_line_to_indices(line, vocabulary))
+                    text_indices = self.convert_text_to_indices(line, vocabulary)
+
+                    # reverse the input in case it's configured
+                    if self.cfg.get('reverse_input'):
+                        text_indices = reversed(text_indices)
+
+                    # shorten the text in case it's longer than configured to be allowed to
+                    if len(text_indices) > self.cfg.get('max_input_length'):
+                        text_indices = text_indices[:self.cfg.get('max_input_length')]
+
+                    curr_conv.append(text_indices)
 
             logger.warn('WARNING: Went through all the data, starting from the beginning again!')
 
@@ -73,23 +83,31 @@ class DataLoader(object):
         else:
             raise Exception('unknown tokenizer %s set in configuration' % tokenizer_name)
 
-    def __convert_line_to_indices(self, line, vocabulary):
-        '''Parses a single line of a conversation and returns
-           it as a list of indices.'''
+    def convert_text_to_indices(self, line, vocabulary):
+        '''Converts a text to the respective list of indices
+           by using the vocabulary dictionary.'''
         line_parts = self.__preprocess_and_tokenize_line(line, vocabulary)
         line_parts = map(lambda w: vocabulary[w] if w in vocabulary else Config.UNKNOWN_WORD_IDX,
                          line_parts)
 
-        # reverse the input in case it's configured
-        if self.cfg.get('reverse_input'):
-            line_parts = reversed(line_parts)
+        return list(line_parts)
 
-        line_parts = list(line_parts)
+    def convert_indices_to_text(self, text_idxs, rev_vocabulary):
+        '''Converts a list of indices to the respective texts
+           by using the vocabulary dictionary. Note that this
+           function expects a reversed version of the vocabulary
+           used to encode the text via convert_text_to_indices().'''
+        shortened_idxs = []
 
-        if len(line_parts) > self.cfg.get('max_input_length'):
-            line_parts = line_parts[:self.cfg.get('max_input_length')]
+        # Let's remove the padded <unknown> words before converting
+        # the indices into text again.
+        for idx in reversed(text_idxs):
+            if idx == Config.UNKNOWN_WORD_IDX and len(shortened_idxs) == 0:
+                continue
+            else:
+                shortened_idxs.append(idx)
 
-        return line_parts
+        return ' '.join(map(lambda x: rev_vocabulary[x], reversed(shortened_idxs)))
 
     def __preprocess_and_tokenize_line(self, line, vocabulary):
         '''Preprocesses a given line (e.g. removes unwanted chars),
