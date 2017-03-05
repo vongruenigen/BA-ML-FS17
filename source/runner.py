@@ -213,11 +213,21 @@ class Runner(object):
            and saves them for later usage in the DataLoader and
            while training/testing.'''
         if self.cfg.get('w2v_embeddings'):
-            self.embeddings, self.vocabulary = utils.load_w2v_embeddings(self.cfg.get('w2v_embeddings'))
+            self.embeddings = utils.load_w2v_embeddings(self.cfg.get('w2v_embeddings'))
         elif self.cfg.get('ft_embeddings'):
-            self.embeddings, self.vocabulary = utils.load_w2v_embeddings(self.cfg.get('ft_embeddings'))
+            self.embeddingsy = utils.load_ft_embeddings(self.cfg.get('ft_embeddings'))
         else:
-            self.embeddings, self.vocabulary = None, {}
+            self.embeddings = None
+
+        self.vocabulary = utils.load_vocabulary(self.cfg.get('vocabulary'))
+
+        # Prepare the vocabulary and embeddings (e.g. add embedding for unknown words)
+        self.embeddings, self.vocabulary = utils.prepare_embeddings_and_vocabulary(
+            self.embeddings, self.vocabulary
+        )
+
+        # revert the vocabulary for the idx -> text usages
+        self.rev_vocabulary = utils.reverse_vocabulary(self.vocabulary)
 
     def __get_model_path(self, version=0):
         '''Returns the path to store the model at as a string. An

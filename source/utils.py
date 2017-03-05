@@ -11,30 +11,12 @@ from os import path
 from gensim.models import Word2Vec
 from config import Config
 
-def __add_unknown_word_embedding(embs):
-    '''Helper function which adds a column for the embedding
-       of the unknown word.'''
-    embedding_for_unknown = np.random.uniform(-1.0, 1.0, size=(1, embs.shape[1]))
-
-    return np.vstack([embedding_for_unknown, embs])
-
 def load_w2v_embeddings(path):
     '''Loads the word2vec embeddings at the given path. It returns
        the embedding matrix as a numpy ndarray and the vocabulary as
        a dict object.'''
     w2v_model = Word2Vec.load(path)
-
-    embeddings = w2v_model.syn0
-    embeddings = __add_unknown_word_embedding(embeddings)
-
-    # NOTE: The +1 when setting the index comes from the fact
-    #       that the embedding for the unknown word will be
-    #       inserted as the first row of the embeddings matrix
-    #       in order to keep it simple.
-    vocab = {k: w.index+1 for k, w in w2v_model.vocab.items()}
-    vocab['UNKNOWN'] = Config.UNKNOWN_WORD_IDX
-
-    return embeddings.astype('float32'), vocab
+    return w2v_model.syn0
 
 def load_ft_embeddings(path):
     '''Loads the fastTrack embeddings at the given path. It returns
@@ -54,6 +36,21 @@ def reverse_vocabulary(vocabulary):
        one will be the indices and the values are the words. This is
        used to convert a list of indices to the respective sentence.'''
     return {v: k for k, v in vocabulary.items()}
+
+def prepare_embeddings_and_vocabulary(embeddings, vocabulary):
+    '''Adds an embeddings for an unknown word at the top of the embeddings
+       matrix and updates the vocabulary accordingly.'''
+    unknown_embedding = np.random.uniform(-1.0, 1.0, size=(1, embeddings.shape[1]))
+    embeddings = np.vstack([unknown_embedding, embeddings])
+
+    # NOTE: The +1 when setting the index comes from the fact
+    #       that the embedding for the unknown word will be
+    #       inserted as the first row of the embeddings matrix
+    #       in order to keep it simple.
+    new_vocabulary = {w: idx+1 for w, idx in vocabulary.items()}
+    new_vocabulary['<unknown>'] = Config.UNKNOWN_WORD_IDX
+
+    return embeddings.astype('float32'), new_vocabulary
 
 def batch(inputs, max_sequence_length=None):
     '''Taks a list of inputs and converts them into a data batch which

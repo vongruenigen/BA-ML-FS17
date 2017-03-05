@@ -67,7 +67,8 @@ class Config(object):
         # Defines the cell type which will be used, either 'RNN', 'LSTM' or 'GRU'
         'cell_type': 'LSTM',
 
-        # Defines the used vocabulary
+        # Defines the used vocabulary. This has to be a pickle file containing
+        # a dictionary which maps words to indices in the embeddings matrix.
         'vocabulary': None,
 
         # Defines the path to the word2vec embeddings to load (if used)
@@ -75,6 +76,12 @@ class Config(object):
 
         # Defines the path to the fasttext embeddings to load (if used)
         'ft_embeddings': None,
+
+        # Defines the vocabulary to use. It should be a path to a pickle
+        # file containing the vocabulary as a dict where the keys are the
+        # words and the values the indices of the respecting word in the
+        # embedding matrix.
+        'vocabulary': None,
 
         # Defines wether the used RNN processes the data in both directions
         # (backward/forward) or if it should be unidirectional.
