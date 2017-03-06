@@ -14,6 +14,7 @@ import tensorflow as tf
 import numpy as np
 
 from tensorflow.contrib import rnn, seq2seq, layers
+from config import Config
 
 class Model(object):
     '''Responsible for building the tensorflow graph, i.e.
@@ -28,10 +29,6 @@ class Model(object):
         'GRU': rnn.GRUCell,
         'RNN': rnn.BasicRNNCell
     }
-
-    # Tokens for the PAD and EOS symbols
-    PAD_TOKEN = 0
-    EOS_TOKEN = 1
     
     def __init__(self, cfg):
         '''Constructor for the Model class. It expects only a
@@ -108,13 +105,13 @@ class Model(object):
         self.encoder_cell = self.cell_fn(self.cfg.get('num_hidden_units'))
         self.decoder_cell = self.cell_fn(self.cfg.get('num_hidden_units'))
 
-        def wrap_droput(cell):
+        def wrap_dropout(cell):
             return rnn.DropoutWrapper(cell, input_keep_prob=self.cfg.get('dropout_input_keep'),
                                       output_keep_prob=self.cfg.get('dropout_output_keep'))
 
         if self.cfg.get('dropout_input_keep') < 1.0 or self.cfg.get('dropout_output_keep') < 1.0:
-            self.encoder_cell = wrap_droput(self.encoder_cell)
-            self.decoder_cell = wrap_droput(self.decoder_cell)
+            self.encoder_cell = wrap_dropout(self.encoder_cell)
+            self.decoder_cell = wrap_dropout(self.decoder_cell)
 
         if self.cfg.get('num_encoder_layers') > 1:
             self.encoder_cell = [self.encoder_cell] * self.cfg.get('num_encoder_layers')
@@ -158,8 +155,8 @@ class Model(object):
         with tf.name_scope('decoder_train_feeds'):
             seq_size, batch_size = tf.unstack(tf.shape(self.decoder_targets))
 
-            EOS_SLICE = tf.ones([1, batch_size], dtype=tf.int32) * self.EOS_TOKEN
-            PAD_SLICE = tf.ones([1, batch_size], dtype=tf.int32) * self.PAD_TOKEN
+            EOS_SLICE = tf.ones([1, batch_size], dtype=tf.int32) * Config.EOS_WORD_IDX
+            PAD_SLICE = tf.ones([1, batch_size], dtype=tf.int32) * Config.PAD_WORD_IDX
 
             self.decoder_train_inputs = tf.concat([EOS_SLICE, self.decoder_targets], axis=0)
             self.decoder_train_length = self.decoder_targets_length + 1
@@ -168,8 +165,8 @@ class Model(object):
             decoder_train_targets_seq_len, _ = tf.unstack(tf.shape(decoder_train_targets))
             decoder_train_targets_eos_mask = tf.one_hot(self.decoder_train_length - 1,
                                                         decoder_train_targets_seq_len,
-                                                        on_value=self.EOS_TOKEN,
-                                                        off_value=self.PAD_TOKEN,
+                                                        on_value=Config.EOS_WORD_IDX,
+                                                        off_value=Config.PAD_WORD_IDX,
                                                         dtype=tf.int32)
 
             decoder_train_targets_eos_mask = tf.transpose(decoder_train_targets_eos_mask, [1, 0])
@@ -245,7 +242,8 @@ class Model(object):
                 self.encoder_state = rnn.LSTMStateTuple(c=encoder_state_c, h=encoder_state_h)
 
             elif isinstance(encoder_fw_state, tf.Tensor):
-                self.encoder_state = tf.concat((encoder_fw_state, encoder_bw_state), 1, name='bidirectional_concat')
+                self.encoder_state = tf.concat((encoder_fw_state, encoder_bw_state), 1,
+                                               name='bidirectional_concat')
 
     def __init_decoder(self):
         '''Initializes the decoder part of the model.'''
@@ -279,8 +277,8 @@ class Model(object):
                     attention_score_fn=attention_score_fn,
                     attention_construct_fn=attention_construct_fn,
                     embeddings=self.embeddings,
-                    start_of_sequence_id=self.EOS_TOKEN,
-                    end_of_sequence_id=self.EOS_TOKEN,
+                    start_of_sequence_id=Config.EOS_WORD_IDX,
+                    end_of_sequence_id=Config.EOS_WORD_IDX,
                     maximum_length=tf.reduce_max(self.encoder_inputs_length) + 3,
                     num_decoder_symbols=self.__get_vocab_size()                    
                 )
@@ -290,8 +288,8 @@ class Model(object):
                     output_fn=output_fn,
                     encoder_state=self.encoder_state,
                     embeddings=self.embeddings,
-                    start_of_sequence_id=self.EOS_TOKEN,
-                    end_of_sequence_id=self.EOS_TOKEN,
+                    start_of_sequence_id=Config.EOS_WORD_IDX,
+                    end_of_sequence_id=Config.EOS_WORD_IDX,
                     maximum_length=tf.reduce_max(self.encoder_inputs_length) + 3,
                     num_decoder_symbols=self.__get_vocab_size()
                 )
@@ -325,15 +323,48 @@ class Model(object):
         '''Initializes the optimizer which should be used for the training.'''
         logits = tf.transpose(self.decoder_logits_train, [1, 0, 2])
         targets = tf.transpose(self.decoder_train_targets, [1, 0])
+        softmax_loss_fn = None
+
+        # If there are more words than configured in 'max_vocabulary_size',
+        # we start using sampled softmax, otherwise the training process won't
+        # fit on a single GPU without problems.
+        if self.__get_vocab_size() > self.cfg.get('max_vocabulary_size'):
+            max_vocabulary_size = self.cfg.get('max_vocabulary_size')
+            num_hidden_units = self.cfg.get('num_hidden_units')
+            num_sampled = self.cfg.get('sampled_softmax_number_of_samples')
+            
+            w_t = tf.get_variable('out_proj_w', [max_vocabulary_size, num_hidden_units], dtype=tf.float32)
+            w   = tf.transpose(w_t)
+            b   = tf.get_variable('out_proj_b', [max_vocabulary_size], dtype=tf.float32)
+
+            def sampled_softmax_loss(labels, inputs):
+              labels = tf.reshape(labels, [-1, 1])
+
+              # We need to compute the sampled_softmax_loss using 32bit floats to
+              # avoid numerical instabilities.
+              local_w_t = tf.cast(w_t, tf.float32)
+              local_b = tf.cast(b, tf.float32)
+              local_inputs = tf.cast(inputs, tf.float32)
+
+              return tf.cast(
+                  tf.nn.sampled_softmax_loss(
+                      weights=local_w_t,
+                      biases=local_b,
+                      labels=labels,
+                      inputs=local_inputs,
+                      num_sampled=num_sampled,
+                      num_classes=max_vocabulary_size))
+
+            softmax_loss_fn = sampled_softmax_loss
 
         # Track the global step state when training
         self.global_step = tf.Variable(0, name='global_step', trainable=False)
 
         self.loss = seq2seq.sequence_loss(logits=logits, targets=targets,
-                                          weights=self.loss_weights)
-        self.train_op = tf.train.AdadeltaOptimizer(
-            learning_rate=1.0, rho=0.95, epsilon=1e-6
-        ).minimize(self.loss, global_step=self.global_step)
+                                          weights=self.loss_weights,
+                                          softmax_loss_function=softmax_loss_fn)
+
+        self.train_op = tf.train.AdadeltaOptimizer().minimize(self.loss, global_step=self.global_step)
 
     def __get_vocab_size(self):
         '''Returns the size of the vocabulary if the embeddings are

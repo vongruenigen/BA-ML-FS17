@@ -97,12 +97,13 @@ class DataLoader(object):
            by using the vocabulary dictionary. Note that this
            function expects a reversed version of the vocabulary
            used to encode the text via convert_text_to_indices().'''
+        skip_idxs = [Config.UNKNOWN_WORD_IDX, Config.PAD_WORD_IDX, Config.EOS_WORD_IDX]
         shortened_idxs = []
 
         # Let's remove the padded <unknown> words before converting
         # the indices into text again.
         for idx in reversed(text_idxs):
-            if idx == Config.UNKNOWN_WORD_IDX and len(shortened_idxs) == 0:
+            if idx in skip_idxs and len(shortened_idxs) == 0:
                 continue
             else:
                 shortened_idxs.append(idx)

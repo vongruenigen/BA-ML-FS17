@@ -22,7 +22,12 @@ class Config(object):
     RESULTS_PATH = path.join(ROOT_PATH, 'results')
 
     # Vocabulary constants
-    UNKNOWN_WORD_IDX = 0
+    UNKNOWN_WORD_IDX   = 0
+    UNKNOWN_WORD_TOKEN = '<unknown>'
+    PAD_WORD_IDX       = 1
+    PAD_WORD_TOKEN     = '<pad>'
+    EOS_WORD_IDX       = 2
+    EOS_WORD_TOKEN     = '<eos>'
 
     # Contains the defaults which are applied in case any config
     # parameter is missing. ALL parameters should have an entry
@@ -67,7 +72,7 @@ class Config(object):
         'num_decoder_layers': 1,
 
         # Number of hidden units in each of the layers in each cell
-        'num_hidden_units': 100,
+        'num_hidden_units': 1000,
 
         # Defines the cell type which will be used, either 'RNN', 'LSTM' or 'GRU'
         'cell_type': 'LSTM',
@@ -115,6 +120,11 @@ class Config(object):
         # Defines how much words should be considered in the vocabulary
         # in case no embeddings are provided.
         'max_vocabulary_size': 10000,
+
+        # Defines how much words should be samples when using samples softmax.
+        # The sampled softmax is only used if the number of words in the vocabulary
+        # exceeds the value in 'max_vocabulary_size'.
+        'sampled_softmax_number_of_samples': 10000,
 
         # Defines how much dimensions should be used when using random embeddings.
         'max_random_embeddings_size': 10,
