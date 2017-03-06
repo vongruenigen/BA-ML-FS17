@@ -1,4 +1,7 @@
 fasttext==0.8.3
-numpy==1.12.0
-tensorflow==1.0.0
 gensim==1.0.0
+numpy==1.12.0
+six==1.10.0
+tensorflow==1.0.0
+nltk==3.2.2
+tqdm==4.11.2
