@@ -6,15 +6,13 @@
 
 import sys
 import logging
-import tensorflow as tf
 
 from os import path
 from config import Config
 
-LOGGER_NAME = 'BA-ML-FS17'
+LOGGER_NAME = 'multimodel'
 LOGGER_FORMAT = '[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s'
-LOGFILE_PATH = path.join(Config.LOGS_PATH, 'ba-ml-fs17.log')
-TF_LOGFILE_PATH = path.join(Config.LOGS_PATH, 'tf.log')
+LOGFILE_PATH = path.join(Config.LOGS_PATH, 'multimodel.log')
 
 mod = sys.modules[__name__]
 mod.logger = None
@@ -56,7 +54,6 @@ def init_logger(cfg):
 
     stream_handler = logging.StreamHandler(sys.stdout)
     file_handler = logging.FileHandler(LOGFILE_PATH)
-    tf_file_handler = logging.FileHandler(TF_LOGFILE_PATH)
 
     stream_handler.setFormatter(formatter)
     file_handler.setFormatter(formatter)
@@ -64,5 +61,3 @@ def init_logger(cfg):
 
     mod.logger.addHandler(file_handler)
     mod.logger.addHandler(stream_handler)
-
-    tf.logging._logger.addHandler(tf_file_handler)
