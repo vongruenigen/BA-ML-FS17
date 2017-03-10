@@ -5,20 +5,21 @@
 #              and running of a given model.
 #
 
+import sys
+import os
 import tensorflow as tf
 import numpy as np
 import contextlib
 import utils
-import os
 import json
-import sys
 import logger
 import tqdm
 
-from model import Model
-from config import Config
 from os import path
+from config import Config
 from data_loader import DataLoader
+from model import Base
+from seq2seq import Seq2Seq
 
 class Runner(object):
     '''This class is responsible for the training,
@@ -41,7 +42,7 @@ class Runner(object):
 
         self.__prepare_summary_writers()
         self.__prepare_results_directory()
-        self.__load_embeddings()
+        self.__load_embeddings_and_vocabulary()
 
         self.data_loader = DataLoader(self.cfg)
 
@@ -86,7 +87,7 @@ class Runner(object):
                                        vocab_lower=vocab_lower, vocab_upper=vocab_upper,
                                        batch_size=batch_size)
 
-            # training_batches = batches
+            training_batches = batches
 
             try:
                 for epoch in range(self.cfg.get('epochs')):
@@ -96,10 +97,23 @@ class Runner(object):
                     logger.info('[Starting epoch #%i]' % epoch_nr)
                     
                     for batch in tqdm.tqdm(range(batches_per_epoch+1)):
+                        # Prepare the training data
                         batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
-
                         feed_dict = model.make_train_inputs(batch_data_x, batch_data_x)
-                        _, loss = session.run([model.train_op, model.loss], feed_dict)
+                        
+                        metric_ops_dict = model.get_metric_ops()
+                        metric_names = list(metric_ops_dict.keys())
+                        metric_ops = [metric_ops_dict[n] for n in metric_names]
+
+                        all_ops = [model.get_train_op()] + metric_ops
+                        results = session.run(all_ops, feed_dict)
+
+                        results.pop(0) # don't need the result from the training op
+
+                        metrics_results = {metric_names[i]: results[i] for i, x in enumerate(metric_names)}
+
+                        import pdb
+                        pdb.set_trace()
 
                         sum_losses += loss
                         sum_iters += 1
@@ -117,7 +131,7 @@ class Runner(object):
                         for i, (e_in, dt_exp, dt_pred) in enumerate(zip(
                             feed_dict[model.encoder_inputs].T,
                             feed_dict[model.decoder_targets].T,
-                            session.run(model.decoder_prediction_train, feed_dict).T
+                            session.run(model.get_inference_op(), feed_dict).T
                         )):
                             # NOTE: WTF do we have to subtract one?!
                             dt_pred = list(map(lambda x: x - 1, dt_pred))
@@ -132,7 +146,7 @@ class Runner(object):
                             logger.info('    Expected   > %s' % text_exp)
                             
                             # don't show more than three samples per epoch
-                            if i >= 2:break
+                            if i >= 2: break
 
                     # Store model after one epoch
                     self.__store_model(session, model, epoch_nr)
@@ -168,17 +182,10 @@ class Runner(object):
            or inference.'''
         with tf.device(self.__get_device()):
             with self.__with_tf_session() as session:
-                model = Model(self.cfg)
+                model = Seq2Seq(self.cfg, session)
 
-                # Set the embeddings after creating a new instance of the model...
-                model.set_embeddings(self.embeddings)
-
-                # ..and build it afterwards
+                # Build and initialize the graph
                 model.build()
-
-                # We need to initialize all the stuff setup when creating
-                # the model instance. Otherwise we might get nasty error
-                # messages regarding uninitialized variables.
                 session.run(tf.global_variables_initializer())
 
                 yield (session, model)
@@ -229,14 +236,13 @@ class Runner(object):
         '''Sets up the Saver which is used to store the model state after
            training. It also loads a previous model if referenced in the
            current configuration.'''
-        model_path = self.cfg.get('model_path')
-            
         self.saver = tf.train.Saver(max_to_keep=self.cfg.get('checkpoint_max_to_keep'))
+        model_path = self.cfg.get('model_path')
 
         # Load model if referenced in the config
         if model_path is not None:
             logger.info('Loading model from the path %s' % model_path)
-            self.saver.restore(session, self.cfg.get('model_path'))
+            self.saver.restore(session, model_path)
 
     def __prepare_results_directory(self):
         '''This method is responsible for preparing the results
@@ -256,27 +262,32 @@ class Runner(object):
         # TODO
         pass
 
-    def __load_embeddings(self):
+    def __load_embeddings_and_vocabulary(self):
         '''Loads the embeddings with the associated vocabulary
            and saves them for later usage in the DataLoader and
            while training/testing.'''
+        if self.cfg.get('vocabulary') is None:
+            # Build a stub dictionary which maps integers to integers for the defined range
+            self.vocabulary = {x: x for x in range(self.cfg.get('max_vocabulary_size'))}
+        else:
+            self.vocabulary = utils.load_vocabulary(self.cfg.get('vocabulary'))
+
         if self.cfg.get('w2v_embeddings'):
             self.embeddings = utils.load_w2v_embeddings(self.cfg.get('w2v_embeddings'))
         elif self.cfg.get('ft_embeddings'):
             self.embeddingsy = utils.load_ft_embeddings(self.cfg.get('ft_embeddings'))
         else:
-            self.embeddings = np.random.uniform(
-                -1.0, 1.0,
-                size=(self.cfg.get('max_vocabulary_size'),
-                      self.cfg.get('max_random_embeddings_size'))
-            )
-
-        self.vocabulary = utils.load_vocabulary(self.cfg.get('vocabulary'))
+            self.embeddings = np.random.uniform(-1.0, 1.0, size=(len(self.vocabulary),
+                                                self.cfg.get('max_random_embeddings_size')))
 
         # Prepare the vocabulary and embeddings (e.g. add embedding for unknown words)
         self.embeddings, self.vocabulary = utils.prepare_embeddings_and_vocabulary(
             self.embeddings, self.vocabulary
         )
+
+        # Store the embeddings and vocabulary in the 
+        self.cfg.set('embeddings', self.embeddings)
+        self.cfg.set('vocabulary', self.vocabulary)
 
         # revert the vocabulary for the idx -> text usages
         self.rev_vocabulary = utils.reverse_vocabulary(self.vocabulary)

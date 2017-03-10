@@ -9,7 +9,7 @@ import sys
 
 from os import path
 
-SOURCE_PATH = path.realpath(path.join(path.dirname(__file__), '..', 'source'))
+SOURCE_PATH = path.realpath(path.join(path.dirname(__file__), '..', 'multimodel'))
 
 def expand_import_path_to_source():
     '''This method ensures that, when called, we can import modules

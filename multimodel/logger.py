@@ -20,25 +20,34 @@ mod = sys.modules[__name__]
 mod.logger = None
 
 def log(lvl, msg):
+    '''Logs the given message with the given level.'''
     if mod.logger is None:
         raise Exception('init_logger() must be called one time before any logging can be done')
+
     mod.logger.log(lvl, msg)
  
 def info(msg):
+    '''Logs the given message with the level info.'''
     log(logging.INFO, msg)
 
 def warn(msg):
+    '''Logs the given message with the level warn.'''
     log(logging.WARN, msg)
 
 def error(msg):
+    '''Logs the given message with the level error.'''
     log(logging.ERROR, msg)
 
 def fatal(msg, exit_code=2):
-    print('--- !!! FATAL ERROR !!! ---')
-    print(msg)
+    '''Logs the given message and terminates the program
+       and returns the given exit code.'''
+    error('--- !!! FATAL ERROR !!! ---')
+    error(msg)
     sys.exit(exit_code)
 
 def init_logger(cfg):
+    '''Initializes the logger. This function has to be called
+       before using any of the other logging functions.'''
     level = logging.DEBUG if cfg.get('debug') else logging.INFO
     formatter = logging.Formatter(LOGGER_FORMAT)
 

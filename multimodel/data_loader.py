@@ -103,7 +103,7 @@ class DataLoader(object):
         # Let's remove the padded <unknown> words before converting
         # the indices into text again.
         for idx in reversed(text_idxs):
-            if idx in skip_idxs and len(shortened_idxs) == 0:
+            if idx in skip_idxs:
                 continue
             else:
                 shortened_idxs.append(idx)

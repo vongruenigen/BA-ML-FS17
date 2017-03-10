@@ -16,6 +16,8 @@ import numpy as np
 from tensorflow.contrib import rnn, seq2seq, layers
 from config import Config
 
+from models import Seq2Seq
+
 class Model(object):
     '''Responsible for building the tensorflow graph, i.e.
        setting up the network so that it can be used by the

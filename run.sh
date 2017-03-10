@@ -3,4 +3,5 @@
 # Filter annoying tf logging messages ...
 export TF_CPP_MIN_LOG_LEVEL=2
 
-python 'source/run.py' $@
+# Add our multimodel project to the pythonpath
+PYTOHNPATH=``pwd`` python 'multimodel/run.py' $@

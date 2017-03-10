@@ -91,6 +91,14 @@ class Config(object):
         # Defines the path to the fasttext embeddings to load (if used)
         'ft_embeddings': None,
 
+        # The embeddings can be set in the config to pass it to the model.
+        # However, it cannot be set via the JSON config and is only availabe
+        # after loading the embeddings.
+        'embeddings': None,
+
+        # The vocabulary will be set when the embeddings are loaded.
+        'vocabulary': None, 
+
         # Defines the vocabulary to use. It should be a path to a pickle
         # file containing the vocabulary as a dict where the keys are the
         # words and the values the indices of the respecting word in the
@@ -163,7 +171,18 @@ class Config(object):
 
         # Defines the maximum allowed length of the input sentences. Longer inputs
         # will be reduced to this maximum.
-        'max_input_length': 100
+        'max_input_length': 100,
+
+        # Defines the standard deviation which should be used when randomly applying
+        # time-dependent gradient noise as seen in: https://arxiv.org/pdf/1511.06807.pdf.
+        # Defaults to zero, which is the same as not applying any noise.
+        'gradient_noise_stddev': 0.0,
+
+        # Defines the max values the gradients will be clipped to if neccessary.
+        'gradient_clipping_norm': 10.0,
+
+        # Configuration specific to the seq2seq model.
+        'seq2seq': {}
     }
 
     def __init__(self, cfg_obj={}):
