@@ -113,7 +113,7 @@ class DataLoader(object):
             else:
                 shortened_idxs.append(idx)
 
-        return ' '.join(map(lambda x: rev_vocabulary[x], reversed(shortened_idxs)))
+        return ' '.join(map(lambda x: str(rev_vocabulary[x]), reversed(shortened_idxs)))
 
     def __preprocess_and_tokenize_line(self, line, vocabulary):
         '''Preprocesses a given line (e.g. removes unwanted chars),

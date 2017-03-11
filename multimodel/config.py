@@ -86,6 +86,10 @@ class Config(object):
         # of the input and respective output of the model as clear text.
         'show_predictions_while_training': False,
 
+        # Defines wether a list of indices or real text should be shown
+        # when showing the predictions while training.
+        'show_text_when_showing_predictions': True,
+
         # Defines the path to the word2vec embeddings to load (if used)
         'w2v_embeddings': None,
 

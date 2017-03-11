@@ -45,16 +45,16 @@ def prepare_embeddings_and_vocabulary(embeddings, vocabulary):
     pad_emb = np.random.uniform(-1.0, 1.0, size=(1, embeddings.shape[1]))
     eos_emb = np.random.uniform(-1.0, 1.0, size=(1, embeddings.shape[1]))
 
-    # embeddings = np.vstack([unknown_emb, pad_emb, eos_emb, embeddings])
+    embeddings = np.vstack([unknown_emb, pad_emb, eos_emb, embeddings])
 
     # NOTE: The +3 when setting the index comes from the
     #       fact that the embedding for the unknown, eos, pad words
     #       will be inserted as the first row of the embeddings.
     new_vocabulary = {w: idx for w, idx in vocabulary.items()}
 
-    # new_vocabulary[Config.UNKNOWN_WORD_TOKEN] = Config.UNKNOWN_WORD_IDX
-    # new_vocabulary[Config.PAD_WORD_TOKEN] = Config.PAD_WORD_IDX
-    # new_vocabulary[Config.EOS_WORD_TOKEN] = Config.EOS_WORD_IDX
+    new_vocabulary[Config.UNKNOWN_WORD_TOKEN] = Config.UNKNOWN_WORD_IDX
+    new_vocabulary[Config.PAD_WORD_TOKEN] = Config.PAD_WORD_IDX
+    new_vocabulary[Config.EOS_WORD_TOKEN] = Config.EOS_WORD_IDX
 
     return embeddings.astype('float32'), new_vocabulary
 

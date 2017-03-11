@@ -14,6 +14,7 @@ import utils
 import json
 import logger
 import tqdm
+import textwrap
 
 import seq2seq, memn2n
 
@@ -79,7 +80,7 @@ class Runner(object):
             length_from=3
             length_to=50
             vocab_lower=3
-            vocab_upper=20
+            vocab_upper=4
             batch_size=100
             max_batches=5000
             batches_in_epoch=1000
@@ -97,12 +98,13 @@ class Runner(object):
                     feed_dict = {}
 
                     logger.info('[Starting epoch #%i]' % epoch_nr)
+                    print()
                     
-                    for batch in tqdm.tqdm(range(batches_per_epoch+1)):
+                    for batch in tqdm.tqdm(range(batches_per_epoch)):
                         # Prepare the training data
                         batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
                         feed_dict = model.make_train_inputs(batch_data_x, batch_data_y)
-                        
+
                         metric_ops_dict = model.get_metric_ops()
                         metric_names = list(metric_ops_dict.keys())
                         metric_ops = [metric_ops_dict[n] for n in metric_names]
@@ -122,6 +124,7 @@ class Runner(object):
                         perplexity_track.append(perplexity)
                         metrics_track.append(metrics_results)
 
+                    print()
                     self.__print_epoch_state(metrics_track[-1], epoch_nr)
                     self.__show_samples_at_end_of_epoch(model, session, feed_dict, epoch_nr)
 
@@ -302,16 +305,25 @@ class Runner(object):
                 session.run(model.get_inference_op(), feed_dict).T
             )):
                 # NOTE: WTF do we have to subtract one?!
-                dt_pred = list(map(lambda x: x - 1, dt_pred))
+                # dt_pred = list(map(lambda x: x - 3, dt_pred))
 
-                text_in = self.data_loader.convert_indices_to_text(e_in, self.rev_vocabulary)
-                text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
-                text_out = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
+                text_in = ''
+                text_exp = ''
+                text_pred = ''
+
+                if self.cfg.get('show_text_when_showing_predictions'):
+                    text_in = self.data_loader.convert_indices_to_text(e_in, self.rev_vocabulary)
+                    text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
+                    text_pred = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
+                else:
+                    text_in = ', '.join(map(lambda x: str(x), e_in))
+                    text_pred = ', '.join(map(lambda x: str(x), dt_pred))
+                    text_exp = ', '.join(map(lambda x: str(x), dt_pred))
 
                 logger.info('[Sample #%i of epoch #%i]' % (i+1, epoch_nr))
-                logger.info('  Input      > %s' % text_in)
-                logger.info('  Prediction > %s' % text_out)
-                logger.info('  Expected   > %s' % text_exp)
+                logger.info('  Input      > %s' % textwrap.shorten(text_in, width=75))
+                logger.info('  Prediction > %s' % textwrap.shorten(text_pred, width=75))
+                logger.info('  Expected   > %s' % textwrap.shorten(text_exp, width=75))
                 
                 # don't show more than three samples per epoch
                 if i >= 2: break

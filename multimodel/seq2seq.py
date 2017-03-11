@@ -50,7 +50,7 @@ class Seq2Seq(model.Base):
         return {'loss': self._loss, 'perplexity': self._perplexity}
 
     def get_inference_op(self):
-        return self._inference_op
+        return self.decoder_prediction_train
 
     def build(self):
         '''Builds sequence-to-sequence model.'''
@@ -176,7 +176,7 @@ class Seq2Seq(model.Base):
         self.embeddings = self.cfg.get('embeddings')
 
         if self.embeddings is None or len(self.embeddings) == 0:
-            loggre.fatal('No embeddings set in the config, should have been '
+            logger.fatal('No embeddings set in the config, should have been '
                          'randomly initialized by the Runner?')
 
         self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
@@ -191,7 +191,6 @@ class Seq2Seq(model.Base):
                 inputs=self.encoder_inputs_embedded,
                 sequence_length=self.encoder_inputs_length,
                 time_major=True,
-                swap_memory=True,
                 dtype=tf.float32
             )
 
@@ -206,7 +205,6 @@ class Seq2Seq(model.Base):
                 inputs=self.encoder_inputs_embedded,
                 sequence_length=self.encoder_inputs_length,
                 time_major=True,
-                swap_memory=True,
                 dtype=tf.float32
             )
 
@@ -232,12 +230,7 @@ class Seq2Seq(model.Base):
     def __init_decoder(self):
         '''Initializes the decoder part of the model.'''
         with tf.variable_scope('decoder') as scope:
-            def output_fn_f(outs):
-                import pdb
-                pdb.set_trace()
-                return layers.linear(outs, self.__get_vocab_size(), scope=scope)
-
-            output_fn = output_fn_f #lambda outs: layers.linear(outs, self.__get_vocab_size(), scope=scope)
+            output_fn = lambda outs: layers.linear(outs, self.__get_vocab_size(), scope=scope)
 
             if self.cfg.get('use_attention'):
                 attention_states = tf.transpose(self.encoder_outputs, [1, 0, 2])
@@ -293,7 +286,7 @@ class Seq2Seq(model.Base):
                     scope=scope
                 )
 
-            self.decoder_logits_train = self.decoder_outputs_train
+            self.decoder_logits_train = output_fn(self.decoder_outputs_train)
             self.decoder_prediction_train = tf.argmax(self.decoder_logits_train, axis=-1, name='decoder_prediction_traion')
 
             scope.reuse_variables()
@@ -342,7 +335,7 @@ class Seq2Seq(model.Base):
                         labels, local_inputs,
                         num_sampled, target_vocab_size)
 
-            softmax_loss_fn = sampled_softmax_loss
+            #softmax_loss_fn = sampled_softmax_loss
 
         self._loss = seq2seq.sequence_loss(logits=logits, targets=targets,
                                            weights=self.loss_weights,
