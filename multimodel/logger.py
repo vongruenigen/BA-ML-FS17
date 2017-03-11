@@ -36,6 +36,10 @@ def error(msg):
     '''Logs the given message with the level error.'''
     log(logging.ERROR, msg)
 
+def debug(msg):
+    '''Logs the given message with the level debug.'''
+    log(logging.DEBUG, msg)
+
 def fatal(msg, exit_code=2):
     '''Logs the given message and terminates the program
        and returns the given exit code.'''
@@ -57,7 +61,6 @@ def init_logger(cfg):
 
     stream_handler.setFormatter(formatter)
     file_handler.setFormatter(formatter)
-    tf_file_handler.setFormatter(formatter)
 
     mod.logger.addHandler(file_handler)
     mod.logger.addHandler(stream_handler)

@@ -1,10 +1,10 @@
 #
 # BA ML FS17 - Dirk von Grünigen & Martin Weilenmann
 #
-# Description: This module contains the model class which defines a model
-#              as seen in the paper: https://arxiv.org/pdf/1511.06807.pdf.
-#              The implementation itself is heavily on the implementation
-#              by domluna at https://github.com/domluna/memn2n.
+# Description: This module contains the Model class which
+#              is responsible for creating the tensorflow
+#              graph, i.e. building the bidirectional LSTM
+#              network used in this project.
 #
 
 import utils
@@ -39,7 +39,7 @@ class Seq2Seq(model.Base):
     def __init__(self, cfg, session):
         '''Constructor for the seq2seq model.'''
         self.s2s_cfg = self.DEFAULT_PARAMS.copy()
-        self.s2s_cfg.update(cfg.get('seq2seq'))
+        self.s2s_cfg.update(cfg.get('model_config'))
         self.cell_fn = self.CELL_FN[self.s2s_cfg.get('cell_type')]
         super(Seq2Seq, self).__init__(cfg, session)
 
@@ -47,7 +47,7 @@ class Seq2Seq(model.Base):
         return self._train_op
 
     def get_metric_ops(self):
-        return {'loss': self._loss}
+        return {'loss': self._loss, 'perplexity': self._perplexity}
 
     def get_inference_op(self):
         return self._inference_op
@@ -232,7 +232,12 @@ class Seq2Seq(model.Base):
     def __init_decoder(self):
         '''Initializes the decoder part of the model.'''
         with tf.variable_scope('decoder') as scope:
-            output_fn = lambda outs: layers.linear(outs, self.__get_vocab_size(), scope=scope)
+            def output_fn_f(outs):
+                import pdb
+                pdb.set_trace()
+                return layers.linear(outs, self.__get_vocab_size(), scope=scope)
+
+            output_fn = output_fn_f #lambda outs: layers.linear(outs, self.__get_vocab_size(), scope=scope)
 
             if self.cfg.get('use_attention'):
                 attention_states = tf.transpose(self.encoder_outputs, [1, 0, 2])
@@ -288,7 +293,7 @@ class Seq2Seq(model.Base):
                     scope=scope
                 )
 
-            self.decoder_logits_train = output_fn(self.decoder_outputs_train)
+            self.decoder_logits_train = self.decoder_outputs_train
             self.decoder_prediction_train = tf.argmax(self.decoder_logits_train, axis=-1, name='decoder_prediction_traion')
 
             scope.reuse_variables()
@@ -308,47 +313,42 @@ class Seq2Seq(model.Base):
         logits = tf.transpose(self.decoder_logits_train, [1, 0, 2])
         targets = tf.transpose(self.decoder_train_targets, [1, 0])
         softmax_loss_fn = None
-
+        
         # If there are more words than configured in 'max_vocabulary_size',
         # we start using sampled softmax, otherwise the training process won't
         # fit on a single GPU without problems.
         if self.__get_vocab_size() > self.cfg.get('max_vocabulary_size'):
-            max_vocabulary_size = self.cfg.get('max_vocabulary_size')
+            target_vocab_size = self.cfg.get('max_vocabulary_size')
             num_hidden_units = self.cfg.get('num_hidden_units')
             num_sampled = self.cfg.get('sampled_softmax_number_of_samples')
             
-            w_t = tf.get_variable('out_proj_w', [max_vocabulary_size, num_hidden_units], dtype=tf.float32)
-            w   = tf.transpose(w_t)
-            b   = tf.get_variable('out_proj_b', [max_vocabulary_size], dtype=tf.float32)
+            w = tf.get_variable('out_proj_w', [num_hidden_units, target_vocab_size], dtype=tf.float32)
+            w_t = tf.transpose(w)
+            b = tf.get_variable('out_proj_b', [target_vocab_size], dtype=tf.float32)
+            
+            self.output_projection = (w, b)
 
-            def sampled_softmax_loss(labels, inputs):
-              labels = tf.reshape(labels, [-1, 1])
+            def sampled_softmax_loss(inputs, labels):
+                labels = tf.reshape(labels, [-1, 1])
 
-              # We need to compute the sampled_softmax_loss using 32bit floats to
-              # avoid numerical instabilities.
-              local_w_t = tf.cast(w_t, tf.float32)
-              local_b = tf.cast(b, tf.float32)
-              local_inputs = tf.cast(inputs, tf.float32)
+                # We need to compute the sampled_softmax_loss using 32bit floats to
+                # avoid numerical instabilities.
+                local_w_t = tf.cast(w_t, tf.float32)
+                local_b = tf.cast(b, tf.float32)
+                local_inputs = tf.cast(inputs, tf.float32)
 
-              return tf.cast(
-                  tf.nn.sampled_softmax_loss(
-                      weights=local_w_t,
-                      biases=local_b,
-                      labels=labels,
-                      inputs=local_inputs,
-                      num_sampled=num_sampled,
-                      num_classes=max_vocabulary_size))
+                return tf.nn.sampled_softmax_loss(
+                        local_w_t, local_b,
+                        labels, local_inputs,
+                        num_sampled, target_vocab_size)
 
-            # Currently disabled because of an issue with tensorflow, probably
-            # going to implemente it by hand in case there's no solution..
-            # softmax_loss_fn = sampled_softmax_loss
-
-        # Track the global step state when training
-        self._global_step = tf.Variable(0, name='global_step', trainable=False)
+            softmax_loss_fn = sampled_softmax_loss
 
         self._loss = seq2seq.sequence_loss(logits=logits, targets=targets,
                                            weights=self.loss_weights,
                                            softmax_loss_function=softmax_loss_fn)
+
+        self._perplexity = tf.pow(2.0, self._loss)
 
         self._train_op = tf.train.AdadeltaOptimizer().minimize(self._loss, global_step=self._global_step)
 

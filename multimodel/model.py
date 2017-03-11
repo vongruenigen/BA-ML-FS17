@@ -2,11 +2,11 @@
 # BA ML FS17 - Dirk von Grünigen & Martin Weilenmann
 #
 # Description: This modul contains the base model which
-#              all models should inherit from.
+#              all models should inherit from. Also contains
+#              some register/factory functions for models.
 #
 
-# from seq2seq import Seq2Seq
-# from memn2n import MemN2N
+import tensorflow as tf
 
 class Base(object):
     '''Base class which all classes should implement to be used as a
@@ -33,25 +33,17 @@ class Base(object):
 
     '''
 
-    # Dict which maps keys to model classes for usage in create_model()
-    MODEL_NAME_CLS_DICT = {
-        # 'seq2seq': Seq2Seq,
-        # 'memn2n': MemN2N
-    }
-
     def __init__(self, cfg, session):
         '''Initializes the model with the given configuration.'''
         self.cfg = cfg
         self.session = session
 
-    @staticmethod
-    def create_model(self, name):
-        '''Creas an instance of the model with the given name according
-           to the mapping in the MODEL_NAME_CLS_DICT constant.'''
-        if name not in MODEL_NAME_CLS_DICT:
-            log.fatal('model with the name "%s" does not exist!' % name)
+        # Track the global step state when training
+        self._global_step = tf.Variable(0, name='global_step', trainable=False)
 
-        return self.MODEL_NAME_CLS_DICT[name](self.cfg)
+    def get_global_step(self):
+        '''Returns the variable used for tracking the global step.'''
+        return self._global_step
 
     def build(self):
         '''Stub function for build the model. This function must

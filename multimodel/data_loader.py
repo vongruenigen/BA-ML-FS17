@@ -86,6 +86,11 @@ class DataLoader(object):
     def convert_text_to_indices(self, line, vocabulary):
         '''Converts a text to the respective list of indices
            by using the vocabulary dictionary.'''
+
+        # we need to pad the lines in case we're dealing with a memn2n model
+        if self.cfg.get('model_name'):
+            line = line.lpad(self.cfg.get('memn2n/sentence_length'))
+
         line_parts = self.__preprocess_and_tokenize_line(line, vocabulary)
         line_parts = map(lambda w: vocabulary[w] if w in vocabulary else Config.UNKNOWN_WORD_IDX,
                          line_parts)

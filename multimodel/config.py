@@ -8,6 +8,7 @@
 
 import json
 import time
+import collections
 
 from os import path
 
@@ -56,7 +57,7 @@ class Config(object):
         'epochs': 1,
 
         # Batch size which will be used when training
-        'batch_size': 1,
+        'batch_size': 4,
 
         # Defines how much batches will be considered per epoch.
         'batches_per_epoch': 1000,
@@ -132,7 +133,7 @@ class Config(object):
         # Defines how much words should be samples when using samples softmax.
         # The sampled softmax is only used if the number of words in the vocabulary
         # exceeds the value in 'max_vocabulary_size'.
-        'sampled_softmax_number_of_samples': 10000,
+        'sampled_softmax_number_of_samples': 10,
 
         # Defines how much dimensions should be used when using random embeddings.
         'max_random_embeddings_size': 10,
@@ -181,8 +182,9 @@ class Config(object):
         # Defines the max values the gradients will be clipped to if neccessary.
         'gradient_clipping_norm': 10.0,
 
-        # Configuration specific to the seq2seq model.
-        'seq2seq': {}
+        # Part to specifiy and configurate the model
+        'model_name': 'seq2seq',
+        'model_config': {}
     }
 
     def __init__(self, cfg_obj={}):
@@ -190,15 +192,40 @@ class Config(object):
            from the cfg_obj parameter. The default parameters
            are used if no cfg_obj object is given.'''
         self.cfg_obj = self.DEFAULT_PARAMS.copy()
-        self.cfg_obj.update(cfg_obj)
+        self.__deep_merge(self.cfg_obj, cfg_obj)
         self.__create_id()
 
-    def get(self, name):
-        '''Returns the value for the given name stored in the current config object.'''
-        if name in self.cfg_obj:
-            return self.cfg_obj[name]
-        else:
-            raise Exception('there is no value for the name %s in the config' % name)
+    @staticmethod
+    def get_model_ctor(name):
+        '''Returns the constructor for the model with the given name.'''
+        if name not in self.MODEL_CTOR_MAPPING:
+            raise Exception('there is no model with the name "%s"\n'
+                            'the following models are available: '
+                            ', '.join(list(self.MODEL_CTOR_MAPPING.keys())))
+
+        return self.MODEL_CTOR_MAPPING[name]
+
+    def get(self, names):
+        '''Returns the value for the given names stored in the current config object.
+           Multiple names separated with a slash (e.g. model/value) can be entered for
+           accessing deeper config values (e.g. specific model params). '''
+        names = names.split('/')
+
+        def read_val(name):
+            if name in self.cfg_obj:
+                return self.cfg_obj[name]
+            else:
+                raise Exception('there is no value for the name %s in the config' % name)
+
+        val = self.cfg_obj
+
+        for n in names:
+            if n not in val:
+                raise Exception('config value %s does not exist' % names)
+
+            val = val.get(n)
+
+        return val
 
     def set(self, name, value):
         '''Sets the value for the given name in the current config object.'''
@@ -225,3 +252,11 @@ class Config(object):
             timestamp = '%s_%s' % (timestamp, name)
 
         self.set('id', timestamp)
+
+    def __deep_merge(self, target, to_merge):
+        '''Deep merges the given dictionaries.'''
+        for k, v in to_merge.items():
+            if k in target and isinstance(target[k], dict):
+                dict_merge(target[k], to_merge[k])
+            else:
+                target[k] = to_merge[k]

@@ -15,12 +15,11 @@ import json
 import logger
 import tqdm
 
+import seq2seq, memn2n
+
 from os import path
 from config import Config
 from data_loader import DataLoader
-from model import Base
-from seq2seq import Seq2Seq
-
 class Runner(object):
     '''This class is responsible for the training,
        testing and running of the model.'''
@@ -39,6 +38,8 @@ class Runner(object):
             raise Exception('cfg_path must be either a path or a Config object')
 
         logger.init_logger(self.cfg)
+        logger.debug('The following config will be used')
+        logger.debug(json.dumps(self.cfg.cfg_obj, indent=4, sort_keys=True))
 
         self.__prepare_summary_writers()
         self.__prepare_results_directory()
@@ -70,6 +71,7 @@ class Runner(object):
             sum_losses = 0.0
             sum_iters = 0
             batches_per_epoch = self.cfg.get('batches_per_epoch')
+            metrics_track = []
             loss_track = []
             perplexity_track = []
 
@@ -84,8 +86,8 @@ class Runner(object):
             verbose=True
 
             batches = utils.random_sequences(length_from=length_from, length_to=length_to,
-                                       vocab_lower=vocab_lower, vocab_upper=vocab_upper,
-                                       batch_size=batch_size)
+                                             vocab_lower=vocab_lower, vocab_upper=vocab_upper,
+                                             batch_size=batch_size)
 
             training_batches = batches
 
@@ -99,7 +101,7 @@ class Runner(object):
                     for batch in tqdm.tqdm(range(batches_per_epoch+1)):
                         # Prepare the training data
                         batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
-                        feed_dict = model.make_train_inputs(batch_data_x, batch_data_x)
+                        feed_dict = model.make_train_inputs(batch_data_x, batch_data_y)
                         
                         metric_ops_dict = model.get_metric_ops()
                         metric_names = list(metric_ops_dict.keys())
@@ -112,41 +114,16 @@ class Runner(object):
 
                         metrics_results = {metric_names[i]: results[i] for i, x in enumerate(metric_names)}
 
-                        import pdb
-                        pdb.set_trace()
-
-                        sum_losses += loss
+                        sum_losses += metrics_results['loss']
                         sum_iters += 1
                         perplexity = np.exp(sum_losses / sum_iters)
                         
-                        loss_track.append(loss)
+                        loss_track.append(metrics_results['loss'])
                         perplexity_track.append(perplexity)
+                        metrics_track.append(metrics_results)
 
-                    logger.info('[Finished Epoch #%i]' % epoch_nr)
-                    logger.info('    Loss       > %f' % loss_track[-1])
-                    logger.info('    Perplexity > %f' % perplexity_track[-1])
-                    
-                    if self.cfg.get('show_predictions_while_training'):
-                        logger.info('Last three samples with predictions:')
-                        for i, (e_in, dt_exp, dt_pred) in enumerate(zip(
-                            feed_dict[model.encoder_inputs].T,
-                            feed_dict[model.decoder_targets].T,
-                            session.run(model.get_inference_op(), feed_dict).T
-                        )):
-                            # NOTE: WTF do we have to subtract one?!
-                            dt_pred = list(map(lambda x: x - 1, dt_pred))
-
-                            text_in = self.data_loader.convert_indices_to_text(e_in, self.rev_vocabulary)
-                            text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
-                            text_out = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
-
-                            logger.info('[Sample #%i of epoch #%i]' % (i+1, epoch_nr))
-                            logger.info('    Input      > %s' % text_in)
-                            logger.info('    Prediction > %s' % text_out)
-                            logger.info('    Expected   > %s' % text_exp)
-                            
-                            # don't show more than three samples per epoch
-                            if i >= 2: break
+                    self.__print_epoch_state(metrics_track[-1], epoch_nr)
+                    self.__show_samples_at_end_of_epoch(model, session, feed_dict, epoch_nr)
 
                     # Store model after one epoch
                     self.__store_model(session, model, epoch_nr)
@@ -182,7 +159,7 @@ class Runner(object):
            or inference.'''
         with tf.device(self.__get_device()):
             with self.__with_tf_session() as session:
-                model = Seq2Seq(self.cfg, session)
+                model = self.__create_model(session)
 
                 # Build and initialize the graph
                 model.build()
@@ -305,6 +282,54 @@ class Runner(object):
             raise Exception('__prepare_results_directory() must be called before using __get_model_path()')
 
         return path.join(self.curr_exp_path, 'model-%s.chkp' % str(version))
+
+    def __print_epoch_state(self, metrics, epoch_nr):
+        '''Prints the metrics after an epoch has been finished.'''
+        logger.info('[Finished Epoch #%i]' % epoch_nr)
+
+        max_len_name = max(map(lambda x: len(x), metrics.keys()))
+
+        for k, v in metrics.items():
+            logger.info('  %s= %f' % (k.ljust(max_len_name+1), float(v)))
+
+    def __show_samples_at_end_of_epoch(self, model, session, feed_dict, epoch_nr):
+        if self.cfg.get('show_predictions_while_training'):
+            logger.info('Last three samples with predictions:')
+
+            for i, (e_in, dt_exp, dt_pred) in enumerate(zip(
+                feed_dict[model.encoder_inputs].T,
+                feed_dict[model.decoder_targets].T,
+                session.run(model.get_inference_op(), feed_dict).T
+            )):
+                # NOTE: WTF do we have to subtract one?!
+                dt_pred = list(map(lambda x: x - 1, dt_pred))
+
+                text_in = self.data_loader.convert_indices_to_text(e_in, self.rev_vocabulary)
+                text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
+                text_out = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
+
+                logger.info('[Sample #%i of epoch #%i]' % (i+1, epoch_nr))
+                logger.info('  Input      > %s' % text_in)
+                logger.info('  Prediction > %s' % text_out)
+                logger.info('  Expected   > %s' % text_exp)
+                
+                # don't show more than three samples per epoch
+                if i >= 2: break
+
+    def __create_model(self, session):
+        '''Creates a model based on the name given.'''
+        name = self.cfg.get('model_name')
+        model_ctor_map = {
+            'seq2seq': seq2seq.Seq2Seq,
+            'memn2n': memn2n.MemN2N
+        }
+
+        if name not in model_ctor_map:
+            logger.fatal('the model with the name %s does not exist\n'
+                         'the following are available: '
+                         ', '.join(model_ctor_map.keys()))
+
+        return model_ctor_map[name](self.cfg, session)
 
     def __prepare_data_batch(self, all_data):
         '''Returns two lists, each of the size of the configured batch size. The first contains

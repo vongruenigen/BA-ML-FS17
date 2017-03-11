@@ -11,9 +11,11 @@ import utils
 import logger
 import math
 import tensorflow as tf
+import tf.rnn.rnn_cell as rnn
 import numpy as np
 
-from tensorflow.contrib import rnn, seq2seq, layers
+from tensorflow.contrib import seq2seq, layers
+
 from config import Config
 
 from models import Seq2Seq
@@ -281,7 +283,7 @@ class Model(object):
                     embeddings=self.embeddings,
                     start_of_sequence_id=Config.EOS_WORD_IDX,
                     end_of_sequence_id=Config.EOS_WORD_IDX,
-                    maximum_length=tf.reduce_max(self.encoder_inputs_length) + 3,
+                    maximum_length=tf.reduce_max(self.encoder_inputs_length) ,#+ 3,
                     num_decoder_symbols=self.__get_vocab_size()                    
                 )
             else:
@@ -292,7 +294,7 @@ class Model(object):
                     embeddings=self.embeddings,
                     start_of_sequence_id=Config.EOS_WORD_IDX,
                     end_of_sequence_id=Config.EOS_WORD_IDX,
-                    maximum_length=tf.reduce_max(self.encoder_inputs_length) + 3,
+                    maximum_length=tf.reduce_max(self.encoder_inputs_length) ,#+ 3,
                     num_decoder_symbols=self.__get_vocab_size()
                 )
 

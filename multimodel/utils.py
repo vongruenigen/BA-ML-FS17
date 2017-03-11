@@ -6,6 +6,7 @@
 
 import numpy as np
 import pickle
+import collections
 
 from os import path
 from gensim.models import Word2Vec
@@ -40,18 +41,20 @@ def reverse_vocabulary(vocabulary):
 def prepare_embeddings_and_vocabulary(embeddings, vocabulary):
     '''Adds an embeddings for an unknown word at the top of the embeddings
        matrix and updates the vocabulary accordingly.'''
-    unknown_embedding = np.random.uniform(-1.0, 1.0, size=(1, embeddings.shape[1]))
-    embeddings = np.vstack([unknown_embedding, embeddings])
+    unknown_emb = np.random.uniform(-1.0, 1.0, size=(1, embeddings.shape[1]))
+    pad_emb = np.random.uniform(-1.0, 1.0, size=(1, embeddings.shape[1]))
+    eos_emb = np.random.uniform(-1.0, 1.0, size=(1, embeddings.shape[1]))
 
-    # NOTE: The +3 when setting the index comes from the fact
-    #       that the embedding for the unknown, eos and pad word
-    #       will be inserted as the first rows of the embeddings
-    #       matrix in order to keep it simple.
-    new_vocabulary = {w: idx+3 for w, idx in vocabulary.items()}
+    # embeddings = np.vstack([unknown_emb, pad_emb, eos_emb, embeddings])
 
-    new_vocabulary[Config.UNKNOWN_WORD_TOKEN] = Config.UNKNOWN_WORD_IDX
-    new_vocabulary[Config.PAD_WORD_TOKEN] = Config.PAD_WORD_IDX
-    new_vocabulary[Config.EOS_WORD_TOKEN] = Config.EOS_WORD_IDX
+    # NOTE: The +3 when setting the index comes from the
+    #       fact that the embedding for the unknown, eos, pad words
+    #       will be inserted as the first row of the embeddings.
+    new_vocabulary = {w: idx for w, idx in vocabulary.items()}
+
+    # new_vocabulary[Config.UNKNOWN_WORD_TOKEN] = Config.UNKNOWN_WORD_IDX
+    # new_vocabulary[Config.PAD_WORD_TOKEN] = Config.PAD_WORD_IDX
+    # new_vocabulary[Config.EOS_WORD_TOKEN] = Config.EOS_WORD_IDX
 
     return embeddings.astype('float32'), new_vocabulary
 
