@@ -50,7 +50,7 @@ class Seq2Seq(model.Base):
         return {'loss': self._loss, 'perplexity': self._perplexity}
 
     def get_inference_op(self):
-        if self.cfg.get('training_data') is not None or True:
+        if self.cfg.get('training_data') is not None:
             return self.decoder_prediction_train
         else:
             return self.decoder_prediction_inference
@@ -118,13 +118,13 @@ class Seq2Seq(model.Base):
         self.encoder_inputs = tf.placeholder(
             shape=(None, None),
             dtype=tf.int32,
-            name='encoder_inputs',
+            name='encoder_inputs'
         )
 
         self.encoder_inputs_length = tf.placeholder(
             shape=(None,),
             dtype=tf.int32,
-            name='encoder_inputs_length',
+            name='encoder_inputs_length'
         )
 
         # The decoder targets are only used when training, since we don't
@@ -145,8 +145,8 @@ class Seq2Seq(model.Base):
     def __init_decoder_train(self):
         '''Is responsible for setting up the connections to the decoder
            which is only necessary while training, not whily using the model.'''
-        with tf.name_scope('decoder_train_feeds') as scope:
-            sequence_size, batch_size = tf.unstack(tf.shape(self.decoder_targets))
+        with tf.name_scope('decoder_train_feeds'):
+            seq_size, batch_size = tf.unstack(tf.shape(self.decoder_targets))
 
             eos_slice = tf.ones([1, batch_size], dtype=tf.int32) * Config.EOS_WORD_IDX
             pad_slice = tf.ones([1, batch_size], dtype=tf.int32) * Config.PAD_WORD_IDX
@@ -163,10 +163,7 @@ class Seq2Seq(model.Base):
                                                         dtype=tf.int32)
 
             decoder_train_targets_eos_mask = tf.transpose(decoder_train_targets_eos_mask, [1, 0])
-
-            # hacky way using one_hot to put EOS symbol at the end of target sequence
-            decoder_train_targets = tf.add(decoder_train_targets,
-                                           decoder_train_targets_eos_mask)
+            decoder_train_targets = tf.add(decoder_train_targets, decoder_train_targets_eos_mask)
 
             self.decoder_train_targets = decoder_train_targets
 
@@ -195,49 +192,56 @@ class Seq2Seq(model.Base):
     def __init_unidirectional_encoder(self):
         '''Initializes the "simple", unidirectional encoder which is responsible
            encoding the input sequence into a thought vector.'''
-        with tf.variable_scope('encoder') as scope:
-            (self.encoder_outputs, self.encoder_state) = (
-                tf.nn.dynamic_rnn(cell=self.encoder_cell,
-                                  inputs=self.encoder_inputs_embedded,
-                                  sequence_length=self.encoder_inputs_length,
-                                  time_major=True,
-                                  dtype=tf.float32)
-                )
+        with tf.name_scope('encoder_unidirectional'):
+            (self.encoder_outputs, self.encoder_state) = tf.nn.dynamic_rnn(
+                cell=self.encoder_cell,
+                inputs=self.encoder_inputs_embedded,
+                sequence_length=self.encoder_inputs_length,
+                time_major=True,
+                dtype=tf.float32
+            )
 
     def __init_bidirectional_encoder(self):
         '''Initializes the "complex", bidirectional encoder which is responsible
            encoding the input sequence into a thought vector.'''
-        with tf.variable_scope('encoder_bidirectional') as scope:
-            ((encoder_fw_outputs,
-              encoder_bw_outputs),
-             (encoder_fw_state,
-              encoder_bw_state)) = (
-                tf.nn.bidirectional_dynamic_rnn(cell_fw=self.encoder_cell,
-                                                cell_bw=self.encoder_cell,
-                                                inputs=self.encoder_inputs_embedded,
-                                                sequence_length=self.encoder_inputs_length,
-                                                time_major=True,
-                                                dtype=tf.float32)
-                )
+        with tf.name_scope('encoder_bidirectional'):
+            ((encoder_fw_outputs, encoder_bw_outputs),
+             (encoder_fw_state, encoder_bw_state)) = tf.nn.bidirectional_dynamic_rnn(
+                cell_fw=self.encoder_cell,
+                cell_bw=self.encoder_cell,
+                inputs=self.encoder_inputs_embedded,
+                sequence_length=self.encoder_inputs_length,
+                time_major=True,
+                swap_memory=True,
+                dtype=tf.float32
+            )
 
             self.encoder_outputs = tf.concat((encoder_fw_outputs, encoder_bw_outputs), 2)
 
-            if isinstance(encoder_fw_state, LSTMStateTuple):
-
+            if isinstance(encoder_fw_state, rnn.LSTMStateTuple):
                 encoder_state_c = tf.concat(
-                    (encoder_fw_state.c, encoder_bw_state.c), 1, name='bidirectional_concat_c')
+                    (encoder_fw_state.c, encoder_bw_state.c), 1,
+                    name='bidirectional_concat_c'
+                )
+
                 encoder_state_h = tf.concat(
-                    (encoder_fw_state.h, encoder_bw_state.h), 1, name='bidirectional_concat_h')
-                self.encoder_state = LSTMStateTuple(c=encoder_state_c, h=encoder_state_h)
+                    (encoder_fw_state.h, encoder_bw_state.h), 1,
+                    name='bidirectional_concat_h'
+                )
+
+                self.encoder_state = rnn.LSTMStateTuple(c=encoder_state_c, h=encoder_state_h)
 
             elif isinstance(encoder_fw_state, tf.Tensor):
-                self.encoder_state = tf.concat((encoder_fw_state, encoder_bw_state), 1, name='bidirectional_concat')
+                self.encoder_state = tf.concat((encoder_fw_state, encoder_bw_state), 1,
+                                               name='bidirectional_concat')
 
     def __init_decoder(self):
         '''Initializes the decoder part of the model.'''
         with tf.variable_scope('decoder') as scope:
-            def output_fn(outputs):
-                return tf.contrib.layers.linear(outputs, self.__get_vocab_size(), scope=scope)
+            def output_fn_f(outs):
+                return layers.linear(outs, self.__get_vocab_size(), scope=scope)
+
+            output_fn = output_fn_f #lambda outs: layers.linear(outs, self.__get_vocab_size(), scope=scope)
 
             if self.cfg.get('use_attention'):
                 attention_states = tf.transpose(self.encoder_outputs, [1, 0, 2])
@@ -314,41 +318,42 @@ class Seq2Seq(model.Base):
         targets = tf.transpose(self.decoder_train_targets, [1, 0])
         softmax_loss_fn = None
         
-        # # If there are more words than configured in 'max_vocabulary_size',
-        # # we start using sampled softmax, otherwise the training process won't
-        # # fit on a single GPU without problems.
-        # if self.__get_vocab_size() > self.cfg.get('max_vocabulary_size'):
-        #     target_vocab_size = self.cfg.get('max_vocabulary_size')
-        #     num_hidden_units = self.cfg.get('num_hidden_units')
-        #     num_sampled = self.cfg.get('sampled_softmax_number_of_samples')
+        # If there are more words than configured in 'max_vocabulary_size',
+        # we start using sampled softmax, otherwise the training process won't
+        # fit on a single GPU without problems.
+        if self.__get_vocab_size() > self.cfg.get('max_vocabulary_size'):
+            target_vocab_size = self.cfg.get('max_vocabulary_size')
+            num_hidden_units = self.cfg.get('num_hidden_units')
+            num_sampled = self.cfg.get('sampled_softmax_number_of_samples')
             
-        #     w = tf.get_variable('out_proj_w', [num_hidden_units, target_vocab_size], dtype=tf.float32)
-        #     w_t = tf.transpose(w)
-        #     b = tf.get_variable('out_proj_b', [target_vocab_size], dtype=tf.float32)
+            w = tf.get_variable('out_proj_w', [num_hidden_units, target_vocab_size], dtype=tf.float32)
+            w_t = tf.transpose(w)
+            b = tf.get_variable('out_proj_b', [target_vocab_size], dtype=tf.float32)
             
-        #     self.output_projection = (w, b)
+            self.output_projection = (w, b)
 
-        #     def sampled_softmax_loss(inputs, labels):
-        #         labels = tf.reshape(labels, [-1, 1])
+            def sampled_softmax_loss(inputs, labels):
+                labels = tf.reshape(labels, [-1, 1])
 
-        #         # We need to compute the sampled_softmax_loss using 32bit floats to
-        #         # avoid numerical instabilities.
-        #         local_w_t = tf.cast(w_t, tf.float32)
-        #         local_b = tf.cast(b, tf.float32)
-        #         local_inputs = tf.cast(inputs, tf.float32)
+                # We need to compute the sampled_softmax_loss using 32bit floats to
+                # avoid numerical instabilities.
+                local_w_t = tf.cast(w_t, tf.float32)
+                local_b = tf.cast(b, tf.float32)
+                local_inputs = tf.cast(inputs, tf.float32)
 
-        #         return tf.nn.sampled_softmax_loss(
-        #                 local_w_t, local_b,
-        #                 labels, local_inputs,
-        #                 num_sampled, target_vocab_size)
+                return tf.nn.sampled_softmax_loss(
+                        local_w_t, local_b,
+                        labels, local_inputs,
+                        num_sampled, target_vocab_size)
 
-        #     #softmax_loss_fn = sampled_softmax_loss
+            #softmax_loss_fn = sampled_softmax_loss
 
         self._loss = seq2seq.sequence_loss(logits=logits, targets=targets,
-                                           weights=self.loss_weights)
+                                           weights=self.loss_weights,
+                                           softmax_loss_function=softmax_loss_fn)
 
         self._perplexity = tf.pow(2.0, self._loss)
-        self._train_op = tf.train.AdamOptimizer().minimize(self._loss, global_step=self._global_step)
+        self._train_op = tf.train.AdadeltaOptimizer().minimize(self._loss, global_step=self._global_step)
 
     def __get_vocab_size(self):
         '''Returns the size of the vocabulary.'''

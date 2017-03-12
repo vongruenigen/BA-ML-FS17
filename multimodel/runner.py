@@ -14,6 +14,7 @@ import utils
 import json
 import logger
 import tqdm
+import math
 
 import seq2seq, memn2n
 
@@ -68,18 +69,13 @@ class Runner(object):
                     self.vocabulary
                 )
 
-            sum_losses = 0.0
-            sum_iters = 0
-            batches_per_epoch = self.cfg.get('batches_per_epoch')
             metrics_track = []
-            loss_track = []
-            perplexity_track = []
 
             # TODO: Remove testing data
             length_from=3
-            length_to=50
+            length_to=8
             vocab_lower=3
-            vocab_upper=20
+            vocab_upper=10
             batch_size=100
             max_batches=5000
             batches_in_epoch=1000
@@ -91,6 +87,12 @@ class Runner(object):
 
             training_batches = batches
 
+            # Collect all neccesary ops to run
+            metric_ops_dict = model.get_metric_ops()
+            metric_names = list(metric_ops_dict.keys())
+            metric_ops = [metric_ops_dict[n] for n in metric_names]
+            all_ops = [model.get_train_op()] + metric_ops
+
             try:
                 for epoch in range(self.cfg.get('epochs')):
                     epoch_nr = epoch + 1
@@ -98,40 +100,28 @@ class Runner(object):
 
                     logger.info('[Starting epoch #%i]' % epoch_nr)
                     
-                    for batch in tqdm.tqdm(range(batches_per_epoch+1)):
+                    for batch in tqdm.tqdm(range(self.cfg.get('batches_per_epoch'))):
                         # Prepare the training data
                         batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
                         feed_dict = model.make_train_inputs(batch_data_x, batch_data_y)
-                        
-                        metric_ops_dict = model.get_metric_ops()
-                        metric_names = list(metric_ops_dict.keys())
-                        metric_ops = [metric_ops_dict[n] for n in metric_names]
-
-                        all_ops = [model.get_train_op()] + metric_ops
                         results = session.run(all_ops, feed_dict)
 
                         results.pop(0) # don't need the result from the training op
 
-                        metrics_results = {metric_names[i]: results[i] for i, x in enumerate(metric_names)}
-
-                        sum_losses += metrics_results['loss']
-                        sum_iters += 1
-                        perplexity = np.exp(sum_losses / sum_iters)
-                        
-                        loss_track.append(metrics_results['loss'])
-                        perplexity_track.append(perplexity)
-                        metrics_track.append(metrics_results)
+                        if len(results) > 0:
+                            metrics_results = {metric_names[i]: results[i] for i, x in enumerate(metric_names)}
+                            metrics_track.append(metrics_results)
 
                     self.__print_epoch_state(metrics_track[-1], epoch_nr)
                     self.__show_samples_at_end_of_epoch(model, session, feed_dict, epoch_nr)
 
-                    # Store model after one epoch
+                    # Store model after each epoch
                     self.__store_model(session, model, epoch_nr)
             except KeyboardInterrupt:
                 logger.warn('training interrupted')
                 # TODO: Save state when the training is interrupted?
 
-            self.__store_metrics(loss_track, perplexity_track)
+            # self.__store_metrics(loss_track, perplexity_track)
 
     def test(self):
         '''This method is responsible for evaluating a trained
@@ -243,9 +233,9 @@ class Runner(object):
         '''Loads the embeddings with the associated vocabulary
            and saves them for later usage in the DataLoader and
            while training/testing.'''
-        if self.cfg.get('vocabulary') is None:
+        if self.cfg.get('vocabulary') is None and self.cfg.get('use_integer_vocabulary'):
             # Build a stub dictionary which maps integers to integers for the defined range
-            self.vocabulary = {x: x for x in range(self.cfg.get('max_vocabulary_size'))}
+            self.vocabulary = {str(x): x for x in range(self.cfg.get('max_vocabulary_size'))}
         else:
             self.vocabulary = utils.load_vocabulary(self.cfg.get('vocabulary'))
 
@@ -253,18 +243,22 @@ class Runner(object):
             self.embeddings = utils.load_w2v_embeddings(self.cfg.get('w2v_embeddings'))
         elif self.cfg.get('ft_embeddings'):
             self.embeddingsy = utils.load_ft_embeddings(self.cfg.get('ft_embeddings'))
-        else:
-            self.embeddings = np.random.uniform(-1.0, 1.0, size=(len(self.vocabulary),
+        elif self.cfg.get('use_random_embeddings'):
+            # uniform(-sqrt(3), sqrt(3)) has variance=1
+            sqrt3 = math.sqrt(3)
+            self.embeddings = np.random.uniform(-sqrt3, sqrt3, size=(len(self.vocabulary), 
                                                 self.cfg.get('max_random_embeddings_size')))
+        else:
+            self.embeddings = None
 
-        # Prepare the vocabulary and embeddings (e.g. add embedding for unknown words)
-        self.embeddings, self.vocabulary = utils.prepare_embeddings_and_vocabulary(
-            self.embeddings, self.vocabulary
-        )
+        if self.embeddings is not None:
+            # Prepare the vocabulary and embeddings (e.g. add embedding for unknown words)
+            self.embeddings, self.vocabulary = utils.prepare_embeddings_and_vocabulary(
+                                                            self.embeddings, self.vocabulary)
 
         # Store the embeddings and vocabulary in the 
         self.cfg.set('embeddings', self.embeddings)
-        self.cfg.set('vocabulary', self.vocabulary)
+        self.cfg.set('vocabulary_m', self.vocabulary)
 
         # revert the vocabulary for the idx -> text usages
         self.rev_vocabulary = utils.reverse_vocabulary(self.vocabulary)
@@ -302,16 +296,16 @@ class Runner(object):
                 session.run(model.get_inference_op(), feed_dict).T
             )):
                 # NOTE: WTF do we have to subtract one?!
-                dt_pred = list(map(lambda x: x - 1, dt_pred))
+                # dt_pred = list(map(lambda x: x - 1, dt_pred))
 
                 text_in = self.data_loader.convert_indices_to_text(e_in, self.rev_vocabulary)
                 text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
                 text_out = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
 
                 logger.info('[Sample #%i of epoch #%i]' % (i+1, epoch_nr))
-                logger.info('  Input      > %s' % text_in)
-                logger.info('  Prediction > %s' % text_out)
-                logger.info('  Expected   > %s' % text_exp)
+                logger.info('  Input      > %s' % utils.truncate(text_in))
+                logger.info('  Prediction > %s' % utils.truncate(text_out))
+                logger.info('  Expected   > %s' % utils.truncate(text_exp))
                 
                 # don't show more than three samples per epoch
                 if i >= 2: break
@@ -338,13 +332,24 @@ class Runner(object):
         data_batch_x, data_batch_y = [], []
         batch_size = self.cfg.get('batch_size')
 
-        conversation = next(all_data)
         conv_turn_idx = 0
+        conversation = next(all_data)
+        first_conv_turn = None
+        second_conv_turn = None
 
         while len(data_batch_y) < batch_size and len(data_batch_x) < batch_size:
+            # Check if we've reached the end of the conversation, in this
+            # case we've to load the next conversation.
+            try:
+                if conv_turn_idx + 1 >= len(conversation):
+                    conversation = next(all_data)
+                    conv_turn_idx = 0
+            except StopIteration as e:
+                break # exit the loop in case there is no more data  
+
             first_conv_turn = conversation[conv_turn_idx]
             second_conv_turn = conversation[conv_turn_idx+1]
-
+            
             if self.cfg.get('train_on_copy'):
                 data_batch_x.append(first_conv_turn)
                 data_batch_y.append(first_conv_turn)
@@ -353,16 +358,5 @@ class Runner(object):
                 data_batch_y.append(second_conv_turn)
 
             conv_turn_idx += 2
-
-            # Check if we've reached the end of the conversation, in this
-            # case we've to load the next conversation. In case there is
-            # no conversation left, we simply exit the loop and return the
-            # already loaded data.
-            try:
-                if conv_turn_idx == len(conversation):
-                    conversation = next(all_data)
-                    conv_turn_idx = 0
-            except StopIteration as e:
-                break # exit the loop
 
         return data_batch_x, data_batch_y

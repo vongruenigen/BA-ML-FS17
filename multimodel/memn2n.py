@@ -90,14 +90,14 @@ class MemN2N(model.Base):
     def _build_inputs(self):
         self._stories = tf.placeholder(tf.int32, [None, self._memory_size, self._sentence_size], name="stories")
         self._queries = tf.placeholder(tf.int32, [None, self._sentence_size], name="queries")
-        self._answers = tf.placeholder(tf.int32, [None, len(self.cfg.get('vocabulary'))], name="answers")
+        self._answers = tf.placeholder(tf.int32, [None, len(self.cfg.get('vocabulary_m'))], name="answers")
         self._lr = tf.placeholder(tf.float32, [], name="learning_rate")
 
     def _build_vars(self):
         with tf.variable_scope(self._name):
             nil_word_slot = tf.zeros([1, self._embedding_size])
-            A = tf.concat(axis=0, values=[nil_word_slot, self._init([len(self.cfg.get('vocabulary'))-1, self._embedding_size]) ])
-            C = tf.concat(axis=0, values=[nil_word_slot, self._init([len(self.cfg.get('vocabulary'))-1, self._embedding_size]) ])
+            A = tf.concat(axis=0, values=[nil_word_slot, self._init([len(self.cfg.get('vocabulary_m'))-1, self._embedding_size]) ])
+            C = tf.concat(axis=0, values=[nil_word_slot, self._init([len(self.cfg.get('vocabulary_m'))-1, self._embedding_size]) ])
 
             self.A_1 = tf.Variable(A, name="A")
 
@@ -111,7 +111,7 @@ class MemN2N(model.Base):
             # self.H = tf.Variable(self._init([self._embedding_size, self._embedding_size]), name="H")
 
             # Use final C as replacement for W
-            # self.W = tf.Variable(self._init([self._embedding_size, len(self.cfg.get('vocabulary'))]), name="W")
+            # self.W = tf.Variable(self._init([self._embedding_size, len(self.cfg.get('vocabulary_m'))]), name="W")
 
         self._nil_vars = set([self.A_1.name] + [x.name for x in self.C])
 

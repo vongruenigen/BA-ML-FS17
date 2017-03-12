@@ -102,7 +102,7 @@ class DataLoader(object):
            by using the vocabulary dictionary. Note that this
            function expects a reversed version of the vocabulary
            used to encode the text via convert_text_to_indices().'''
-        skip_idxs = [Config.UNKNOWN_WORD_IDX, Config.PAD_WORD_IDX, Config.EOS_WORD_IDX]
+        skip_idxs = [Config.PAD_WORD_IDX]
         shortened_idxs = []
 
         # Let's remove the padded <unknown> words before converting
@@ -113,7 +113,7 @@ class DataLoader(object):
             else:
                 shortened_idxs.append(idx)
 
-        return ' '.join(map(lambda x: rev_vocabulary[x], reversed(shortened_idxs)))
+        return ' '.join(map(lambda x: str(rev_vocabulary[x]), reversed(shortened_idxs)))
 
     def __preprocess_and_tokenize_line(self, line, vocabulary):
         '''Preprocesses a given line (e.g. removes unwanted chars),
