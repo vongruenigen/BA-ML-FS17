@@ -23,12 +23,12 @@ class Config(object):
     RESULTS_PATH = path.join(ROOT_PATH, 'results')
 
     # Vocabulary constants
-    UNKNOWN_WORD_IDX   = 0
-    UNKNOWN_WORD_TOKEN = '<unknown>'
-    PAD_WORD_IDX       = 1
+    PAD_WORD_IDX       = 0
     PAD_WORD_TOKEN     = '<pad>'
-    EOS_WORD_IDX       = 2
+    EOS_WORD_IDX       = 1
     EOS_WORD_TOKEN     = '<eos>'
+    UNKNOWN_WORD_IDX   = 2
+    UNKNOWN_WORD_TOKEN = '<unknown>'
 
     # Contains the defaults which are applied in case any config
     # parameter is missing. ALL parameters should have an entry
@@ -78,10 +78,6 @@ class Config(object):
         # Defines the cell type which will be used, either 'RNN', 'LSTM' or 'GRU'
         'cell_type': 'LSTM',
 
-        # Defines the used vocabulary. This has to be a pickle file containing
-        # a dictionary which maps words to indices in the embeddings matrix.
-        'vocabulary': None,
-
         # Defines wether there should be examples printed to the console
         # of the input and respective output of the model as clear text.
         'show_predictions_while_training': False,
@@ -101,14 +97,15 @@ class Config(object):
         # after loading the embeddings.
         'embeddings': None,
 
-        # The vocabulary will be set when the embeddings are loaded.
-        'vocabulary': None, 
-
         # Defines the vocabulary to use. It should be a path to a pickle
         # file containing the vocabulary as a dict where the keys are the
         # words and the values the indices of the respecting word in the
         # embedding matrix.
         'vocabulary': None,
+
+        # Defines the used vocabulary. This has to be a pickle file containing
+        # a dictionary which maps words to indices in the embeddings matrix.
+        'vocabulary_m': None,
 
         # Defines wether the used RNN processes the data in both directions
         # (backward/forward) or if it should be unidirectional.
@@ -137,7 +134,7 @@ class Config(object):
         # Defines how much words should be samples when using samples softmax.
         # The sampled softmax is only used if the number of words in the vocabulary
         # exceeds the value in 'max_vocabulary_size'.
-        'sampled_softmax_number_of_samples': 10,
+        'sampled_softmax_number_of_samples': 512,
 
         # Defines how much dimensions should be used when using random embeddings.
         'max_random_embeddings_size': 10,
@@ -158,6 +155,14 @@ class Config(object):
         # when applying the dropout mechanism. The value 1.0 means that all
         # neurons are used and none is dropped.
         'dropout_output_keep': 1.0,
+
+        # A simple integer to integer vocabulary can be used in case none is
+        # configured. It simply maps each number n to itself.
+        'use_integer_vocabulary': True,
+
+        # Embeddings can be randomly initialized if activated and no other
+        # embeddings are specified in the config.
+        'use_random_embeddings': True,
 
         # Defines which tokenizer should be used to parse the conversational
         # texts. The default tokenizers is the 'word_tokenizer' of the ntlk

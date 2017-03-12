@@ -87,22 +87,24 @@ class DataLoader(object):
         '''Converts a text to the respective list of indices
            by using the vocabulary dictionary.'''
 
-        # we need to pad the lines in case we're dealing with a memn2n model
-        if self.cfg.get('model_name'):
-            line = line.lpad(self.cfg.get('memn2n/sentence_length'))
-
         line_parts = self.__preprocess_and_tokenize_line(line, vocabulary)
         line_parts = map(lambda w: vocabulary[w] if w in vocabulary else Config.UNKNOWN_WORD_IDX,
                          line_parts)
+        line_parts = list(line_parts)
 
-        return list(line_parts)
+        # we need to pad the lines in case we're dealing with a memn2n model
+        if self.cfg.get('model_name') == 'memn2n':
+            sent_len = self.cfg.get('memn2n/sentence_length')
+            line_parts += [Config.PAD_WORD_IDX] * (N - len(a)) # pad the sentence
+
+        return line_parts
 
     def convert_indices_to_text(self, text_idxs, rev_vocabulary):
         '''Converts a list of indices to the respective texts
            by using the vocabulary dictionary. Note that this
            function expects a reversed version of the vocabulary
            used to encode the text via convert_text_to_indices().'''
-        skip_idxs = [Config.UNKNOWN_WORD_IDX, Config.PAD_WORD_IDX, Config.EOS_WORD_IDX]
+        skip_idxs = [Config.PAD_WORD_IDX]
         shortened_idxs = []
 
         # Let's remove the padded <unknown> words before converting
