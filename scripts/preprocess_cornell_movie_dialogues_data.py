@@ -6,6 +6,13 @@
 #              dialogue dataset into a format which can
 #              be used for training.
 #
+# How to use:  1. Download raw data from https://www.cs.cornell.edu/~cristian/Cornell_Movie-Dialogs_Corpus.html
+#                 Have to check the raw data format from the other OpenSubtitles versions later.
+#              2. Run this file with the top lvl path of your raw data as parameter.
+#              3. You will find the output file in your given path.
+#
+#
+#
 
 import sys
 import os
