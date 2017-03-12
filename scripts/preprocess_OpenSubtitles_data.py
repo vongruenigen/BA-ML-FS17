@@ -19,7 +19,7 @@ import os
 import re
 import helpers
 import gzip
-from glob import glob
+import glob
 
 helpers.expand_import_path_to_source()
 
@@ -58,4 +58,4 @@ with open(output_file, 'w+') as f:
             print('(Processed %i of %i conversations)' % (i+1, len(files)))
         f.write('<<<<<END-CONV>>>>>' + '\n')
 
-print('Converted all conversations and stored them in %s' % output_file) 
+print('Converted all conversations and stored them in %s' % output_file)
