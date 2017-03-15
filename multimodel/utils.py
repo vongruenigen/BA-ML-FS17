@@ -43,7 +43,7 @@ def prepare_embeddings_and_vocabulary(embeddings, vocabulary):
     '''Adds an embeddings for an unknown word at the top of the embeddings
        matrix and updates the vocabulary accordingly.'''
     unknown_emb = np.random.uniform(-1.0, 1.0, size=(1, embeddings.shape[1]))
-    pad_emb = np.zeros((1, embeddings.shape[1]))
+    pad_emb = np.zeros((1, embeddings.shape[1]), dtype=np.float32)
     eos_emb = np.random.uniform(-1.0, 1.0, size=(1, embeddings.shape[1]))
 
     embeddings = np.vstack([pad_emb, eos_emb, unknown_emb, embeddings])
@@ -73,7 +73,7 @@ def batch(inputs, max_sequence_length=None):
     if max_sequence_length is None:
         max_sequence_length = max(sequence_lengths)
     
-    inputs_batch_major = np.full((batch_size, max_sequence_length), Config.PAD_WORD_IDX)
+    inputs_batch_major = np.full((batch_size, max_sequence_length), Config.PAD_WORD_IDX, dtype=np.float32)
     
     for i, seq in enumerate(inputs):
         for j, element in enumerate(seq):

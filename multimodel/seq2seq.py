@@ -50,7 +50,7 @@ class Seq2Seq(model.Base):
         return {'loss': self._loss, 'perplexity': self._perplexity}
 
     def get_inference_op(self):
-        if self.cfg.get('training_data') is not None or True:
+        if self.cfg.get('training_data') is not None:
             return self.decoder_prediction_train
         else:
             return self.decoder_prediction_inference
@@ -185,7 +185,7 @@ class Seq2Seq(model.Base):
            given vector embeddings.'''
         self.embeddings = self.cfg.get('embeddings')
 
-        if self.embeddings is None or len(self.embeddings) == 0:
+        if self.embeddings is None:
             self.encoder_inputs_embedded = self.encoder_inputs
             self.decoder_train_inputs_embedded = self.decoder_train_inputs
         else:
@@ -223,20 +223,19 @@ class Seq2Seq(model.Base):
             self.encoder_outputs = tf.concat((encoder_fw_outputs, encoder_bw_outputs), 2)
 
             if isinstance(encoder_fw_state, LSTMStateTuple):
-
                 encoder_state_c = tf.concat(
                     (encoder_fw_state.c, encoder_bw_state.c), 1, name='bidirectional_concat_c')
                 encoder_state_h = tf.concat(
                     (encoder_fw_state.h, encoder_bw_state.h), 1, name='bidirectional_concat_h')
                 self.encoder_state = LSTMStateTuple(c=encoder_state_c, h=encoder_state_h)
-
             elif isinstance(encoder_fw_state, tf.Tensor):
                 self.encoder_state = tf.concat((encoder_fw_state, encoder_bw_state), 1, name='bidirectional_concat')
 
     def __init_decoder(self):
         '''Initializes the decoder part of the model.'''
         with tf.variable_scope('decoder') as scope:
-            output_fn = lambda outs: layers.linear(outs, self.__get_vocab_size(), scope=scope)
+            def output_fn(outs):
+                return layers.linear(outs, self.__get_vocab_size(), scope=scope)
 
             if self.cfg.get('use_attention'):
                 attention_states = tf.transpose(self.encoder_outputs, [1, 0, 2])
@@ -289,6 +288,7 @@ class Seq2Seq(model.Base):
                     inputs=self.decoder_train_inputs_embedded,
                     sequence_length=self.decoder_train_length,
                     time_major=True,
+                    swap_memory=True,
                     scope=scope
                 )
 
@@ -302,6 +302,7 @@ class Seq2Seq(model.Base):
                 cell=self.decoder_cell,
                 decoder_fn=decoder_fn_inference,
                 time_major=True,
+                swap_memory=True,
                 scope=scope
             )
 
@@ -312,42 +313,52 @@ class Seq2Seq(model.Base):
         logits = tf.transpose(self.decoder_logits_train, [1, 0, 2])
         targets = tf.transpose(self.decoder_train_targets, [1, 0])
         softmax_loss_fn = None
+
+        out_proj_w = None
+        out_proj_b = None
         
-        # # If there are more words than configured in 'max_vocabulary_size',
-        # # we start using sampled softmax, otherwise the training process won't
-        # # fit on a single GPU without problems.
+        # If there are more words than configured in 'max_vocabulary_size',
+        # we start using sampled softmax, otherwise the training process won't
+        # fit on a single GPU without problems.
         if self.__get_vocab_size() > self.cfg.get('max_vocabulary_size'):
-            target_vocab_size = self.cfg.get('max_vocabulary_size')
+            vocab_size = self.__get_vocab_size()
             num_hidden_units = self.cfg.get('num_hidden_units')
             num_sampled = self.cfg.get('sampled_softmax_number_of_samples')
             
-            w = tf.get_variable('out_proj_w', [num_hidden_units, target_vocab_size], dtype=tf.float32)
-            w_t = tf.transpose(w)
-            b = tf.get_variable('out_proj_b', [target_vocab_size], dtype=tf.float32)
-            
-            self.output_projection = (w, b)
+            w_t = tf.get_variable('out_proj_w', [vocab_size, num_hidden_units], dtype=tf.float32)
+            w = tf.transpose(w_t)
+            b = tf.get_variable('out_proj_b', [vocab_size], dtype=tf.float32)
 
             def sampled_softmax_loss(inputs, labels):
                 labels = tf.reshape(labels, [-1, 1])
 
                 # We need to compute the sampled_softmax_loss using 32bit floats to
                 # avoid numerical instabilities.
-                local_w_t = tf.cast(w_t, tf.float32)
-                local_b = tf.cast(b, tf.float32)
+                local_w_t = out_proj_w = tf.cast(w, tf.float32)
+                local_b = out_proj_b = tf.cast(b, tf.float32)
                 local_inputs = tf.cast(inputs, tf.float32)
 
                 return tf.nn.sampled_softmax_loss(
-                        local_w_t, local_b,
-                        labels, local_inputs,
-                        num_sampled, target_vocab_size)
+                        weights=local_w_t,
+                        biases=local_b,
+                        labels=labels,
+                        inputs=local_inputs,
+                        num_sampled=num_sampled,
+                        num_classes=vocab_size)
 
-            #softmax_loss_fn = sampled_softmax_loss
+            # softmax_loss_fn = sampled_softmax_loss
 
         self._loss = seq2seq.sequence_loss(logits=logits, targets=targets,
-                                           weights=self.loss_weights)
+                                           weights=self.loss_weights,
+                                           softmax_loss_function=softmax_loss_fn)
 
         self._perplexity = tf.pow(2.0, self._loss)
-        self._train_op = tf.train.AdamOptimizer().minimize(self._loss, global_step=self._global_step)
+        self._train_op = tf.train.AdamOptimizer(
+            learning_rate=0.002,
+            beta1=0.9,
+            beta2=0.999,
+            epsilon=1e-08
+        ).minimize(self._loss, global_step=self._global_step)
 
     def __get_vocab_size(self):
         '''Returns the size of the vocabulary.'''

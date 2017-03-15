@@ -44,9 +44,11 @@ class Runner(object):
 
         self.__prepare_summary_writers()
         self.__prepare_results_directory()
-        self.__load_embeddings_and_vocabulary()
 
         self.data_loader = DataLoader(self.cfg)
+        
+        self.session = None
+        self.model = None
 
     def train(self):
         '''This method is responsible for training a model
@@ -71,21 +73,11 @@ class Runner(object):
 
             metrics_track = []
 
-            # TODO: Remove testing data
-            length_from=3
-            length_to=8
-            vocab_lower=3
-            vocab_upper=10
-            batch_size=100
-            max_batches=5000
-            batches_in_epoch=1000
-            verbose=True
-
-            batches = utils.random_sequences(length_from=length_from, length_to=length_to,
-                                             vocab_lower=vocab_lower, vocab_upper=vocab_upper,
-                                             batch_size=batch_size)
-
-            training_batches = batches
+            if self.cfg.get('use_random_integer_sequences') and not training_batches:
+                batches = utils.random_sequences(length_from=3, length_to=8,
+                                                 vocab_lower=3, vocab_upper=10,
+                                                 batch_size=self.cfg.get('batch_size'))
+                training_batches = batches
 
             # Collect all neccesary ops to run
             metric_ops_dict = model.get_metric_ops()
@@ -123,7 +115,7 @@ class Runner(object):
                 logger.warn('training interrupted')
                 # TODO: Save state when the training is interrupted?
 
-            # self.__store_metrics(loss_track, perplexity_track)
+            self.__store_metrics(metrics_track)
 
     def test(self):
         '''This method is responsible for evaluating a trained
@@ -151,21 +143,25 @@ class Runner(object):
            or inference.'''
         with tf.device(self.__get_device()):
             with self.__with_tf_session() as session:
-                model = self.__create_model(session)
+                if self.model is None:
+                    self.__load_embeddings_and_vocabulary()
 
-                # Build and initialize the graph
-                model.build()
-                session.run(tf.global_variables_initializer())
+                    # Build and initialize the graph
+                    self.model = self.__create_model(session)
+                    self.model.build()
+                    session.run(tf.global_variables_initializer())
 
-                yield (session, model)
+                yield (session, self.model)
 
     @contextlib.contextmanager
     def __with_tf_session(self):
         '''This method is responsible for wrapping the execution
            of a given block within a tensorflow session.'''
         with tf.Graph().as_default():
-            with tf.Session() as session:
-                yield session
+            if self.session is None:
+                self.session = tf.Session()
+
+            yield self.session
 
     @contextlib.contextmanager
     def __with_tf_saver(self, session):
@@ -187,19 +183,23 @@ class Runner(object):
         self.saver.save(session, model_path, global_step=model.get_global_step())
         logger.info('Current version of the model stored after epoch #%i' % epoch_nr)
 
-    def __store_metrics(self, loss_track, perplexity_track):
+    def __store_metrics(self, metrics_track):
         '''This method is responsible for storing the metrics
            collected while training the model. Currently, this
            only includes the losses and perplexities.'''
         metrics_path = path.join(self.curr_exp_path, 'metrics.json')
-        
-        conv_to_float = lambda x: float(x)
-        perplexity_track = list(map(conv_to_float, perplexity_track))
-        loss_track = list(map(conv_to_float, loss_track))
+        metrics_obj = {}
+
+        if len(metrics_track) > 0:
+            for k in metrics_track[0].keys():
+                metrics_obj[k] = []
+
+            for metrics in metrics_track:
+                for k in metrics_obj.keys():
+                    metrics_obj[k].append(float(metrics[k]))
 
         with open(metrics_path, 'w+') as f:
-            json.dump({'loss': loss_track, 'perplexity': perplexity_track},
-                      f, indent=4, sort_keys=True)
+            json.dump(metrics_obj, f, indent=4, sort_keys=True)
 
     def __setup_saver_and_restore_model(self, session):
         '''Sets up the Saver which is used to store the model state after
@@ -241,22 +241,35 @@ class Runner(object):
         else:
             self.vocabulary = utils.load_vocabulary(self.cfg.get('vocabulary'))
 
+        embeddings_matrix = None
+
         if self.cfg.get('w2v_embeddings'):
-            self.embeddings = utils.load_w2v_embeddings(self.cfg.get('w2v_embeddings'))
+            embeddings_matrix = utils.load_w2v_embeddings(self.cfg.get('w2v_embeddings'))
         elif self.cfg.get('ft_embeddings'):
-            self.embeddingsy = utils.load_ft_embeddings(self.cfg.get('ft_embeddings'))
+            embeddings_matrix = utils.load_ft_embeddings(self.cfg.get('ft_embeddings'))
         elif self.cfg.get('use_random_embeddings'):
+            max_idx = self.cfg.get('max_vocabulary_size')
+            new_vocabulary = {}
+
+            for k, v in self.vocabulary.items():
+                if v <= max_idx+1:
+                    new_vocabulary[k] = v
+
+            self.vocabulary = new_vocabulary
+
             # uniform(-sqrt(3), sqrt(3)) has variance=1
             sqrt3 = math.sqrt(3)
-            self.embeddings = np.random.uniform(-sqrt3, sqrt3, size=(len(self.vocabulary), 
-                                                self.cfg.get('max_random_embeddings_size')))
-        else:
-            self.embeddings = None
+            embeddings_matrix = np.random.uniform(-sqrt3, sqrt3, size=(len(self.vocabulary), 
+                                                  self.cfg.get('max_random_embeddings_size')))
 
-        if self.embeddings is not None:
+        if embeddings_matrix is not None:
             # Prepare the vocabulary and embeddings (e.g. add embedding for unknown words)
-            self.embeddings, self.vocabulary = utils.prepare_embeddings_and_vocabulary(
-                                                            self.embeddings, self.vocabulary)
+            embeddingx_matrix, self.vocabulary = utils.prepare_embeddings_and_vocabulary(
+                                                            embeddings_matrix, self.vocabulary)
+
+        self.embeddings = tf.get_variable(name='embeddings_m', shape=embeddings_matrix.shape,
+                                          trainable=self.cfg.get('train_word_embeddings'),
+                                          initializer=tf.constant_initializer(embeddings_matrix))
 
         # Store the embeddings and vocabulary in the 
         self.cfg.set('embeddings', self.embeddings)
@@ -292,29 +305,31 @@ class Runner(object):
         if self.cfg.get('show_predictions_while_training'):
             logger.info('Last three samples with predictions:')
 
+            text_in = None
+            text_exp = None
+            text_pred = None
+
             for i, (e_in, dt_exp, dt_pred) in enumerate(zip(
                 feed_dict[model.encoder_inputs].T,
                 feed_dict[model.decoder_targets].T,
                 session.run(model.get_inference_op(), feed_dict).T
             )):
-                # dt_pred = list(map(lambda x: x - 1, dt_pred))
-
                 if self.cfg.get('show_text_when_showing_predictions'):
                     text_in = self.data_loader.convert_indices_to_text(e_in, self.rev_vocabulary)
                     text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
                     text_pred = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
                 else:
-                    text_in = ', '.join(map(lambda x: str(x), e_in))
-                    text_pred = ', '.join(map(lambda x: str(x), dt_pred))
-                    text_exp = ', '.join(map(lambda x: str(x), dt_pred))
+                    text_in = ', '.join(map(lambda x: str(int(x)), e_in))
+                    text_pred = ', '.join(map(lambda x: str(int(x)), dt_pred))
+                    text_exp = ', '.join(map(lambda x: str(int(x)), dt_exp))
 
                 logger.info('[Sample #%i of epoch #%i]' % (i+1, epoch_nr))
-                logger.info('  Input      > %s' % utils.truncate(text_in))
-                logger.info('  Prediction > %s' % utils.truncate(text_out))
-                logger.info('  Expected   > %s' % utils.truncate(text_exp))
+                logger.info('  Input      > %s' % utils.truncate(text_in, width=100))
+                logger.info('  Prediction > %s' % utils.truncate(text_pred, width=100))
+                logger.info('  Expected   > %s' % utils.truncate(text_exp, width=100))
                 
                 # don't show more than three samples per epoch
-                if i >= 2: break
+                if i > 2: break
 
     def __create_model(self, session):
         '''Creates a model based on the name given.'''

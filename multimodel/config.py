@@ -73,7 +73,7 @@ class Config(object):
         'num_decoder_layers': 1,
 
         # Number of hidden units in each of the layers in each cell
-        'num_hidden_units': 1000,
+        'num_hidden_units': 256,
 
         # Defines the cell type which will be used, either 'RNN', 'LSTM' or 'GRU'
         'cell_type': 'LSTM',
@@ -129,7 +129,10 @@ class Config(object):
 
         # Defines how much words should be considered in the vocabulary
         # in case no embeddings are provided.
-        'max_vocabulary_size': 10000,
+        'max_vocabulary_size': 20000,
+
+        # Defines wether the word embeddings should be trainable or constant.
+        'train_word_embeddings': False,
 
         # Defines how much words should be samples when using samples softmax.
         # The sampled softmax is only used if the number of words in the vocabulary
@@ -159,6 +162,10 @@ class Config(object):
         # A simple integer to integer vocabulary can be used in case none is
         # configured. It simply maps each number n to itself.
         'use_integer_vocabulary': True,
+
+        # Defines wether real data or random integer sequences should be used
+        # for training and testing.
+        'use_random_integer_sequences': False,
 
         # Embeddings can be randomly initialized if activated and no other
         # embeddings are specified in the config.
@@ -203,16 +210,6 @@ class Config(object):
         self.cfg_obj = self.DEFAULT_PARAMS.copy()
         self.__deep_merge(self.cfg_obj, cfg_obj)
         self.__create_id()
-
-    @staticmethod
-    def get_model_ctor(name):
-        '''Returns the constructor for the model with the given name.'''
-        if name not in self.MODEL_CTOR_MAPPING:
-            raise Exception('there is no model with the name "%s"\n'
-                            'the following models are available: '
-                            ', '.join(list(self.MODEL_CTOR_MAPPING.keys())))
-
-        return self.MODEL_CTOR_MAPPING[name]
 
     def get(self, names):
         '''Returns the value for the given names stored in the current config object.
