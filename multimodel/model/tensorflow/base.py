@@ -37,13 +37,40 @@ class Base(object):
         '''Initializes the model with the given configuration.'''
         self.cfg = cfg
         self.session = session
-
-        # Track the global step state when training
-        self._global_step = tf.Variable(0, name='global_step', trainable=False)
+        self.global_step = tf.Variable(0, name='global_step', trainable=False)
 
     def get_global_step(self):
         '''Returns the variable used for tracking the global step.'''
-        return self._global_step
+        return self.global_step
+
+    def build(self):
+        '''Stub function for build the model. This function must
+           be overriden by deriving classes and should build the
+           model using the tensorflow session set in the constructor.
+           Raises an exception in case it is not overriden or called
+           on a Base object.'''
+        raise Exception('must be implemented by the deriving class!')
+
+    def get_metric_ops(self):
+        '''Stub function for return the ops used for calculating metrics.'''
+        raise Exception('must be implemented by the deriving class!')
+
+    def get_train_op(self):
+        '''Stub function for return the ops used for training the model.'''
+        raise Exception('must be implemented by the deriving class!')
+
+    def get_inference_op(self):
+        '''Stub function for return the ops used for doing inference on the model.'''
+        raise Exception('must be implemented by the deriving class!')
+
+    def make_train_inputs(self, inpute_seqs, output_seqs):
+        '''Stub function for prepare data for feeding it into the model for training.'''
+        raise Exception('must be implemented by the deriving class!')
+
+    def make_inference_inputs(self, inputs_seqs):
+        '''Stub function for prepare data for feeding it into the model for inference.'''
+        raise Exception('must be implemented by the deriving class!')
+
 
     def build(self):
         '''Stub function for build the model. This function must

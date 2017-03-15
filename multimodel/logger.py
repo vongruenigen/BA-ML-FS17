@@ -8,11 +8,11 @@ import sys
 import logging
 
 from os import path
-from config import Config
+from multimodel.constants import LOGS_PATH
 
 LOGGER_NAME = 'multimodel'
 LOGGER_FORMAT = '[%(asctime)s] %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s'
-LOGFILE_PATH = path.join(Config.LOGS_PATH, 'multimodel.log')
+LOGFILE_PATH = path.join(LOGS_PATH, 'multimodel.log')
 
 mod = sys.modules[__name__]
 mod.logger = None
@@ -20,7 +20,7 @@ mod.logger = None
 def log(lvl, msg):
     '''Logs the given message with the given level.'''
     if mod.logger is None:
-        raise Exception('init_logger() must be called one time before any logging can be done')
+        init_logger()
 
     mod.logger.log(lvl, msg)
  
@@ -47,10 +47,11 @@ def fatal(msg, exit_code=2):
     error(msg)
     sys.exit(exit_code)
 
-def init_logger(cfg):
+def init_logger():
     '''Initializes the logger. This function has to be called
        before using any of the other logging functions.'''
-    level = logging.DEBUG if cfg.get('debug') else logging.INFO
+    # TODO: How to get debugging flag from the config here?
+    level = logging.INFO
     formatter = logging.Formatter(LOGGER_FORMAT)
 
     mod.logger = logging.getLogger(LOGGER_NAME)

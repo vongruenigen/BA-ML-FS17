@@ -11,9 +11,9 @@ import model
 import tensorflow as tf
 import numpy as np
 
-from six.moves import range
+from multimodel.model.tensorflow.base import Base
 
-class MemN2N(model.Base):
+class MemN2N(Base):
     # Responsible for creating the graph to run a End-To-End memory network.'''
 
     # Default settings

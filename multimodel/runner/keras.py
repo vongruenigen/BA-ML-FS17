@@ -16,106 +16,83 @@ import logger
 import tqdm
 import math
 
-import seq2seq, memn2n
-
 from os import path
-from config import Config
-from data_loader import DataLoader
-class Runner(object):
+
+from multimodel.constants import RESULTS_PATH
+from multimodel.model.tensorflow import seq2seq, memn2n
+from multimodel.runner.base import Base
+from multimodel.config import Config
+from multimodel.data_loader.conversational_loader import ConversationalDataLoader
+
+class KerasRunner(Base):
     '''This class is responsible for the training,
        testing and running of the model.'''
 
     def __init__(self, cfg_path):
-        '''Constructor of the Runner class. It expects
-           the path to the config file to runs as the
-           only parameter.'''
-        if isinstance(cfg_path, str):
-            self.cfg_path = cfg_path
-            self.cfg = Config.load_from_json(self.cfg_path)
-        elif isinstance(cfg_path, Config):
-            self.cfg_path = None
-            self.cfg = cfg_path
-        else:
-            raise Exception('cfg_path must be either a path or a Config object')
-
-        logger.init_logger(self.cfg)
-        logger.debug('The following config will be used')
-        logger.debug(json.dumps(self.cfg.cfg_obj, indent=4, sort_keys=True))
-
-        self.__prepare_summary_writers()
-        self.__prepare_results_directory()
-
-        self.data_loader = DataLoader(self.cfg)
-        
-        self.session = None
-        self.model = None
+        '''Creates a new instance of the KerasRunner class.'''
+        super(TensorflowRunner, self).__init__(cfg_path)
 
     def train(self):
         '''This method is responsible for training a model
            with the settings defined in the config.'''
-        with self.__with_model() as (session, model):
-            self.__setup_saver_and_restore_model(session)
+       
+        if self.cfg.get('training_data'):
+            training_batches = self.data_loader.load_conversations(
+                self.cfg.get('training_data'),
+                self.vocabulary
+            )
 
-            training_batches = []
-            test_batches = []
+        if self.cfg.get('test_data'):
+            test_batches = self.data_loader.load_conversations(
+                self.cfg.get('test_data'),
+                self.vocabulary
+            )
 
-            if self.cfg.get('training_data'):
-                training_batches = self.data_loader.load_conversations(
-                    self.cfg.get('training_data'),
-                    self.vocabulary
-                )
+        metrics_track = []
 
-            if self.cfg.get('test_data'):
-                test_batches = self.data_loader.load_conversations(
-                    self.cfg.get('test_data'),
-                    self.vocabulary
-                )
+        if self.cfg.get('use_random_integer_sequences') and not training_batches:
+            batches = utils.random_sequences(length_from=3, length_to=8,
+                                             vocab_lower=3, vocab_upper=10,
+                                             batch_size=self.cfg.get('batch_size'))
+            training_batches = batches
 
-            metrics_track = []
+        # Collect all neccesary ops to run
+        metric_ops_dict = model.get_metric_ops()
+        metric_names = list(metric_ops_dict.keys())
+        metric_ops = [metric_ops_dict[n] for n in metric_names]
+        all_ops = [model.get_train_op()] + metric_ops
 
-            if self.cfg.get('use_random_integer_sequences') and not training_batches:
-                batches = utils.random_sequences(length_from=3, length_to=8,
-                                                 vocab_lower=3, vocab_upper=10,
-                                                 batch_size=self.cfg.get('batch_size'))
-                training_batches = batches
+        try:
+            for epoch in range(self.cfg.get('epochs')):
+                epoch_nr = epoch + 1
+                feed_dict = {}
 
-            # Collect all neccesary ops to run
-            metric_ops_dict = model.get_metric_ops()
-            metric_names = list(metric_ops_dict.keys())
-            metric_ops = [metric_ops_dict[n] for n in metric_names]
-            all_ops = [model.get_train_op()] + metric_ops
+                logger.info('[Starting epoch #%i]' % epoch_nr)
+                print()
+                
+                for batch in tqdm.tqdm(range(self.cfg.get('batches_per_epoch'))):
+                    # Prepare the training data
+                    batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
+                    feed_dict = model.make_train_inputs(batch_data_x, batch_data_y)
+                    results = session.run(all_ops, feed_dict)
 
-            try:
-                for epoch in range(self.cfg.get('epochs')):
-                    epoch_nr = epoch + 1
-                    feed_dict = {}
+                    results.pop(0) # don't need the result from the training op
 
-                    logger.info('[Starting epoch #%i]' % epoch_nr)
-                    print()
-                    
-                    for batch in tqdm.tqdm(range(self.cfg.get('batches_per_epoch'))):
-                        # Prepare the training data
-                        batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
-                        feed_dict = model.make_train_inputs(batch_data_x, batch_data_y)
-                        results = session.run(all_ops, feed_dict)
+                    if len(results) > 0:
+                        metrics_results = {metric_names[i]: results[i] for i, x in enumerate(metric_names)}
+                        metrics_track.append(metrics_results)
 
-                        results.pop(0) # don't need the result from the training op
+                print()
+                self.__print_epoch_state(metrics_track[-1], epoch_nr)
+                self.__show_samples_at_end_of_epoch(model, session, feed_dict, epoch_nr)
 
-                        if len(results) > 0:
-                            metrics_results = {metric_names[i]: results[i] for i, x in enumerate(metric_names)}
-                            metrics_track.append(metrics_results)
+                # Store model after each epoch
+                self.__store_model(session, model, epoch_nr)
+        except KeyboardInterrupt:
+            logger.warn('training interrupted')
+            # TODO: Save state when the training is interrupted?
 
-                    print()
-                    self.__print_epoch_state(metrics_track[-1], epoch_nr)
-                    self.__show_samples_at_end_of_epoch(model, session, feed_dict, epoch_nr)
-
-                    # Store model after each epoch
-                    self.__store_model(session, model, epoch_nr)
-            except KeyboardInterrupt:
-                logger.warn('training interrupted')
-                # TODO: Save state when the training is interrupted?
-
-            self.__store_metrics(metrics_track)
+        self.store_metrics(metrics_track)
 
     def test(self):
         '''This method is responsible for evaluating a trained
@@ -136,70 +113,11 @@ class Runner(object):
 
             return self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
 
-    @contextlib.contextmanager
-    def __with_model(self):
-        '''This method is responsible for setting up the device,
-           session and model which can then be used for training
-           or inference.'''
-        with tf.device(self.__get_device()):
-            with self.__with_tf_session() as session:
-                if self.model is None:
-                    self.__load_embeddings_and_vocabulary()
-
-                    # Build and initialize the graph
-                    self.model = self.__create_model(session)
-                    self.model.build()
-                    session.run(tf.global_variables_initializer())
-
-                yield (session, self.model)
-
-    @contextlib.contextmanager
-    def __with_tf_session(self):
-        '''This method is responsible for wrapping the execution
-           of a given block within a tensorflow session.'''
-        with tf.Graph().as_default():
-            if self.session is None:
-                self.session = tf.Session()
-
-            yield self.session
-
-    @contextlib.contextmanager
-    def __with_tf_saver(self, session):
-        '''This method is responsible for ensuring that the state
-           of the model is saved at all times using the tf.Saver
-           class''' 
-        pass
-
-    def __get_device(self):
-        '''Returns the name of the device to use when executing
-           a computation.'''
-        return '/gpu:0'
-
     def __store_model(self, session, model, epoch_nr):
         '''Stores the given model in the current results directory.
            This model can then later be reloaded with the __load_model()
            method.'''
-        model_path = self.__get_model_path()
-        self.saver.save(session, model_path, global_step=model.get_global_step())
-        logger.info('Current version of the model stored after epoch #%i' % epoch_nr)
-
-    def __store_metrics(self, metrics_track):
-        '''This method is responsible for storing the metrics
-           collected while training the model. Currently, this
-           only includes the losses and perplexities.'''
-        metrics_path = path.join(self.curr_exp_path, 'metrics.json')
-        metrics_obj = {}
-
-        if len(metrics_track) > 0:
-            for k in metrics_track[0].keys():
-                metrics_obj[k] = []
-
-            for metrics in metrics_track:
-                for k in metrics_obj.keys():
-                    metrics_obj[k].append(float(metrics[k]))
-
-        with open(metrics_path, 'w+') as f:
-            json.dump(metrics_obj, f, indent=4, sort_keys=True)
+        raise Exception('to be implemented')
 
     def __setup_saver_and_restore_model(self, session):
         '''Sets up the Saver which is used to store the model state after
@@ -216,10 +134,10 @@ class Runner(object):
     def __prepare_results_directory(self):
         '''This method is responsible for preparing the results
            directory for the experiment with loaded config.'''
-        if not path.isdir(Config.RESULTS_PATH):
-            os.mkdir(Config.RESULTS_PATH)
+        if not path.isdir(RESULTS_PATH):
+            os.mkdir(RESULTS_PATH)
 
-        self.curr_exp_path = path.join(Config.RESULTS_PATH, self.cfg.get('id'))
+        self.curr_exp_path = path.join(RESULTS_PATH, self.cfg.get('id'))
 
         if path.isdir(self.curr_exp_path):
             raise Exception('A results directory with the name' +
@@ -277,20 +195,6 @@ class Runner(object):
 
         # revert the vocabulary for the idx -> text usages
         self.rev_vocabulary = utils.reverse_vocabulary(self.vocabulary)
-
-    def __get_model_path(self, version=0):
-        '''Returns the path to store the model at as a string. An
-           optional version can be specified and will be appended
-           to the name of the stored file. If a model_path is set
-           in the config, this will be returned and version will be
-           ignored.'''
-        if self.cfg.get('model_path'):
-            return self.cfg.get('model_path')
-
-        if not self.curr_exp_path:
-            raise Exception('__prepare_results_directory() must be called before using __get_model_path()')
-
-        return path.join(self.curr_exp_path, 'model-%s.chkp' % str(version))
 
     def __print_epoch_state(self, metrics, epoch_nr):
         '''Prints the metrics after an epoch has been finished.'''

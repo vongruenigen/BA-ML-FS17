@@ -13,9 +13,15 @@ import os
 import numpy as np
 import time
 
-from config import Config
 from os import path
 from subprocess import Popen, PIPE
+
+# add multimodel to the python module import paths
+sys.path.insert(0, path.realpath(path.join(path.dirname(__file__), '..')))
+
+from multimodel import logger
+from multimodel.config import Config
+from multimodel.runner.tensorflow import TensorflowRunner
 
 #
 # Parameters for the run
@@ -89,13 +95,11 @@ for i, arg in enumerate(argv):
 
         np.random.seed(random_seed)
 
-        from runner import Runner
-
         #
         # Execute the run!
         #
         config = Config(cfg_obj)
-        runner = Runner(config)
+        runner = TensorflowRunner(config)
         runner.train()
 
         print('Finished run with file %s' % config_path)

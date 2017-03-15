@@ -1,19 +1,17 @@
 #
 # BA ML FS17 - Dirk von Grünigen & Martin Weilenmann
 #
-# Description: This module contains the DataLoader class
-#              which is responsible for loading the training
-#              and testing data.
+# Description: This module contains the ConversationalDataLoader class
+#              which is responsible for loading the conversational
+#              training and testing data.
 #
 
 import nltk
 import re
-import utils
-import logger
 
-from config import Config
+from multimodel import constants, utils, logger
 
-class DataLoader(object):
+class ConversationalDataLoader(object):
     '''This class is responsible for loading and preprocessing
        the training and test data used in this project. This class
        can load data in the specified format: The conversations have
@@ -23,7 +21,7 @@ class DataLoader(object):
        has to be finished by a special token (defined in the SPLIT_CONV_SYM constant).'''
 
     # NOTE: All datasets have to be preprocessed again if this symbol
-    #       changes, otherwise the DataLoader class won't be able to
+    #       changes, otherwise the ConversationalDataLoader class won't be able to
     #       load the conversations correctly!
     SPLIT_CONV_SYM = '<<<<<END-CONV>>>>>'
 
@@ -34,7 +32,7 @@ class DataLoader(object):
     UNKNOWN_WORD_IDX = 0
 
     def __init__(self, cfg):
-        '''Constructor of the DataLoader class. It only expects
+        '''Constructor of the ConversationalDataLoader class. It only expects
            a Config object as the first and only parameter.'''
         self.cfg = cfg
 
@@ -88,14 +86,14 @@ class DataLoader(object):
            by using the vocabulary dictionary.'''
 
         line_parts = self.__preprocess_and_tokenize_line(line, vocabulary)
-        line_parts = map(lambda w: vocabulary[w] if w in vocabulary else Config.UNKNOWN_WORD_IDX,
+        line_parts = map(lambda w: vocabulary[w] if w in vocabulary else constants.UNKNOWN_WORD_IDX,
                          line_parts)
         line_parts = list(line_parts)
 
         # we need to pad the lines in case we're dealing with a memn2n model
         if self.cfg.get('model_name') == 'memn2n':
             sent_len = self.cfg.get('memn2n/sentence_length')
-            line_parts += [Config.PAD_WORD_IDX] * (N - len(a)) # pad the sentence
+            line_parts += [constants.PAD_WORD_IDX] * (N - len(a)) # pad the sentence
 
         return line_parts
 
@@ -104,7 +102,7 @@ class DataLoader(object):
            by using the vocabulary dictionary. Note that this
            function expects a reversed version of the vocabulary
            used to encode the text via convert_text_to_indices().'''
-        skip_idxs = [Config.PAD_WORD_IDX]
+        skip_idxs = [constants.PAD_WORD_IDX]
         shortened_idxs = []
 
         # Let's remove the padded <unknown> words before converting

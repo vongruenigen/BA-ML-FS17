@@ -11,7 +11,8 @@ import textwrap
 
 from os import path
 from gensim.models import Word2Vec
-from config import Config
+
+import multimodel.constants as constants
 
 def load_w2v_embeddings(path):
     '''Loads the word2vec embeddings at the given path. It returns
@@ -53,9 +54,9 @@ def prepare_embeddings_and_vocabulary(embeddings, vocabulary):
     #       will be inserted as the first row of the embeddings.
     new_vocabulary = {w: idx+3 for w, idx in vocabulary.items()}
 
-    new_vocabulary[Config.UNKNOWN_WORD_TOKEN] = Config.UNKNOWN_WORD_IDX
-    new_vocabulary[Config.PAD_WORD_TOKEN] = Config.PAD_WORD_IDX
-    new_vocabulary[Config.EOS_WORD_TOKEN] = Config.EOS_WORD_IDX
+    new_vocabulary[constants.UNKNOWN_WORD_TOKEN] = constants.UNKNOWN_WORD_IDX
+    new_vocabulary[constants.PAD_WORD_TOKEN] = constants.PAD_WORD_IDX
+    new_vocabulary[constants.EOS_WORD_TOKEN] = constants.EOS_WORD_IDX
 
     return embeddings.astype('float32'), new_vocabulary
 
@@ -73,7 +74,7 @@ def batch(inputs, max_sequence_length=None):
     if max_sequence_length is None:
         max_sequence_length = max(sequence_lengths)
     
-    inputs_batch_major = np.full((batch_size, max_sequence_length), Config.PAD_WORD_IDX, dtype=np.float32)
+    inputs_batch_major = np.full((batch_size, max_sequence_length), constants.PAD_WORD_IDX, dtype=np.float32)
     
     for i, seq in enumerate(inputs):
         for j, element in enumerate(seq):

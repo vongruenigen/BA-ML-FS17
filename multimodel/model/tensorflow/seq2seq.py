@@ -12,16 +12,16 @@ import logger
 import math
 import tensorflow as tf
 import numpy as np
-import model
 
 from tensorflow.contrib import rnn, seq2seq, layers
-from config import Config
 
-class Seq2Seq(model.Base):
-    '''Responsible for building the tensorflow graph, i.e.
-       setting up the network so that it can be used by the
-       Runner class. This implementation is heavily based on
-       the tensorflow tutorial found at:
+from multimodel.model.tensorflow.base import Base
+from multimodel import constants
+
+class Seq2Seq(Base):
+    '''Responsible for building the tensorflow graph, i.e. setting up the network
+       so that it can be used by the TensorflowRunner class. This implementation
+       is heavily based on the tensorflow tutorial found at:
        https://github.com/ematvey/tensorflow-seq2seq-tutorials/blob/master/model_new.py'''
 
     # List of possible style of RNN cells
@@ -41,6 +41,7 @@ class Seq2Seq(model.Base):
         self.s2s_cfg = self.DEFAULT_PARAMS.copy()
         self.s2s_cfg.update(cfg.get('model_config'))
         self.cell_fn = self.CELL_FN[self.s2s_cfg.get('cell_type')]
+        
         super(Seq2Seq, self).__init__(cfg, session)
 
     def get_train_op(self):
@@ -148,8 +149,8 @@ class Seq2Seq(model.Base):
         with tf.name_scope('decoder_train_feeds') as scope:
             sequence_size, batch_size = tf.unstack(tf.shape(self.decoder_targets))
 
-            eos_slice = tf.ones([1, batch_size], dtype=tf.int32) * Config.EOS_WORD_IDX
-            pad_slice = tf.ones([1, batch_size], dtype=tf.int32) * Config.PAD_WORD_IDX
+            eos_slice = tf.ones([1, batch_size], dtype=tf.int32) * constants.EOS_WORD_IDX
+            pad_slice = tf.ones([1, batch_size], dtype=tf.int32) * constants.PAD_WORD_IDX
 
             self.decoder_train_inputs = tf.concat([eos_slice, self.decoder_targets], axis=0)
             self.decoder_train_length = self.decoder_targets_length + 1
@@ -158,8 +159,8 @@ class Seq2Seq(model.Base):
             decoder_train_targets_seq_len, _ = tf.unstack(tf.shape(decoder_train_targets))
             decoder_train_targets_eos_mask = tf.one_hot(self.decoder_train_length - 1,
                                                         decoder_train_targets_seq_len,
-                                                        on_value=Config.EOS_WORD_IDX,
-                                                        off_value=Config.PAD_WORD_IDX,
+                                                        on_value=constants.EOS_WORD_IDX,
+                                                        off_value=constants.PAD_WORD_IDX,
                                                         dtype=tf.int32)
 
             decoder_train_targets_eos_mask = tf.transpose(decoder_train_targets_eos_mask, [1, 0])
@@ -264,8 +265,8 @@ class Seq2Seq(model.Base):
                     attention_score_fn=attention_score_fn,
                     attention_construct_fn=attention_construct_fn,
                     embeddings=self.embeddings,
-                    start_of_sequence_id=Config.EOS_WORD_IDX,
-                    end_of_sequence_id=Config.EOS_WORD_IDX,
+                    start_of_sequence_id=constants.EOS_WORD_IDX,
+                    end_of_sequence_id=constants.EOS_WORD_IDX,
                     maximum_length=tf.reduce_max(self.encoder_inputs_length) + 3,
                     num_decoder_symbols=self.__get_vocab_size()                    
                 )
@@ -275,8 +276,8 @@ class Seq2Seq(model.Base):
                     output_fn=output_fn,
                     encoder_state=self.encoder_state,
                     embeddings=self.embeddings,
-                    start_of_sequence_id=Config.EOS_WORD_IDX,
-                    end_of_sequence_id=Config.EOS_WORD_IDX,
+                    start_of_sequence_id=constants.EOS_WORD_IDX,
+                    end_of_sequence_id=constants.EOS_WORD_IDX,
                     maximum_length=tf.reduce_max(self.encoder_inputs_length) + 3,
                     num_decoder_symbols=self.__get_vocab_size()
                 )
@@ -346,7 +347,7 @@ class Seq2Seq(model.Base):
                         num_sampled=num_sampled,
                         num_classes=vocab_size)
 
-            # softmax_loss_fn = sampled_softmax_loss
+            softmax_loss_fn = sampled_softmax_loss
 
         self._loss = seq2seq.sequence_loss(logits=logits, targets=targets,
                                            weights=self.loss_weights,
@@ -358,7 +359,7 @@ class Seq2Seq(model.Base):
             beta1=0.9,
             beta2=0.999,
             epsilon=1e-08
-        ).minimize(self._loss, global_step=self._global_step)
+        ).minimize(self._loss, global_step=self.get_global_step())
 
     def __get_vocab_size(self):
         '''Returns the size of the vocabulary.'''
