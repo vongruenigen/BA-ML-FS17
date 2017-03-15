@@ -21,6 +21,7 @@ sys.path.insert(0, path.realpath(path.join(path.dirname(__file__), '..')))
 
 from multimodel import logger
 from multimodel.config import Config
+from multimodel.runner.keras import KerasRunner
 from multimodel.runner.tensorflow import TensorflowRunner
 
 #
@@ -99,7 +100,7 @@ for i, arg in enumerate(argv):
         # Execute the run!
         #
         config = Config(cfg_obj)
-        runner = TensorflowRunner(config)
+        runner = KerasRunner(config)
         runner.train()
 
         print('Finished run with file %s' % config_path)

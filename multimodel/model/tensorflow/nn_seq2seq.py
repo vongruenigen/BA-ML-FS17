@@ -18,7 +18,7 @@ from tensorflow.contrib import rnn, seq2seq, layers
 from multimodel.model.tensorflow.base import Base
 from multimodel import constants
 
-class Seq2Seq(Base):
+class NnSeq2Seq(Base):
     '''Responsible for building the tensorflow graph, i.e. setting up the network
        so that it can be used by the TensorflowRunner class. This implementation
        is heavily based on the tensorflow tutorial found at:
@@ -42,7 +42,7 @@ class Seq2Seq(Base):
         self.s2s_cfg.update(cfg.get('model_config'))
         self.cell_fn = self.CELL_FN[self.s2s_cfg.get('cell_type')]
         
-        super(Seq2Seq, self).__init__(cfg, session)
+        super(NnSeq2Seq, self).__init__(cfg, session)
 
     def get_train_op(self):
         return self._train_op

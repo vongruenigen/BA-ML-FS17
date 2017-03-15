@@ -99,7 +99,7 @@ DEFAULT_CONFIG_PARAMS = {
 
     # Defines the used vocabulary. This has to be a pickle file containing
     # a dictionary which maps words to indices in the embeddings matrix.
-    'vocabulary_m': None,
+    'vocabulary': None,
 
     # Defines wether the used RNN processes the data in both directions
     # (backward/forward) or if it should be unidirectional.

@@ -78,7 +78,7 @@ class TensorflowRunner(Base):
                     
                     for batch in tqdm.tqdm(range(self.cfg.get('batches_per_epoch'))):
                         # Prepare the training data
-                        batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
+                        batch_data_x, batch_data_y = self.prepare_data_batch(training_batches)
                         feed_dict = model.make_train_inputs(batch_data_x, batch_data_y)
                         results = session.run(all_ops, feed_dict)
 
@@ -127,8 +127,6 @@ class TensorflowRunner(Base):
         with tf.device(self.__get_device()):
             with self.__with_tf_session() as session:
                 if self.model is None:
-                    self.__load_embeddings_and_vocabulary()
-
                     # Build and initialize the graph
                     self.model = self.__create_model(session)
                     self.model.build()
@@ -170,57 +168,6 @@ class TensorflowRunner(Base):
         if model_path is not None:
             logger.info('Loading model from the path %s' % model_path)
             self.saver.restore(session, model_path)
-
-    def __prepare_summary_writers(self):
-        # TODO
-        pass
-
-    def __load_embeddings_and_vocabulary(self):
-        '''Loads the embeddings with the associated vocabulary
-           and saves them for later usage in the DataLoader and
-           while training/testing.'''
-        if self.cfg.get('vocabulary') is None and self.cfg.get('use_integer_vocabulary'):
-            # Build a stub dictionary which maps integers to integers for the defined range
-            self.vocabulary = {str(x): x for x in range(self.cfg.get('max_vocabulary_size'))}
-        else:
-            self.vocabulary = utils.load_vocabulary(self.cfg.get('vocabulary'))
-
-        embeddings_matrix = None
-
-        if self.cfg.get('w2v_embeddings'):
-            embeddings_matrix = utils.load_w2v_embeddings(self.cfg.get('w2v_embeddings'))
-        elif self.cfg.get('ft_embeddings'):
-            embeddings_matrix = utils.load_ft_embeddings(self.cfg.get('ft_embeddings'))
-        elif self.cfg.get('use_random_embeddings'):
-            max_idx = self.cfg.get('max_vocabulary_size')
-            new_vocabulary = {}
-
-            for k, v in self.vocabulary.items():
-                if v <= max_idx+1:
-                    new_vocabulary[k] = v
-
-            self.vocabulary = new_vocabulary
-
-            # uniform(-sqrt(3), sqrt(3)) has variance=1
-            sqrt3 = math.sqrt(3)
-            embeddings_matrix = np.random.uniform(-sqrt3, sqrt3, size=(len(self.vocabulary), 
-                                                  self.cfg.get('max_random_embeddings_size')))
-
-        if embeddings_matrix is not None:
-            # Prepare the vocabulary and embeddings (e.g. add embedding for unknown words)
-            embeddingx_matrix, self.vocabulary = utils.prepare_embeddings_and_vocabulary(
-                                                            embeddings_matrix, self.vocabulary)
-
-        self.embeddings = tf.get_variable(name='embeddings_m', shape=embeddings_matrix.shape,
-                                          trainable=self.cfg.get('train_word_embeddings'),
-                                          initializer=tf.constant_initializer(embeddings_matrix))
-
-        # Store the embeddings and vocabulary in the 
-        self.cfg.set('embeddings', self.embeddings)
-        self.cfg.set('vocabulary_m', self.vocabulary)
-
-        # revert the vocabulary for the idx -> text usages
-        self.rev_vocabulary = utils.reverse_vocabulary(self.vocabulary)
 
     def __print_epoch_state(self, metrics, epoch_nr):
         '''Prints the metrics after an epoch has been finished.'''
@@ -275,39 +222,3 @@ class TensorflowRunner(Base):
                          ', '.join(model_ctor_map.keys()))
 
         return model_ctor_map[name](self.cfg, session)
-
-    def __prepare_data_batch(self, all_data):
-        '''Returns two lists, each of the size of the configured batch size. The first contains
-           the input sentences (sentences which the first "person" said), the latter contains the
-           list of expected answers.'''
-        data_batch_x, data_batch_y = [], []
-        batch_size = self.cfg.get('batch_size')
-
-        conv_turn_idx = 0
-        conversation = next(all_data)
-        first_conv_turn = None
-        second_conv_turn = None
-
-        while len(data_batch_y) < batch_size and len(data_batch_x) < batch_size:
-            # Check if we've reached the end of the conversation, in this
-            # case we've to load the next conversation.
-            try:
-                if conv_turn_idx + 1 >= len(conversation):
-                    conversation = next(all_data)
-                    conv_turn_idx = 0
-            except StopIteration as e:
-                break # exit the loop in case there is no more data  
-
-            first_conv_turn = conversation[conv_turn_idx]
-            second_conv_turn = conversation[conv_turn_idx+1]
-            
-            if self.cfg.get('train_on_copy'):
-                data_batch_x.append(first_conv_turn)
-                data_batch_y.append(first_conv_turn)
-            else:
-                data_batch_x.append(first_conv_turn)
-                data_batch_y.append(second_conv_turn)
-
-            conv_turn_idx += 2
-
-        return data_batch_x, data_batch_y
