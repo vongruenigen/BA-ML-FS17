@@ -48,18 +48,25 @@ with open(train_out, 'w+') as train_f:
                        valid_out: (valid_f, 0, num_valid),
                        test_out:  (test_f, 0, num_test)}
 
+            lines = []
             ds_dict_keys = list(ds_dict.keys())
 
             for i, line in tqdm.tqdm(enumerate(open(corpus, 'r')), total=num_lines):
+                lines.append(line)
+                if len(lines) == 1: continue
+
                 rand_idx = np.random.randint(0, len(ds_dict_keys))
                 rand_key = ds_dict_keys[rand_idx]
 
                 rand_f, rand_curr, rand_max = ds_dict[rand_key]
                 
-                rand_f.write(line)
-                rand_curr += 1
+                for line in lines:
+                    rand_f.write(line)
+                   
+                rand_curr += 2
+                lines = []
 
-                if rand_curr == rand_max:
+                if rand_curr >= rand_max:
                     print('Finished corpus, stored at %s' % rand_f.name)
                     ds_dict_keys.remove(rand_key)
                 else:

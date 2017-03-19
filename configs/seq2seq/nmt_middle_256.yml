@@ -22,11 +22,11 @@ model_params:
         num_units: 256
       dropout_input_keep_prob: 0.8
       dropout_output_keep_prob: 1.0
-      num_layers: 2
+      num_layers: 1
   optimizer.name: Adam
-  optimizer.learning_rate: 0.0001
+  optimizer.learning_rate: 0.001
   source.max_seq_len: 50
   source.reverse: false
   target.max_seq_len: 50
-  vocab_source: ../data/vocabularies/vocabulary_news_embeddings_en.txt
-  vocab_target: ../data/vocabularies/vocabulary_news_embeddings_en.txt
+  vocab_source: ../data/vocabularies/vocab_news_50k.txt
+  vocab_target: ../data/vocabularies/vocab_news_50k.txt
