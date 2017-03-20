@@ -5,8 +5,11 @@ if [ ! -f $SEQ2SEQ_DIR_NAME ]; then
   git clone https://github.com/google/seq2seq.git $SEQ2SEQ_DIR_NAME
 fi
 
+pip install cython
+pip install -r requirements.txt
+
 cd $SEQ2SEQ_DIR_NAME
 LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda-8.0/extras/CUPTI/lib64 \
-python -m bin.train --config_paths="../configs/seq2seq/nmt_middle_256.yml,../configs/seq2seq/train_seq2seq.yml,../configs/seq2seq/input_pipeline/opensubtitles.yml" \
+python -m bin.train --config_paths="../configs/seq2seq/nmt_4096.yml,../configs/seq2seq/train_seq2seq.yml,../configs/seq2seq/input_pipeline/opensubtitles.yml" \
                     --output_dir="../results/seq2seq-opus-2016/"
 cd ..
