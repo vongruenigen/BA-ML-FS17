@@ -1,3 +1,4 @@
+#!/bin/bash
 SEQ2SEQ_DIR_NAME="seq2seq"
 
 if [ ! -f $SEQ2SEQ_DIR_NAME ]; then
