@@ -6,11 +6,6 @@ if [ ! -f $SEQ2SEQ_DIR_NAME ]; then
   git clone https://github.com/google/seq2seq.git $SEQ2SEQ_DIR_NAME
 fi
 
-if [ -f /.dockerenv ]; then
-  pip install cython
-  pip install -r /BA-ML-FS17/requirements.txt
-fi
-
 export S2S_PREFIX='../configs/seq2seq'
 
 cd $SEQ2SEQ_DIR_NAME
