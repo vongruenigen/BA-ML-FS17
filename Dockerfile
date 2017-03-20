@@ -5,6 +5,7 @@ MAINTAINER MARTIN WEILENMANN <weilemar@students.zhaw.ch>
 # Clean
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+RUN apt-get install git
 
 WORKDIR /BA-ML-FS17/
 
