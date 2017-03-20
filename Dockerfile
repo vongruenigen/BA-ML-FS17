@@ -6,7 +6,6 @@ MAINTAINER MARTIN WEILENMANN <weilemar@students.zhaw.ch>
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY . /BA-ML-FS17
 WORKDIR /BA-ML-FS17/
 RUN pip install cython
 RUN pip install -r requirements.txt
