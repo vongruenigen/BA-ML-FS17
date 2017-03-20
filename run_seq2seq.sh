@@ -11,12 +11,17 @@ if [ -f /.dockerenv ]; then
   pip install -r /BA-ML-FS17/requirements.txt
 fi
 
+OUT_PATH="../results/seq2seq-opus-2016"
+
 export S2S_PREFIX='../configs/seq2seq'
+
+# remove potentially old data
+rm -rf $OUT_PATH/*
 
 cd $SEQ2SEQ_DIR_NAME
 LD_PRELOAD="/usr/lib/libtcmalloc_minimal.so.4" \
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda-8.0/extras/CUPTI/lib64 \
-python -m bin.train --config_paths="$S2S_PREFIX/nmt_4096.yml,$S2S_PREFIX/train_seq2seq.yml,\
+python -m bin.train --config_paths="$S2S_PREFIX/nmt_2048.yml,$S2S_PREFIX/train_seq2seq.yml,\
                                     $S2S_PREFIX/input_pipeline/opensubtitles.yml,$S2S_PREFIX/metrics.yml" \
-                    --output_dir="../results/seq2seq-opus-2016/"
+                    --output_dir=$OUT_PATH
 cd ..
