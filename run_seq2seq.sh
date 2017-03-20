@@ -7,7 +7,7 @@ fi
 
 if [ -f /.dockerenv ]; then
   pip install cython
-  pip install -r requirements.txt
+  pip install -r /BA-ML-FS17/requirements.txt
 fi
 
 cd $SEQ2SEQ_DIR_NAME
