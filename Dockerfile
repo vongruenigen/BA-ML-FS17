@@ -7,6 +7,7 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 RUN apt-get update
 RUN apt-get install -y git
+RUN apt-get install -y libtcmalloc-minimal4
 
 WORKDIR /BA-ML-FS17/
 
