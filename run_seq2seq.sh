@@ -20,7 +20,7 @@ rm -rf $OUT_PATH/*
 mkdir -p $OUT_PATH
 
 # Run tensorboard in the background
-python -m tensorflow.tensorboard --port=8008 --logdir=$OUT_PATH &2> /dev/null
+python -m tensorflow.tensorboard --port=8008 --logdir=$OUT_PATH &2> tensorboard.log
 
 cd $SEQ2SEQ_DIR_NAME
 LD_PRELOAD="/usr/lib/libtcmalloc_minimal.so.4" \
