@@ -10,10 +10,6 @@ RUN apt-get install -y git
 
 WORKDIR /BA-ML-FS17/
 
-ADD requirements.txt .
-RUN pip install cython
-RUN pip install -r requirements
-
 # TensorBoard
 EXPOSE 6006
 
