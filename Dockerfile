@@ -7,8 +7,6 @@ RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 WORKDIR /BA-ML-FS17/
-RUN pip install cython
-RUN pip install -r requirements.txt
 
 # TensorBoard
 EXPOSE 6006
