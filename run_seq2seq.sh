@@ -17,6 +17,10 @@ export S2S_PREFIX='../configs/seq2seq'
 
 # remove potentially old data
 rm -rf $OUT_PATH/*
+mkdir -p $OUT_PATH
+
+# Run tensorboard in the background
+python -m tensorflow.tensorboard --port=8008 --logdir=$OUT_PATH &2> /dev/null
 
 cd $SEQ2SEQ_DIR_NAME
 LD_PRELOAD="/usr/lib/libtcmalloc_minimal.so.4" \
