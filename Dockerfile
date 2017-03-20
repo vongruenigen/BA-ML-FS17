@@ -1,4 +1,4 @@
-FROM gcr.io/tensorflow/tensorflow:latest-py3
+FROM gcr.io/tensorflow/tensorflow:latest-gpu-py3
 
 MAINTAINER MARTIN WEILENMANN <weilemar@students.zhaw.ch>
 
