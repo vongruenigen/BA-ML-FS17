@@ -5,8 +5,10 @@ if [ ! -f $SEQ2SEQ_DIR_NAME ]; then
   git clone https://github.com/google/seq2seq.git $SEQ2SEQ_DIR_NAME
 fi
 
-pip install cython
-pip install -r requirements.txt
+if [ -f /.dockerenv ]; then
+  pip install cython
+  pip install -r requirements.txt
+fi
 
 cd $SEQ2SEQ_DIR_NAME
 LD_LIBRARY_PATH=/usr/local/cuda/lib64:/usr/local/cuda-8.0/extras/CUPTI/lib64 \
