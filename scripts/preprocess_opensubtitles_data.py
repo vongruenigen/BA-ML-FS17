@@ -27,7 +27,6 @@ from os import path
 
 files = []
 pattern = "*.gz"
-out_file_name = 'opensubtitle_all.txt'
 
 argv = sys.argv[1:]
 
@@ -37,7 +36,7 @@ if len(argv) < 2 or not path.isdir(argv[0]):
     sys.exit(2)
 
 data_dir = argv[0]
-output_file = path.join(data_dir, out_file_name)
+output_file = argv[1]
 
 def clean_text(t):
     t = t.strip('-')
@@ -51,6 +50,7 @@ def clean_text(t):
     t = t.replace('  ', ' ')
     t = t.replace("~", "")
     t = t.strip(' ')
+    t = t.replace('...', '')
 
     return t
 
@@ -60,6 +60,7 @@ for d, _, _ in os.walk(data_dir):
 with open(output_file, 'w+') as f:
     # Write the header to indicate the type of data
     f.write('# type=only-sentences')
+
     for i, fname in tqdm(enumerate(files), total=len(files)):
         with gzip.open(fname, 'rb') as gzf:
             tree = ET.fromstring(gzf.read())
