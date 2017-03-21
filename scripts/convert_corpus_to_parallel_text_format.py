@@ -23,24 +23,21 @@ use_first_sent = True
 first_sent = None
 second_sent = None
 
+last_sentence = None
+
 with open(out_src_path, 'w+') as src_f:
     with open(out_target_path, 'w+') as target_f:
-        for i, line in enumerate(open(in_path, 'r')):
-            if first_sent is None:
-                first_sent = line
-            elif second_sent is None:
-                second_sent = line
+        for i, curr_sentence in enumerate(open(in_path, 'r')):
+            # Skip comments
+            if curr_sentence.startswith('#'):
+                print('skipping line %i because it is a comment' % (i+1))
+                continue
 
-            if (first_sent is not None and 
-                second_sent is not None):
-                src_f.write(first_sent)
-                src_f.write(second_sent)
+            if last_sentence is not None:
+                src_f.write(last_sentence)
+                target_f.write(curr_sentence)
 
-                target_f.write(second_sent)
-                target_f.write(first_sent)
-
-                first_sent = None
-                second_sent = None
+            last_sentence = curr_sentence
 
             if (i+1) % 1000 == 0:
                 print('Processed %i sentences...' % (i+1))
