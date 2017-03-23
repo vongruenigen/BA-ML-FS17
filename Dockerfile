@@ -1,6 +1,6 @@
 FROM gcr.io/tensorflow/tensorflow:latest-gpu-py3
 
-MAINTAINER MARTIN WEILENMANN <weilemar@students.zhaw.ch>
+LABEL authors="Dirk von Grünigen, Martin Weilenmann"
 
 # Clean
 RUN apt-get clean && \
@@ -10,6 +10,9 @@ RUN apt-get install -y git
 RUN apt-get install -y libtcmalloc-minimal4
 
 WORKDIR /BA-ML-FS17/
+ADD /requirements.txt /BA-ML-FS17/requirements.txt
+RUN pip install cython
+RUN pip install -r /BA-ML-FS17/requirements.txt
 
 # TensorBoard
 EXPOSE 6006
