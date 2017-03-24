@@ -2,14 +2,14 @@ input_pipeline_train:
   class: ParallelTextInputPipeline
   params:
     source_files:
-      - ../data/opensubtitles/opensubtitles_2016_train.0.src.txt
+      - ../data/opensubtitles/opensubtitles_train.src.txt
     target_files:
-      - ../data/opensubtitles/opensubtitles_2016_train.0.target.txt
+      - ../data/opensubtitles/opensubtitles_train.target.txt
 
 input_pipeline_dev:
   class: ParallelTextInputPipeline
   params:
     source_files:
-      - ../data/opensubtitles/opensubtitles_2016_valid.0.src.txt
+      - ../data/opensubtitles/opensubtitles_valid.0.src.txt
     target_files:
-      - ../data/opensubtitles/opensubtitles_2016_valid.0.target.txt
+      - ../data/opensubtitles/opensubtitles_valid.0.target.txt
