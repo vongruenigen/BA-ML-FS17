@@ -8,7 +8,7 @@ model_params:
   encoder.class: seq2seq.encoders.BidirectionalRNNEncoder
   encoder.params:
     rnn_cell:
-      cell_class: GRUCell
+      cell_class: LSTMCell
       cell_params:
         num_units: 512
       dropout_input_keep_prob: 0.8
@@ -17,14 +17,14 @@ model_params:
   decoder.class: seq2seq.decoders.AttentionDecoder
   decoder.params:
     rnn_cell:
-      cell_class: GRUCell
+      cell_class: LSTMCell
       cell_params:
         num_units: 512
       dropout_input_keep_prob: 0.8
       dropout_output_keep_prob: 1.0
-      num_layers: 1
+      num_layers: 2
   optimizer.name: Adam
-  optimizer.learning_rate: 0.001
+  optimizer.learning_rate: 0.0001
   source.max_seq_len: 50
   source.reverse: false
   target.max_seq_len: 50
