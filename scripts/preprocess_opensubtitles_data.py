@@ -51,6 +51,7 @@ def clean_text(t):
     t = t.replace("~", "")
     t = t.strip(' ')
     t = t.replace('...', '')
+    t = t.replace('#', '')
 
     return t
 
