@@ -17,7 +17,7 @@ LOGDIR=$2
 
 while :; do
   nvidia-docker run -it -p $PORT:8008 -v /cluster/home/weilemar/data/farm-ai/images/BA-ML-FS17:/BA-ML-FS17 \
-                     weilemar-vongrdir-ba-ml-fs17 python -m tensorflow.tensorboard --port=$PORT \
+                     weilemar-vongrdir-ba-ml-fs17 python -m tensorflow.tensorboard --port=8008 \
                                                          --logdir=$LOGDIR
   sleep 1
 done
