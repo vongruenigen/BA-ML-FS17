@@ -10,6 +10,6 @@ input_pipeline_dev:
   class: ParallelTextInputPipeline
   params:
     source_files:
-      - ../data/opensubtitles/opensubtitles_valid.0.src.txt
+      - ../data/opensubtitles/opensubtitles_valid.src.txt
     target_files:
-      - ../data/opensubtitles/opensubtitles_valid.0.target.txt
+      - ../data/opensubtitles/opensubtitles_valid.target.txt
