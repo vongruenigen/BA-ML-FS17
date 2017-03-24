@@ -65,6 +65,6 @@ set -x
 
 LD_PRELOAD="/usr/lib/libtcmalloc_minimal.so.4" \
 LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda-8.0/extras/CUPTI/lib64 \
-python -m bin.train --config_paths=$YML_CONFIGS \
-                    --output_dir=$OUT_PATH 2>&1 | tee ../logs/tf.log
+python -m bin.train --config_paths="$YML_CONFIGS" \
+                    --output_dir="$OUT_PATH" 2>&1 | tee ../logs/tf.log
 cd ..
