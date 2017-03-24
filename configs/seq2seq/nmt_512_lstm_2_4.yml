@@ -28,3 +28,5 @@ model_params:
   source.max_seq_len: 50
   source.reverse: false
   target.max_seq_len: 50
+  vocab_source: ../data/vocabularies/vocab_news_50k.txt
+  vocab_target: ../data/vocabularies/vocab_news_50k.txt
