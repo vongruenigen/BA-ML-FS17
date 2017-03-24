@@ -28,11 +28,6 @@ last_sentence = None
 with open(out_src_path, 'w+') as src_f:
     with open(out_target_path, 'w+') as target_f:
         for i, curr_sentence in enumerate(open(in_path, 'r')):
-            # Skip comments
-            if curr_sentence.startswith('#'):
-                print('skipping line %i because it is a comment' % (i+1))
-                continue
-
             if last_sentence is not None:
                 src_f.write(last_sentence)
                 target_f.write(curr_sentence)
