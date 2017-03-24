@@ -1,6 +1,6 @@
 batch_size: 32
 train_steps: 34425344
-eval_every_n_steps: 50000
+#eval_every_n_steps: 50000
 buckets: 10,20,30,40
 hooks:
   - class: PrintModelAnalysisHook
