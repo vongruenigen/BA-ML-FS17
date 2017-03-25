@@ -4,7 +4,7 @@ model_params:
   attention.params:
     num_units: 2048
   bridge.class: seq2seq.models.bridges.ZeroBridge
-  embedding.dim: 128
+  embedding.dim: 256
   encoder.class: seq2seq.encoders.BidirectionalRNNEncoder
   encoder.params:
     rnn_cell:
@@ -28,5 +28,5 @@ model_params:
   source.max_seq_len: 50
   source.reverse: false
   target.max_seq_len: 50
-  vocab_source: ../data/vocabularies/vocab_news_50k.txt
-  vocab_target: ../data/vocabularies/vocab_news_50k.txt
+  vocab_source: ../data/vocabularies/vocab_news_25k.txt
+  vocab_target: ../data/vocabularies/vocab_news_25k.txt
