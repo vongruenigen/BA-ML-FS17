@@ -50,15 +50,15 @@ OUT_BASE_PATH='../results'
 OUT_PATH="$OUT_BASE_PATH/$RESULTS_NAME"
 
 # remove potentially old data
-if [ -d $OUT_PATH ]; then
-  if [ -z ${FORCE+x} ]; then
-    echoerr "The directory $OUT_PATH exists and FORCE is not set, exiting!"
-    exit 2
-  else
-    rm -rf $OUT_PATH/
-    mkdir -p $OUT_PATH
-  fi
-fi
+# if [ -d $OUT_PATH ]; then
+#   if [ -z ${FORCE+x} ]; then
+#     echoerr "The directory $OUT_PATH exists and FORCE is not set, exiting!"
+#     exit 2
+#   else
+#     rm -rf $OUT_PATH/
+#     mkdir -p $OUT_PATH
+#   fi
+# fi
 
 # Log everything to stderr
 set -x
