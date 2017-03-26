@@ -1,5 +1,5 @@
 batch_size: 128
-train_steps: 160000 # ~= (2.1e6 / batch_size) * 10 ~= 10 epochs
+train_steps: 480000 # ~= (2.1e6 / batch_size) * 30 ~= 30 epochs
 eval_every_n_steps: 10000000000
 buckets: 10,20,30,40
 hooks:
