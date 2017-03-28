@@ -27,7 +27,7 @@ from nltk import word_tokenize
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
-INPUT_FILE_NAME = 'RC_2015-01_10000'
+INPUT_FILE_NAME = 'RC_2015-01'
 
 argv = sys.argv[1:]
 
