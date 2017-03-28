@@ -4,6 +4,9 @@ logs/*
 
 # Data directories
 data/**/*
+!data/vocabularies/*.txt
+!data/corpora/**/*.txt
+!data/corpora/**/*.json
 !data/**/*.gitkeep
 
 # Byte-compiled / optimized / DLL files
