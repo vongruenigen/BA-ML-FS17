@@ -18,19 +18,25 @@ if len(argv) != 3:
     print('       (e.g. python scripts/extract_vocabulary_tokens.py <w2v-emb> <top-nth> <vocab-out>')
     sys.exit(2)
 
-embeddings = Word2Vec.load(argv[0])
-top_nth = argv[1]
+emb_path = argv[0]
+embeddings = Word2Vec.load(emb_path)
+vocab_out = argv[2]
+top_nth = int(argv[1])
 top_nth_arr = []
-vocab_out = open(argv[2], 'w+')
 
 if top_nth <= 0 or top_nth > len(embeddings.vocab):
     top_nth = len(embeddings.vocab)
 
-if top_nth == len(embeddings.vocab):
-    top_nth_arr = list(embeddings.vocab.keys())
-else:
-    top_nth_arr = list(embeddings.vocab.items()).sort(lambda x: x[1].count)
+top_nth_arr = list(embeddings.vocab.items())
+top_nth_arr.sort(reverse=True, key=lambda x: x[1].count)
+top_nth_arr = top_nth_arr[:top_nth]
 
-with open(voc_out, 'w+') as out_file:
-    for tok in top_nth_arr:
+# import pdb
+# pdb.set_trace()
+
+with open(vocab_out, 'w+') as out_file:
+    for tok in map(lambda x: x[0], top_nth_arr):
         out_file.write('%s\n' % tok)
+
+print('Extracted %i words from embeddings %s and stored at %s' % (len(top_nth_arr), emb_path, vocab_out))
+
