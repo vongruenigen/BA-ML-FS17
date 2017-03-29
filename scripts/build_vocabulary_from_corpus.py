@@ -24,8 +24,8 @@ voc_out = argv[1]
 vocab_dict = {}
 
 for i, line in enumerate(open(corpus_in, 'r')):
-    # Skip type declarations
-    if i == 0 and line.startswith('#'):
+    # Skip type declarations and end-conv symbols
+    if (i == 0 and line.startswith('#')) or line.startswith('<<<'):
         continue
 
     words = word_tokenize(line.lower().strip('\n'))
