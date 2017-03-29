@@ -28,7 +28,7 @@ reload(sys)
 sys.setdefaultencoding('utf-8')
 
 INPUT_FILE_NAME = 'RC_2015-01'
-
+SPLIT_CONV_SYM = '<<<<<END-CONV>>>>>'
 argv = sys.argv[1:]
 
 if len(argv) < 2:
@@ -82,6 +82,7 @@ def clean_text(t):
 print('Start with filtering the reddit data using your chosen subreddit tag %s.' % subreddit)
 
 with open(input_file_dir, 'r') as in_f:
+    prev_content = ''
     with open(temp_dir, 'w+') as out_f:
         for i, line in enumerate(in_f):
             try:
@@ -92,6 +93,9 @@ with open(input_file_dir, 'r') as in_f:
             id = json_obj['id']
             if tag == subreddit:
                 content = json_obj['body']
+                if content == prev_content:
+                    continue
+                prev_content = content
                 if not content == '' and not content == '[deleted]':
                     out_f.write(line)
 #sys.exit(2)
@@ -117,6 +121,8 @@ with open(temp_dir, 'r') as in_f:
     print('Start copying the sorted datasets into the output file.')
 
     with open(output_file_dir, 'w+') as out_f:
+        prev_link_id = ''
+        sample_conv = 1
         for i, keyval in enumerate(sorted_list):
             key = keyval[0]
             in_f.seek(line_offset[key], 0)
@@ -125,10 +131,47 @@ with open(temp_dir, 'r') as in_f:
             except ValueError:
                 print("JSON loads error")
                 continue
-            content = json_obj['body']
-            clean_content = clean_text(content)
-            if not clean_content == '' and not clean_content == ' ':
-                out_f.write(clean_content + "\n")
+            sample_conv += 1
+
+            if sample_conv > 2 and sample_conv < len(sorted_list):
+                second_json_line = json_obj
+                first_link_id = first_json_line['link_id']
+                second_link_id = second_json_line['link_id']
+                content = first_json_line['body']
+                second_content = second_json_line['body']
+                retrieved_on = first_json_line['retrieved_on']
+
+                value_next_line = clean_text(second_content)
+                clean_content = clean_text(content)
+                if value_next_line == '' or value_next_line == ' ':
+                    continue
+                if not clean_content == '' and not clean_content == ' ':
+                    if not first_link_id == prev_link_id and not first_link_id == second_link_id:
+                        first_json_line = second_json_line
+                        continue
+                    elif not first_link_id == prev_link_id and i != 0:
+                        out_f.write(SPLIT_CONV_SYM + "\n")
+                    
+                    out_f.write(clean_content + "\n")
+                    prev_link_id = first_link_id
+                    first_json_line = second_json_line
+
+                    if (sample_conv + 1) == len(sorted_list) and second_link_id == prev_link_id:
+                        clean_content = clean_text(content)
+                        out_f.write(clean_content + "\n")
+                        out_f.write(SPLIT_CONV_SYM + "\n")
+                        content = second_json_line['body']
+                    elif (sample_conv + 1) == len(sorted_list):
+                        out_f.write(SPLIT_CONV_SYM + "\n")
+                else:
+                    print("delete an empty line")
+                    first_json_line = second_json_line
+                    if (sample_conv + 1) == len(sorted_list):
+                        out_f.write(SPLIT_CONV_SYM + "\n")
+                    continue
+            else:
+                first_json_line = json_obj
+
 
 os.remove(temp_dir)
 
