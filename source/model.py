@@ -16,6 +16,103 @@ import numpy as np
 from tensorflow.contrib import rnn, seq2seq, layers
 from config import Config
 
+class PSeq2SeqModel(object):
+    def __init__(self, cfg):
+        self.cfg = cfg
+
+    def build(self):
+        self.__build_model()
+
+    def __build_model(self):
+        max_inp_len = self.cfg.get('max_input_length')
+        max_out_len = self.cfg.get('max_output_length')
+        hidden_units = self.cfg.get('num_hidden_units')
+        vocab_len = len(self.cfg.get('vocabulary_dict'))
+        embeddings_m = self.cfg.get('embeddings_matrix')
+        embeddings_size = self.cfg.get('max_random_embeddings_size')
+
+        self.encoder_inputs = [tf.placeholder(shape=[None,], 
+                               dtype=tf.int64, 
+                               name='enc_inp_{}'.format(t)) for t in range(max_inp_len)]
+
+        #  labels that represent the real outputs
+        self.labels = [tf.placeholder(shape=[None,], 
+                       dtype=tf.int64, 
+                       name='target_{}'.format(t)) for t in range(max_out_len)]
+
+        #  decoder inputs : 'GO' + [ y1, y2, ... y_t-1 ]
+        self.decoder_inputs = [ tf.zeros_like(self.encoder_inputs[0], dtype=tf.int64, name='GO') ] + self.labels[:-1]
+
+
+        # Basic LSTM cell wrapped in Dropout Wrapper
+        self.keep_prob = tf.placeholder(tf.float32)
+
+        # define the basic cell
+        basic_cell = tf.nn.rnn_cell.DropoutWrapper(
+            tf.nn.rnn_cell.BasicLSTMCell(hidden_units, state_is_tuple=True),
+            output_keep_prob=self.keep_prob
+        )
+
+        # stack cells together : n layered model
+        stacked_lstm = tf.nn.rnn_cell.MultiRNNCell([basic_cell]*3, state_is_tuple=True)
+
+        # for parameter sharing between training model
+        #  and testing model
+        with tf.variable_scope('decoder') as scope:
+            # build the seq2seq model 
+            #  inputs : encoder, decoder inputs, LSTM cell type, vocabulary sizes, embedding dimensions
+            self.decode_outputs, self.decode_states = tf.nn.seq2seq.embedding_rnn_seq2seq(
+                self.encoder_inputs,
+                self.decoder_inputs,
+                stacked_lstm,
+                vocab_len, vocab_len, embeddings_size)
+
+            # share parameters
+            scope.reuse_variables()
+
+            # testing model, where output of previous timestep is fed as input 
+            #  to the next timestep
+            self.decode_outputs_test, self.decode_states_test = tf.nn.seq2seq.embedding_rnn_seq2seq(
+                self.encoder_inputs,
+                self.decoder_inputs,
+                stacked_lstm,
+                vocab_len,
+                vocab_len,
+                embeddings_size,
+                feed_previous=True
+            )
+
+        loss_weights = [tf.ones_like(label, dtype=tf.float32) for label in self.labels]
+        self.loss = tf.nn.seq2seq.sequence_loss(self.decode_outputs, self.labels, loss_weights, vocab_len)
+
+        self.train_op = tf.train.AdamOptimizer(learning_rate=0.0001).minimize(self.loss)
+
+    def make_train_inputs(self, input_seq, target_seq):
+        max_input_length = self.cfg.get('max_input_length')
+        max_output_length = self.cfg.get('max_output_length')
+
+        input_seq_batched, _ = utils.batch(input_seq, max_sequence_length=max_input_length)
+        target_seq_batched, _ = utils.batch(target_seq, max_sequence_length=max_output_length)
+
+        feed_dict = {self.encoder_inputs[t]: input_seq_batched[t] for t in range(max_input_length)}
+        feed_dict.update({self.labels[t]: target_seq_batched[t] for t in range(max_output_length)})
+
+        feed_dict[self.keep_prob] = 0.5
+
+        return feed_dict
+
+    def make_inference_inputs(self, input_seq):
+        '''This method is responsible for preparing the given sequences
+           so that they can be used for inference using the model.'''
+        max_input_length = self.cfg.get('max_input_length')
+
+        input_seq_batched, _ = utils.batch(input_seq, max_sequence_length=max_input_length)
+
+        feed_dict = {self.encoder_inputs[t]: input_seq_batched[t] for t in range(max_input_length)}
+        feed_dict[self.keep_prob] = 1.0
+
+        return feed_dict
+
 class Model(object):
     '''Responsible for building the tensorflow graph, i.e.
        setting up the network so that it can be used by the
@@ -25,9 +122,9 @@ class Model(object):
 
     # List of possible style of RNN cells
     CELL_FN = {
-        'LSTM': rnn.LSTMCell,
-        'GRU': rnn.GRUCell,
-        'RNN': rnn.BasicRNNCell
+        # 'LSTM': rnn.LSTMCell,
+        # 'GRU': rnn.GRUCell,
+        # 'RNN': rnn.BasicRNNCell
     }
     
     def __init__(self, cfg):
@@ -192,11 +289,12 @@ class Model(object):
                        self.cfg.get('max_random_embeddings_size')],
                 initializer=tf.random_uniform_initializer(-1, 1),
                 dtype=tf.float32,
-                trainable=False
+                trainable=True
             )
 
-        self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
-        self.decoder_train_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.decoder_train_inputs)
+        with tf.device('/cpu:0'):
+            self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
+            self.decoder_train_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.decoder_train_inputs)
 
     def __init_unidirectional_encoder(self):
         '''Initializes the "simple", unidirectional encoder which is responsible
