@@ -1,6 +1,6 @@
 {
-  "epochs": 400,
-  "batches_per_epoch": 100,
+  "epochs": 500,
+  "batches_per_epoch": 200,
   "batch_size": 32,
   "num_hidden_units": 1024,
   "show_predictions_while_training": true,
