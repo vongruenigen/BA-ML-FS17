@@ -28,6 +28,8 @@ class Config(object):
     PAD_WORD_TOKEN     = '<pad>'
     UNKNOWN_WORD_IDX   = 2
     UNKNOWN_WORD_TOKEN = '<unknown>'
+    GO_WORD_IDX        = 3
+    GO_WORD_TOKEN      = '<go>'
 
     # Contains the defaults which are applied in case any config
     # parameter is missing. ALL parameters should have an entry
@@ -89,6 +91,17 @@ class Config(object):
         # This can, but should not be set via the config since it's over-
         # written when loading the configured vocabulary.
         'vocabulary_dict': None,
+
+        # Defines the buckets to use if the model allows for bucketing.
+        'buckets': [(50, 50)],
+
+        # Defines wether the input data should be batch-major or time-major.
+        'time_major': True,
+
+        # Defines wether bucketing should be used. This flag allows the
+        # data loader to pad input sequences to the minimum length required
+        # and available in the list of possible buckets.
+        'use_bucketing': False,
 
         # Defines wether there should be examples printed to the console
         # of the input and respective output of the model as clear text.

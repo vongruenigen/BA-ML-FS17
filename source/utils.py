@@ -6,6 +6,7 @@
 
 import numpy as np
 import pickle
+import itertools
 
 from os import path
 from gensim.models import Word2Vec
@@ -47,15 +48,16 @@ def prepare_embeddings_and_vocabulary(embeddings, vocabulary):
     #       that the embedding for the unknown, eos and pad word
     #       will be inserted as the first rows of the embeddings
     #       matrix in order to keep it simple.
-    new_vocabulary = {w: idx+3 for w, idx in vocabulary.items()}
+    new_vocabulary = {w: idx+4 for w, idx in vocabulary.items()}
 
     new_vocabulary[Config.UNKNOWN_WORD_TOKEN] = Config.UNKNOWN_WORD_IDX
     new_vocabulary[Config.PAD_WORD_TOKEN] = Config.PAD_WORD_IDX
     new_vocabulary[Config.EOS_WORD_TOKEN] = Config.EOS_WORD_IDX
+    new_vocabulary[Config.GO_WORD_TOKEN] = Config.GO_WORD_IDX
 
     return embeddings.astype('float32'), new_vocabulary
 
-def batch(inputs, max_sequence_length=None):
+def batch(inputs, max_sequence_length=None, time_major=True):
     '''Taks a list of inputs and converts them into a data batch which
        can be used by the model for training or inference.'''
     sequence_lengths = [len(seq) for seq in inputs]
@@ -70,10 +72,16 @@ def batch(inputs, max_sequence_length=None):
         for j, element in enumerate(seq):
             inputs_batch_major[i, j] = element
 
-    # [batch_size, max_time] -> [max_time, batch_size]
-    inputs_time_major = inputs_batch_major.swapaxes(0, 1)
+    if time_major:
+      # [batch_size, max_time] -> [max_time, batch_size]
+      inputs_time_major = inputs_batch_major.swapaxes(0, 1)
+      return inputs_time_major, sequence_lengths
+    else:
+      return inputs_batch_major, sequence_lengths
 
-    return inputs_time_major, sequence_lengths
+def flatten_list(list_to_flatten):
+    '''Returns a flattened version of the list supplied as a parameter.'''
+    return list(itertools.chain(*list_to_flatten))
 
 def random_sequences(length_from, length_to, vocab_lower, vocab_upper, batch_size):
     '''Generates batches of random integer sequences.'''

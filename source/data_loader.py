@@ -30,9 +30,6 @@ class DataLoader(object):
     # Regular expression which is used to filter unwanted characters
     WHITELIST_REGEX = '[^A-Za-z0-9\.,\?\!\s]+'
 
-    # Index of the embedding for the unknown word in the embedding matrix.
-    UNKNOWN_WORD_IDX = 0
-
     def __init__(self, cfg):
         '''Constructor of the DataLoader class. It only expects
            a Config object as the first and only parameter.'''
@@ -89,12 +86,14 @@ class DataLoader(object):
         line_parts = self.__preprocess_and_tokenize_line(line, vocabulary)
         line_parts = map(lambda w: vocabulary[w] if w in vocabulary else Config.UNKNOWN_WORD_IDX,
                          line_parts)
+
         line_parts = list(line_parts)
+        line_parts.insert(0, Config.GO_WORD_IDX)
         line_parts.append(Config.EOS_WORD_IDX)
 
         if len(line_parts) < self.cfg.get('max_input_length'):
             max_input_length = self.cfg.get('max_input_length')
-            padding_parts = [Config.PAD_WORD_IDX for i in range(max_input_length - len(line_parts) - 1)]
+            padding_parts = [Config.PAD_WORD_IDX for i in range(max_input_length - len(line_parts))]
             line_parts += padding_parts
 
         return list(line_parts)
@@ -104,7 +103,9 @@ class DataLoader(object):
            by using the vocabulary dictionary. Note that this
            function expects a reversed version of the vocabulary
            used to encode the text via convert_text_to_indices().'''
-        skip_idxs = [Config.UNKNOWN_WORD_IDX, Config.PAD_WORD_IDX, Config.EOS_WORD_IDX]
+        skip_idxs = [Config.UNKNOWN_WORD_IDX, Config.PAD_WORD_IDX,
+                     Config.EOS_WORD_IDX, Config.GO_WORD_IDX]
+
         shortened_idxs = []
 
         # Let's remove the padded <unknown> words before converting
@@ -114,6 +115,10 @@ class DataLoader(object):
                 continue
             else:
                 shortened_idxs.append(idx)
+
+        # Remove <go> tokens from the beginning of the sentence
+        if shortened_idxs[-1] == Config.GO_WORD_IDX:
+            shortened_idxs.pop()
 
         return ' '.join(map(lambda x: rev_vocabulary[x], reversed(shortened_idxs)))
 

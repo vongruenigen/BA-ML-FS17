@@ -15,7 +15,7 @@ import sys
 import logger
 import tqdm
 
-from model import Model, PSeq2SeqModel
+from model import Model, PSeq2SeqModel, TSeq2SeqModel
 from config import Config
 from os import path
 from data_loader import DataLoader
@@ -65,108 +65,20 @@ class Runner(object):
                     self.cfg.get('test_data'),
                     self.cfg.get('vocabulary_dict')
                 )
-
-            sum_losses = 0.0
-            sum_iters = 0
-            batches_per_epoch = self.cfg.get('batches_per_epoch')
+            
             loss_track = []
             perplexity_track = []
 
-            # TODO: Remove testing data
-            # length_from=3
-            # length_to=50
-            # vocab_lower=3
-            # vocab_upper=20
-            # batch_size=100
-            # max_batches=5000
-            # batches_in_epoch=1000
-            # verbose=True
-
-            # batches = utils.random_sequences(length_from=length_from, length_to=length_to,
-            #                            vocab_lower=vocab_lower, vocab_upper=vocab_upper,
-            #                            batch_size=batch_size)
-
-            # training_batches = batches
-
             try:
-                for epoch in range(self.cfg.get('epochs')):
-                    epoch_nr = epoch + 1
-                    feed_dict = {}
+                for epoch_nr in range(1, self.cfg.get('epochs')+1):                    
+                    # Run one epoch and get the resulting loss and perplexity
+                    loss, perplexity, last_batch = self.__run_epoch(session, model, training_batches, epoch_nr)
 
-                    batch_data_x = None
-                    batch_data_y = None
-
-                    logger.info('[Starting epoch #%i]' % epoch_nr)
-                    
-                    for batch in tqdm.tqdm(range(batches_per_epoch+1)):
-                        batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
-
-                        feed_dict = model.make_train_inputs(batch_data_x, batch_data_y)
-                        _, loss = session.run([model.train_op, model.loss], feed_dict)
-
-                        sum_losses += loss
-                        sum_iters += 1
-                    
-                    avg_loss = sum_losses / sum_iters
-                    perplexity = np.power(avg_loss, 2)
-
-                    sum_iters = 0
-                    sum_losses = 0
-                        
-                    loss_track.append(avg_loss)
+                    loss_track.append(loss)
                     perplexity_track.append(perplexity)
-
-                    logger.info('[Finished Epoch #%i]' % epoch_nr)
-                    logger.info('    Loss       > %f' % loss_track[-1])
-                    logger.info('    Perplexity > %f' % perplexity_track[-1])
                     
-                    if self.cfg.get('show_predictions_while_training'):
-                        num_show_samples    = self.cfg.get('batch_size')
-                        max_input_length    = self.cfg.get('max_input_length')
-                        max_output_length   = self.cfg.get('max_output_length')
-                        input_samples_idxs  = []
-                        output_samples_idxs = []
-
-                        for c in range(num_show_samples):
-                            sample_idxs = []
-
-                            for r in range(max_input_length):
-                                curr_idx = feed_dict[model.encoder_inputs[r]][c]
-                                sample_idxs.append(curr_idx)
-
-                            input_samples_idxs.append(sample_idxs)
-
-                        for c in range(num_show_samples):
-                            sample_idxs = []
-
-                            for r in range(max_input_length):
-                                curr_idx = feed_dict[model.labels[r]][c]
-                                sample_idxs.append(curr_idx)
-
-                            output_samples_idxs.append(sample_idxs)
-
-                        feed_dict = model.make_inference_inputs(batch_data_x)
-
-                        predicted_idxs = session.run(model.decode_outputs_test, feed_dict)
-                        predicted_idxs = np.array(predicted_idxs).transpose([1, 0, 2])
-                        predicted_idxs = list(map(lambda x: np.argmax(x, axis=1), predicted_idxs))
-
-                        inp_out_pred = zip(input_samples_idxs, output_samples_idxs, predicted_idxs)
-
-                        for i, (e_in, dt_exp, dt_pred) in enumerate(inp_out_pred):
-                            text_in = self.data_loader.convert_indices_to_text(e_in, self.rev_vocabulary)
-                            text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
-                            text_out = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
-
-                            logger.info('Last three samples with predictions:')
-                            logger.info('[Sample #%i of epoch #%i]' % (i+1, epoch_nr))
-                            logger.info('    Input      > %s' % text_in)
-                            logger.info('    Prediction > %s' % text_out)
-                            logger.info('    Expected   > %s' % text_exp)
-
-                            if i > 9: break
-
-                    # Store model after one epoch
+                    # Show predictions & store the model after one epoch
+                    self.__show_predictions(session, model, last_batch, epoch_nr)
                     self.__store_model(session, model, epoch_nr)
             except KeyboardInterrupt:
                 logger.warn('training interrupted')
@@ -185,17 +97,102 @@ class Runner(object):
            a list of texts. It returns a single answer from the
            machine.'''
         with self.__with_model() as (session, model):
-            #self.__setup_saver_and_restore_model(session)
-
             vocabulary = self.cfg.get('vocabulary_dict')
             text_idxs = self.data_loader.convert_text_to_indices(text, vocabulary)
-            feed_dict = model.make_inference_inputs([text_idxs])
+            feed_dict, bucket_id = model.make_inference_inputs([text_idxs])
+            inference_op = model.get_inference_op(bucket_id)
 
-            answer_idxs = session.run([model.decode_outputs_test], feed_dict)
-            answer_idxs = np.array(answer_idxs[0]).transpose([1, 0, 2])
+            answer_idxs = session.run(inference_op, feed_dict)
+            answer_idxs = np.array(answer_idxs).transpose([1, 0, 2])
             answer_idxs = np.argmax(answer_idxs, axis=2)[0]
 
             return self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
+
+    def __run_epoch(self, session, model, training_batches, epoch_nr):
+        '''Runs one epoch of the training.'''
+        feed_dict = {}
+
+        batch_data_x = None
+        batch_data_y = None
+        
+        sum_losses = 0.0
+        sum_iters = 0
+
+        logger.info('[Starting epoch #%i]' % epoch_nr)
+        
+        for batch in tqdm.tqdm(range(self.cfg.get('batches_per_epoch'))):
+            batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
+
+            feed_dict, bucket_id = model.make_train_inputs(batch_data_x, batch_data_y)
+
+            all_ops = model.get_train_ops(bucket_id)
+            all_ops.append(model.get_loss_op(bucket_id))
+
+            op_results = session.run(all_ops, feed_dict)
+
+            loss = op_results[-1]
+
+            sum_losses += loss
+            sum_iters += 1
+
+        avg_loss = sum_losses / sum_iters
+        perplexity = np.power(avg_loss, 2)
+
+        logger.info('[Finished Epoch #%i]' % epoch_nr)
+        logger.info('    Loss       > %f' % loss)
+        logger.info('    Perplexity > %f' % perplexity)
+
+        return loss, perplexity, (batch_data_x, batch_data_y)
+
+    def __show_predictions(self, session, model, last_batch, epoch_nr):
+        if self.cfg.get('show_predictions_while_training'):
+            num_show_samples    = self.cfg.get('batch_size')
+            max_input_length    = self.cfg.get('max_input_length')
+            max_output_length   = self.cfg.get('max_output_length')
+            input_samples_idxs  = []
+            output_samples_idxs = []
+
+            batch_data_x, batch_data_y = last_batch
+
+            for r in range(num_show_samples):
+                sample_idxs = []
+
+                for c in range(max_input_length):
+                    curr_idx = batch_data_x[r][c]
+                    sample_idxs.append(curr_idx)
+
+                input_samples_idxs.append(sample_idxs)
+
+            for r in range(num_show_samples):
+                sample_idxs = []
+
+                for c in range(max_output_length):
+                    curr_idx = batch_data_y[r][c]
+                    sample_idxs.append(curr_idx)
+
+                output_samples_idxs.append(sample_idxs)
+
+            feed_dict, bucket_id = model.make_inference_inputs(last_batch[0])
+            inference_op = model.get_inference_op(bucket_id)
+
+            predicted_idxs = session.run(inference_op, feed_dict)
+            predicted_idxs = np.array(predicted_idxs).transpose([1, 0, 2])
+            predicted_idxs = np.argmax(predicted_idxs, axis=2)
+
+            inp_out_pred = zip(input_samples_idxs, output_samples_idxs, predicted_idxs)
+
+            for i, (e_in, dt_exp, dt_pred) in enumerate(inp_out_pred):
+                text_in = self.data_loader.convert_indices_to_text(e_in, self.rev_vocabulary)
+                text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
+                text_out = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
+
+                logger.info('Last three samples with predictions:')
+                logger.info('[Sample #%i of epoch #%i]' % (i+1, epoch_nr))
+                logger.info('    Input      > %s' % text_in)
+                logger.info('    Prediction > %s' % text_out)
+                logger.info('    Expected   > %s' % text_exp)
+
+                if i > 9: break
 
     @contextlib.contextmanager
     def __with_model(self):
@@ -204,7 +201,7 @@ class Runner(object):
            or inference.'''
         with tf.device(self.__get_device()):
             with self.__with_tf_session() as session:
-                model = PSeq2SeqModel(self.cfg)
+                model = TSeq2SeqModel(self.cfg)
 
                 # ..and build it afterwards
                 model.build()
@@ -266,7 +263,7 @@ class Runner(object):
            current configuration.'''
         model_path = self.cfg.get('model_path')
             
-        self.saver = tf.train.Saver(max_to_keep=self.cfg.get('checkpoint_max_to_keep'))
+        self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=self.cfg.get('checkpoint_max_to_keep'))
 
         # Load model if referenced in the config
         if model_path is not None:
