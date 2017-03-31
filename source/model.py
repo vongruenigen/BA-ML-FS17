@@ -54,7 +54,7 @@ class PSeq2SeqModel(object):
         )
 
         # stack cells together : n layered model
-        stacked_lstm = tf.nn.rnn_cell.MultiRNNCell([basic_cell]*2, state_is_tuple=True)
+        stacked_lstm = tf.nn.rnn_cell.MultiRNNCell([basic_cell]*3, state_is_tuple=True)
 
         # for parameter sharing between training model
         #  and testing model
