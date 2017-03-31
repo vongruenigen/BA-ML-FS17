@@ -35,8 +35,8 @@ class TSeq2SeqModel(object):
 
         # TODO: Make configurable!
         num_samples = 512
-        num_layers = 2
-        learning_rate = 0.0001
+        num_layers = 3
+        learning_rate = 0.001
         learning_rate_decay_factor = 0.99
         use_lstm = True
         max_gradient_norm = 5.0
@@ -169,6 +169,7 @@ class TSeq2SeqModel(object):
 
     def make_train_inputs(self, input_seq, target_seq):
         batch_size = self.cfg.get('batch_size')
+        max_out_len = self.cfg.get('max_output_length')
         feed_dict = {}
 
         buckets = self.cfg.get('buckets')
@@ -183,6 +184,15 @@ class TSeq2SeqModel(object):
 
         # Now we create batch-major vectors from the data selected above.
         batch_encoder_inputs, batch_decoder_inputs, batch_weights = [], [], []
+
+        for i in range(len(target_seq)):
+            current_seq = target_seq[i]
+            current_seq.insert(0, Config.GO_WORD_IDX)
+
+            if len(current_seq) > max_out_len:
+                current_seq = current_seq[:max_out_len]
+
+            target_seq[i] = current_seq
 
         # Batch encoder inputs are just re-indexed encoder_inputs.
         for length_idx in range(encoder_size):
@@ -242,9 +252,12 @@ class TSeq2SeqModel(object):
     def make_inference_inputs(self, input_seq):
         '''This method is responsible for preparing the given sequences
            so that they can be used for inference using the model.'''
-        # Fill outputs with padding tokens, they're not neede in case of inference
-        empty_outputs = np.full(np.array(input_seq).shape, Config.PAD_WORD_IDX)
-        return self.make_train_inputs(input_seq, empty_outputs)
+        fake_outputs = []
+
+        for i in range(len(input_seq)):
+            fake_outputs.append([Config.GO_WORD_IDX] + [Config.PAD_WORD_IDX] * (len(input_seq[0]) - 1))
+
+        return self.make_train_inputs(input_seq, fake_outputs)
 
     def __get_bucket_id(self, input_seq):
         '''Returns the correct bucket id to use for the length of the given examples.'''
