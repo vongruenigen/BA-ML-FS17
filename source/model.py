@@ -79,10 +79,20 @@ class TSeq2SeqModel(object):
         # Create the internal multi-layer cell for our RNN.
         def single_cell():
           return tf.contrib.rnn.GRUCell(hidden_units)
+
+        def wrap_dropout(cell):
+            return rnn.DropoutWrapper(cell, input_keep_prob=self.cfg.get('dropout_input_keep'),
+                                            output_keep_prob=self.cfg.get('dropout_output_keep'))
+        
         if use_lstm:
           def single_cell():
             return tf.contrib.rnn.BasicLSTMCell(hidden_units)
+        
         cell = single_cell()
+
+        if self.cfg.get('train'):
+            cell = wrap_dropout(cell)
+        
         if num_layers > 1:
           cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)])
 
@@ -123,6 +133,7 @@ class TSeq2SeqModel(object):
               self.encoder_inputs, self.decoder_inputs, targets,
               self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
               softmax_loss_function=softmax_loss_function)
+          
           # If we use output projection, we need to project outputs for decoding.
           if output_projection is not None:
             for b in range(len(buckets)):
@@ -144,14 +155,15 @@ class TSeq2SeqModel(object):
         self.updates = []
 
         if self.cfg.get('train'):
-          opt = tf.train.AdamOptimizer(self.learning_rate)
-          for b in range(len(buckets)):
-            gradients = tf.gradients(self.losses[b], params)
-            clipped_gradients, norm = tf.clip_by_global_norm(gradients,
-                                                             max_gradient_norm)
-            self.gradient_norms.append(norm)
-            self.updates.append(opt.apply_gradients(
-                zip(clipped_gradients, params), global_step=self.global_step))
+            opt = tf.train.AdamOptimizer(self.learning_rate)
+            
+            for b in range(len(buckets)):
+              gradients = tf.gradients(self.losses[b], params)
+              clipped_gradients, norm = tf.clip_by_global_norm(gradients,
+                                                               max_gradient_norm)
+              self.gradient_norms.append(norm)
+              self.updates.append(opt.apply_gradients(
+                  zip(clipped_gradients, params), global_step=self.global_step))
 
         self.train_op = self.updates
 

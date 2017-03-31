@@ -116,10 +116,6 @@ class DataLoader(object):
             else:
                 shortened_idxs.append(idx)
 
-        # Remove <go> tokens from the beginning of the sentence
-        if shortened_idxs[-1] == Config.GO_WORD_IDX:
-            shortened_idxs.pop()
-
         return ' '.join(map(lambda x: rev_vocabulary[x], reversed(shortened_idxs)))
 
     def __preprocess_and_tokenize_line(self, line, vocabulary):
