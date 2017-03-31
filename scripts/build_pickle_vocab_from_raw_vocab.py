@@ -25,7 +25,7 @@ for i, word in enumerate(open(voc_in, 'r')):
     if len(word) == 0:
         continue
 
-    voc_dict[i] = word
+    voc_dict[i] = word.strip('\n')
 
 with open(voc_out, 'wb') as out_f:
     pickle.dump(voc_dict, out_f)
