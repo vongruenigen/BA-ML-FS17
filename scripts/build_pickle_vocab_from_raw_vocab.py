@@ -22,12 +22,12 @@ voc_out = argv[1]
 voc_dict = {}
 
 for i, word in enumerate(open(voc_in, 'r')):
-    if len(line) == 0:
+    if len(word) == 0:
         continue
 
     voc_dict[i] = word
 
 with open(voc_out, 'wb') as out_f:
-    pickle.dump(out_f, voc_dict)
+    pickle.dump(voc_dict, out_f)
 
 print('Successfully stored pickle vocab at %s' % voc_out)

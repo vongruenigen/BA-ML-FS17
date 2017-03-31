@@ -54,8 +54,11 @@ print('You have selected the model stored at %s' % selected_model)
 
 config_path = argv[0]
 config = Config.load_from_json(config_path)
+
 config.set('train', False) # == inference
+config.set('batch_size', 1)
 config.set('model_path', selected_model)
+
 runner = Runner(config)
 
 print('Welcome! You can now talk to the loaded model.')
@@ -74,8 +77,6 @@ try:
         ans = runner.inference(msg)
         print('(Answer) > %s' % ans)
 except Exception as e:
-    import pdb
-    pdb.set_trace()
-    print('(Exiting conversation due to an error)')
+    print('(Exiting conversation due to an error: %s)' % e)
 
 print('Bye bye!')
