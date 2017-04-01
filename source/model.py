@@ -36,7 +36,7 @@ class TSeq2SeqModel(object):
         # TODO: Make configurable!
         num_samples = 512
         num_layers = 3
-        learning_rate = 0.001
+        learning_rate = 0.0001
         learning_rate_decay_factor = 0.99
         use_lstm = True
         max_gradient_norm = 5.0
@@ -186,13 +186,32 @@ class TSeq2SeqModel(object):
         batch_encoder_inputs, batch_decoder_inputs, batch_weights = [], [], []
 
         for i in range(len(target_seq)):
-            current_seq = target_seq[i]
-            current_seq.insert(0, Config.GO_WORD_IDX)
+            current_input_seq = input_seq[i]
+            current_target_seq = target_seq[i]
 
-            if len(current_seq) > max_out_len:
-                current_seq = current_seq[:max_out_len]
+            if len(current_input_seq) < self.cfg.get('max_input_length'):
+                max_input_length = self.cfg.get('max_input_length')
+                padding_parts = [Config.PAD_WORD_IDX for i in range(max_input_length - len(current_input_seq))]
+                current_input_seq += padding_parts
 
-            target_seq[i] = current_seq
+            if self.cfg.get('reverse_input'):
+              current_input_seq = list(reversed(current_input_seq))
+
+            current_target_seq.append(Config.EOS_WORD_IDX)
+
+            if len(current_target_seq) < self.cfg.get('max_output_length'):
+                max_output_length = self.cfg.get('max_output_length')
+                padding_parts = [Config.PAD_WORD_IDX for i in range(max_input_length - len(current_input_seq))]
+                current_target_seq += padding_parts
+            
+            current_target_seq.insert(0, Config.GO_WORD_IDX)
+
+            if len(current_target_seq) > max_out_len:
+                current_target_seq = current_target_seq[:max_out_len]
+                current_target_seq[-1] = Config.EOS_WORD_IDX
+
+            input_seq[i] = current_input_seq
+            target_seq[i] = current_target_seq
 
         # Batch encoder inputs are just re-indexed encoder_inputs.
         for length_idx in range(encoder_size):
@@ -547,9 +566,8 @@ class Model(object):
                 trainable=True
             )
 
-        with tf.device('/cpu:0'):
-            self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
-            self.decoder_train_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.decoder_train_inputs)
+        self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
+        self.decoder_train_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.decoder_train_inputs)
 
     def __init_unidirectional_encoder(self):
         '''Initializes the "simple", unidirectional encoder which is responsible

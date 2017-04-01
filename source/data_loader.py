@@ -56,10 +56,6 @@ class DataLoader(object):
                 else:
                     text_indices = self.convert_text_to_indices(line, vocabulary)
 
-                    # reverse the input in case it's configured
-                    if self.cfg.get('reverse_input'):
-                        text_indices = reversed(text_indices)
-
                     # shorten the text in case it's longer than configured to be allowed to
                     if len(text_indices) > self.cfg.get('max_input_length'):
                         text_indices = text_indices[:self.cfg.get('max_input_length')]
@@ -87,15 +83,6 @@ class DataLoader(object):
         line_parts = map(lambda w: vocabulary[w] if w in vocabulary else Config.UNKNOWN_WORD_IDX,
                          line_parts)
 
-        line_parts = list(line_parts)
-        line_parts.insert(0, Config.GO_WORD_IDX)
-        line_parts.append(Config.EOS_WORD_IDX)
-
-        if len(line_parts) < self.cfg.get('max_input_length'):
-            max_input_length = self.cfg.get('max_input_length')
-            padding_parts = [Config.PAD_WORD_IDX for i in range(max_input_length - len(line_parts))]
-            line_parts += padding_parts
-
         return list(line_parts)
 
     def convert_indices_to_text(self, text_idxs, rev_vocabulary):
@@ -106,15 +93,22 @@ class DataLoader(object):
         skip_idxs = [Config.UNKNOWN_WORD_IDX, Config.PAD_WORD_IDX,
                      Config.EOS_WORD_IDX, Config.GO_WORD_IDX]
 
+        rev_text_idxs = list(reversed(text_idxs))
         shortened_idxs = []
 
         # Let's remove the padded <unknown> words before converting
         # the indices into text again.
-        for idx in reversed(text_idxs):
+        for idx in rev_text_idxs:
             if idx in skip_idxs and len(shortened_idxs) == 0:
                 continue
             else:
                 shortened_idxs.append(idx)
+
+        if len(shortened_idxs) == 0:
+            shortened_idxs = rev_text_idxs
+
+        if len(shortened_idxs) > 0 and shortened_idxs[-1] == Config.GO_WORD_IDX:
+            shortened_idxs = shortened_idxs[:-1]
 
         return ' '.join(map(lambda x: rev_vocabulary[x], reversed(shortened_idxs)))
 

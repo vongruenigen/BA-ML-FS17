@@ -29,21 +29,21 @@ class Runner(object):
            the path to the config file to runs as the
            only parameter.'''
         if isinstance(cfg_path, str):
-            self.cfg_path = cfg_path
-            self.cfg = Config.load_from_json(self.cfg_path)
+            self.config_path = cfg_path
+            self.config = Config.load_from_json(self.config_path)
         elif isinstance(cfg_path, Config):
-            self.cfg_path = None
-            self.cfg = cfg_path
+            self.config_path = None
+            self.config = cfg_path
         else:
             raise Exception('cfg_path must be either a path or a Config object')
 
-        logger.init_logger(self.cfg)
+        logger.init_logger(self.config)
 
         self.__prepare_summary_writers()
         self.__prepare_results_directory()
         self.__load_embeddings()
 
-        self.data_loader = DataLoader(self.cfg)
+        self.data_loader = DataLoader(self.config)
 
     def train(self):
         '''This method is responsible for training a model
@@ -54,23 +54,23 @@ class Runner(object):
             training_batches = []
             test_batches = []
 
-            if self.cfg.get('training_data'):
+            if self.config.get('training_data'):
                 training_batches = self.data_loader.load_conversations(
-                    self.cfg.get('training_data'),
-                    self.cfg.get('vocabulary_dict')
+                    self.config.get('training_data'),
+                    self.config.get('vocabulary_dict')
                 )
 
-            if self.cfg.get('test_data'):
+            if self.config.get('test_data'):
                 test_batches = self.data_loader.load_conversations(
-                    self.cfg.get('test_data'),
-                    self.cfg.get('vocabulary_dict')
+                    self.config.get('test_data'),
+                    self.config.get('vocabulary_dict')
                 )
             
             loss_track = []
             perplexity_track = []
 
             try:
-                for epoch_nr in range(1, self.cfg.get('epochs')+1):                    
+                for epoch_nr in range(1, self.config.get('epochs')+1):                    
                     # Run one epoch and get the resulting loss and perplexity
                     loss, perplexity, last_batch = self.__run_epoch(session, model, training_batches, epoch_nr)
 
@@ -97,7 +97,7 @@ class Runner(object):
            a list of texts. It returns a single answer from the
            machine.'''
         with self.__with_model() as (session, model):
-            vocabulary = self.cfg.get('vocabulary_dict')
+            vocabulary = self.config.get('vocabulary_dict')
             text_idxs = self.data_loader.convert_text_to_indices(text, vocabulary)
             feed_dict, bucket_id = model.make_inference_inputs([text_idxs])
             inference_op = model.get_inference_op(bucket_id)
@@ -120,7 +120,7 @@ class Runner(object):
 
         logger.info('[Starting epoch #%i]' % epoch_nr)
         
-        for batch in tqdm.tqdm(range(self.cfg.get('batches_per_epoch'))):
+        for batch in tqdm.tqdm(range(self.config.get('batches_per_epoch'))):
             batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
 
             feed_dict, bucket_id = model.make_train_inputs(batch_data_x, batch_data_y)
@@ -145,10 +145,10 @@ class Runner(object):
         return loss, perplexity, (batch_data_x, batch_data_y)
 
     def __show_predictions(self, session, model, last_batch, epoch_nr):
-        if self.cfg.get('show_predictions_while_training'):
-            num_show_samples    = self.cfg.get('batch_size')
-            max_input_length    = self.cfg.get('max_input_length')
-            max_output_length   = self.cfg.get('max_output_length')
+        if self.config.get('show_predictions_while_training'):
+            num_show_samples    = self.config.get('batch_size')
+            max_input_length    = self.config.get('max_input_length')
+            max_output_length   = self.config.get('max_output_length')
             input_samples_idxs  = []
             output_samples_idxs = []
 
@@ -199,19 +199,12 @@ class Runner(object):
         '''This method is responsible for setting up the device,
            session and model which can then be used for training
            or inference.'''
-        with tf.device(self.__get_device()):
+        with tf.device(self.config.get('device')):
             with self.__with_tf_session() as session:
-                model = TSeq2SeqModel(self.cfg)
-
-                # ..and build it afterwards
+                model = TSeq2SeqModel(self.config)
                 model.build()
 
                 self.__setup_saver_and_restore_model(session)
-
-                # We need to initialize all the stuff setup when creating
-                # the model instance. Otherwise we might get nasty error
-                # messages regarding uninitialized variables.
-                session.run(tf.global_variables_initializer())
 
                 yield (session, model)
 
@@ -229,11 +222,6 @@ class Runner(object):
            of the model is saved at all times using the tf.Saver
            class''' 
         pass
-
-    def __get_device(self):
-        '''Returns the name of the device to use when executing
-           a computation.'''
-        return '/gpu:0'
 
     def __store_model(self, session, model, epoch_nr):
         '''Stores the given model in the current results directory.
@@ -261,14 +249,16 @@ class Runner(object):
         '''Sets up the Saver which is used to store the model state after
            training. It also loads a previous model if referenced in the
            current configuration.'''
-        model_path = self.cfg.get('model_path')
+        model_path = self.config.get('model_path')
             
-        self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=self.cfg.get('checkpoint_max_to_keep'))
+        self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=self.config.get('checkpoint_max_to_keep'))
 
-        # Load model if referenced in the config
-        if model_path is not None:
+        # Load model if referenced in the config, otherwise freshly initialize it
+        if model_path is None:
+            session.run(tf.global_variables_initializer())
+        else:
             logger.info('Loading model from the path %s' % model_path)
-            ckpt = tf.train.get_checkpoint_state(self.cfg.get('model_path'))
+            ckpt = tf.train.get_checkpoint_state(self.config.get('model_path'))
 
             if ckpt and ckpt.model_checkpoint_path:
                 self.saver.restore(session, ckpt.model_checkpoint_path)
@@ -276,17 +266,17 @@ class Runner(object):
     def __prepare_results_directory(self):
         '''This method is responsible for preparing the results
            directory for the experiment with loaded config.'''
-        if not self.cfg.get('train'):
+        if not self.config.get('train'):
             return
 
         if not path.isdir(Config.RESULTS_PATH):
             os.mkdir(Config.RESULTS_PATH)
 
-        self.curr_exp_path = path.join(Config.RESULTS_PATH, self.cfg.get('id'))
+        self.curr_exp_path = path.join(Config.RESULTS_PATH, self.config.get('id'))
 
         if path.isdir(self.curr_exp_path):
             raise Exception('A results directory with the name' +
-                            ' %s already exists' % str(self.cfg.id))
+                            ' %s already exists' % str(self.config.id))
         else:
             os.mkdir(self.curr_exp_path)
 
@@ -301,24 +291,24 @@ class Runner(object):
         vocabulary = None
         embeddings = None
 
-        vocabulary = utils.load_vocabulary(self.cfg.get('vocabulary'))
+        vocabulary = utils.load_vocabulary(self.config.get('vocabulary'))
 
-        if self.cfg.get('w2v_embeddings'):
-            embeddings = utils.load_w2v_embeddings(self.cfg.get('w2v_embeddings'))
-        elif self.cfg.get('ft_embeddings'):
-            embeddingsy = utils.load_ft_embeddings(self.cfg.get('ft_embeddings'))
+        if self.config.get('w2v_embeddings'):
+            embeddings = utils.load_w2v_embeddings(self.config.get('w2v_embeddings'))
+        elif self.config.get('ft_embeddings'):
+            embeddingsy = utils.load_ft_embeddings(self.config.get('ft_embeddings'))
         else:
             embeddings = np.random.uniform(
                 -1.0, 1.0,
                 size=(len(vocabulary),
-                      self.cfg.get('max_random_embeddings_size'))
+                      self.config.get('max_random_embeddings_size'))
             )
 
         # Prepare the vocabulary and embeddings (e.g. add embedding for unknown words)
         embeddings, vocabulary = utils.prepare_embeddings_and_vocabulary(embeddings, vocabulary)
 
-        self.cfg.set('vocabulary_dict', vocabulary)
-        self.cfg.set('embeddings_matrix', embeddings)
+        self.config.set('vocabulary_dict', vocabulary)
+        self.config.set('embeddings_matrix', embeddings)
 
         # revert the vocabulary for the idx -> text usages
         self.rev_vocabulary = utils.reverse_vocabulary(vocabulary)
@@ -329,8 +319,8 @@ class Runner(object):
            to the name of the stored file. If a model_path is set
            in the config, this will be returned and version will be
            ignored.'''
-        if self.cfg.get('model_path'):
-            return self.cfg.get('model_path')
+        if self.config.get('model_path'):
+            return self.config.get('model_path')
 
         if not self.curr_exp_path:
             raise Exception('__prepare_results_directory() must be called before using __get_model_path()')
@@ -342,7 +332,7 @@ class Runner(object):
            the input sentences (sentences which the first "person" said), the latter contains the
            list of expected answers.'''
         data_batch_x, data_batch_y = [], []
-        batch_size = self.cfg.get('batch_size')
+        batch_size = self.config.get('batch_size')
 
         conversation = next(all_data)
         conv_turn_idx = 0
@@ -351,7 +341,7 @@ class Runner(object):
             first_conv_turn = conversation[conv_turn_idx]
             second_conv_turn = conversation[conv_turn_idx+1]
 
-            if self.cfg.get('train_on_copy'):
+            if self.config.get('train_on_copy'):
                 data_batch_x.append(first_conv_turn)
                 data_batch_y.append(first_conv_turn)
             else:
