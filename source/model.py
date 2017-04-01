@@ -201,14 +201,17 @@ class TSeq2SeqModel(object):
 
             if len(current_target_seq) < self.cfg.get('max_output_length'):
                 max_output_length = self.cfg.get('max_output_length')
-                padding_parts = [Config.PAD_WORD_IDX for i in range(max_input_length - len(current_input_seq))]
+                padding_parts = [Config.PAD_WORD_IDX for i in range(max_output_length - len(current_target_seq))]
                 current_target_seq += padding_parts
             
             current_target_seq.insert(0, Config.GO_WORD_IDX)
 
             if len(current_target_seq) > max_out_len:
+                set_eos_word = current_target_seq[-1] == Config.EOS_WORD_IDX
                 current_target_seq = current_target_seq[:max_out_len]
-                current_target_seq[-1] = Config.EOS_WORD_IDX
+
+                if set_eos_word:
+                    current_target_seq[-1] = Config.EOS_WORD_IDX
 
             input_seq[i] = current_input_seq
             target_seq[i] = current_target_seq
