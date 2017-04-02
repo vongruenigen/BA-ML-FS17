@@ -89,6 +89,13 @@ class DataLoader(object):
         line_parts = self.__preprocess_and_tokenize_line(line, vocabulary)
         line_parts = map(lambda w: vocabulary[w] if w in vocabulary else Config.UNKNOWN_WORD_IDX,
                          line_parts)
+        line_parts = list(line_parts)
+        line_parts.append(Config.EOS_WORD_IDX)
+
+        if len(line_parts) < self.cfg.get('max_input_length'):
+            max_input_length = self.cfg.get('max_input_length')
+            padding_parts = [Config.PAD_WORD_IDX for i in range(max_input_length - len(line_parts) - 1)]
+            line_parts += padding_parts
 
         return list(line_parts)
 

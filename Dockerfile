@@ -13,6 +13,7 @@ WORKDIR /BA-ML-FS17/
 ADD /requirements.txt /BA-ML-FS17/requirements.txt
 RUN pip install cython
 RUN pip install -r /BA-ML-FS17/requirements.txt
+RUN python -m nltk.downloader punkt
 
 # TensorBoard
 EXPOSE 6006

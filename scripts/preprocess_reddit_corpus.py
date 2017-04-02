@@ -38,6 +38,7 @@ if len(argv) < 3:
     sys.exit(2)
 
 data_dir = argv[0]
+
 years = [int(x) for x in argv[1].split(',')]
 subreddit = argv[2]
 
@@ -45,6 +46,7 @@ subreddit_regex = re.compile('\/[A-Za-z]{1}\/')
 http_regex = re.compile(r"http\S+")
 regex = re.compile('\{.+?\}')
 allowed_chars = re.compile('[^\w , . ! ?]')
+
 
 def clean_text(t):
 
@@ -106,6 +108,7 @@ with open(temp_dir, 'w+') as out_f:
                     if not content == '' and not content == '[deleted]':
                         out_f.write(line)
                         prev_content = content
+
 
 print('Start with sorting the datasets based on timestamp and the link_id tag.')
 with open(temp_dir, 'r') as in_f:
