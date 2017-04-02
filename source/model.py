@@ -26,7 +26,7 @@ class TSeq2SeqModel(object):
     def __build_model(self):
         max_inp_len = self.cfg.get('max_input_length')
         max_out_len = self.cfg.get('max_output_length')
-        hidden_units = 32 #self.cfg.get('num_hidden_units')
+        hidden_units = self.cfg.get('num_hidden_units')
         vocab_len = len(self.cfg.get('vocabulary_dict'))
         embeddings_m = self.cfg.get('embeddings_matrix')
         embeddings_size = self.cfg.get('max_random_embeddings_size')
