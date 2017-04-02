@@ -37,7 +37,7 @@ for entry in os.listdir(results_dir):
     full_entry = path.join(results_dir, entry)
 
     if path.isdir(full_entry) and any(map(lambda x: 'chkp' in x, os.listdir(full_entry))):
-        available_models.append(entry)
+        available_models.append(path.join(results_dir, entry))
 
 if len(available_models) > 0:
     print('The following models are available, please specify which one you want to load:\n')
