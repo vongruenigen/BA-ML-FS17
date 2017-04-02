@@ -273,7 +273,7 @@ class Runner(object):
             session.run(tf.global_variables_initializer())
         else:
             logger.info('Loading model from the path %s' % model_path)
-            ckpt = tf.train.get_checkpoint_state(self.config.get('model_path'))
+            ckpt = tf.train.get_checkpoint_state(self.cfg.get('model_path'))
 
             if ckpt and ckpt.model_checkpoint_path:
                 self.saver.restore(session, ckpt.model_checkpoint_path)
