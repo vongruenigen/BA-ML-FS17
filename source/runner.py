@@ -211,11 +211,6 @@ class Runner(object):
 
                 self.__setup_saver_and_restore_model(session)
 
-                # We need to initialize all the stuff setup when creating
-                # the model instance. Otherwise we might get nasty error
-                # messages regarding uninitialized variables.
-                session.run(tf.global_variables_initializer())
-
                 yield (session, model)
 
     @contextlib.contextmanager
