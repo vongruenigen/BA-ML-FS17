@@ -9,5 +9,6 @@
   "vocabulary": "data/vocabularies/pickle_25000_reddit_corpus_movies_2014_2015.txt",
   "max_random_embeddings_size": 1024,
   "max_input_length": 50,
-  "dropout_input_keep": 0.8
+  "dropout_input_keep": 0.8,
+  "model_path": "results/2017-03-31_22-56-25_reddit_movies_2014_2015/"
 }
