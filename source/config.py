@@ -96,7 +96,7 @@ class Config(object):
         'vocabulary_dict': None,
 
         # Defines the buckets to use if the model allows for bucketing.
-        'buckets': [(50, 50)],
+        'buckets': [(30, 30)],
 
         # Defines wether the input data should be batch-major or time-major.
         'time_major': True,

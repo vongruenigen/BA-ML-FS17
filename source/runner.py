@@ -69,6 +69,7 @@ class Runner(object):
             loss_track = []
             perplexity_track = []
 
+
             try:
                 for epoch_nr in range(1, self.config.get('epochs')+1):                    
                     # Run one epoch and get the resulting loss and perplexity
@@ -97,6 +98,7 @@ class Runner(object):
            a list of texts. It returns a single answer from the
            machine.'''
         with self.__with_model() as (session, model):
+
             vocabulary = self.config.get('vocabulary_dict')
             text_idxs = self.data_loader.convert_text_to_indices(text, vocabulary)
             feed_dict, bucket_id = model.make_inference_inputs([text_idxs])

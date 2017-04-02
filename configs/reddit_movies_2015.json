@@ -1,0 +1,13 @@
+{
+  "epochs": 400,
+  "batches_per_epoch": 100,
+  "batch_size": 32,
+  "num_hidden_units": 1024,
+  "show_predictions_while_training": true,
+  "training_data": "data/reddit_movies/reddit_corpus_movies_2014_2015_train.0.txt",
+  "validation_data": "data/reddit_movies/reddit_corpus_movies_2014_2015_valid.0.txt",
+  "vocabulary": "data/vocabularies/pickle_25000_reddit_corpus_movies_2014_2015.txt",
+  "max_random_embeddings_size": 1024,
+  "max_input_length": 50,
+  "dropout_input_keep": 0.8
+}

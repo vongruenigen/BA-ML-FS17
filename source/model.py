@@ -36,7 +36,7 @@ class TSeq2SeqModel(object):
         # TODO: Make configurable!
         num_samples = 512
         num_layers = 3
-        learning_rate = 0.0001
+        learning_rate = 0.001
         learning_rate_decay_factor = 0.99
         use_lstm = True
         max_gradient_norm = 5.0
@@ -569,8 +569,9 @@ class Model(object):
                 trainable=True
             )
 
-        self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
-        self.decoder_train_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.decoder_train_inputs)
+        with tf.device('/cpu:0'):
+            self.encoder_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.encoder_inputs)
+            self.decoder_train_inputs_embedded = tf.nn.embedding_lookup(self.embeddings, self.decoder_train_inputs)
 
     def __init_unidirectional_encoder(self):
         '''Initializes the "simple", unidirectional encoder which is responsible
