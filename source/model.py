@@ -37,10 +37,10 @@ class TSeq2SeqModel(object):
         # TODO: Make configurable!
         num_samples = 512
         num_layers = 3
-        learning_rate = 0.0001
+        learning_rate = 0.001
         learning_rate_decay_factor = 0.99
         use_lstm = True
-        max_gradient_norm = 5.0
+        max_gradient_norm = 10.0
 
         self.learning_rate = tf.Variable(
             float(learning_rate), trainable=False, dtype=dtype)

@@ -49,7 +49,7 @@ class Runner(object):
         '''This method is responsible for training a model
            with the settings defined in the config.'''
         with self.__with_model() as (session, model):
-            #self.__setup_saver_and_restore_model(session)
+            self.__store_config()
 
             training_batches = []
             test_batches = []
@@ -68,6 +68,10 @@ class Runner(object):
             
             loss_track = []
             perplexity_track = []
+
+            if model.learning_rate.eval() < 0.001:
+                session.run(model.learning_rate.assign(0.001))
+                logger.info('Resetting learning rate when starting new training')
 
             try:
                 for epoch_nr in range(1, self.config.get('epochs')+1):                    
@@ -236,13 +240,24 @@ class Runner(object):
            class''' 
         pass
 
+    def __store_config(self):
+        '''Stores the config in the results directory.'''
+        config_path = path.join(self.curr_exp_path, 'config.json')
+
+        with open(config_path, 'w+') as f:
+            json.dump(self.config.get_dict(), f,
+                      indent=4, sort_keys=True)
+
     def __store_model(self, session, model, epoch_nr):
         '''Stores the given model in the current results directory.
            This model can then later be reloaded with the __load_model()
            method.'''
         if epoch_nr % self.config.get('save_model_after_n_epochs') == 0:
+            # Update the global step of the model
+            session.run(model.global_step.assign(model.global_step + 1))
+
             model_path = self.__get_model_path()
-            self.saver.save(session, model_path, global_step=epoch_nr)
+            self.saver.save(session, model_path, global_step=model.global_step)
             logger.info('Current version of the model stored after epoch #%i' % epoch_nr)
 
     def __store_metrics(self, loss_track, perplexity_track):

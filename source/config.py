@@ -8,6 +8,7 @@
 
 import json
 import time
+import copy
 
 from os import path
 
@@ -228,6 +229,17 @@ class Config(object):
             self.cfg_obj[name] = value
         else:
             raise Exception('there is no value for the name %s in the config' % name)
+
+    def get_dict(self):
+        '''Returns a copy of the internal config dictionary.
+           Numpy matrices and other unserializable variables
+           are removed.'''
+        cfg_obj = copy.deepcopy(self.cfg_obj)
+
+        del cfg_obj['vocabulary_dict']
+        del cfg_obj['embeddings_matrix']
+
+        return cfg_obj
 
     @staticmethod
     def load_from_json(json_path):
