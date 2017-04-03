@@ -176,6 +176,9 @@ class TSeq2SeqModel(object):
         buckets = self.cfg.get('buckets')
         bucket_id = self.__get_bucket_id(input_seq)
 
+        if len(input_seq) < batch_size:
+          batch_size = len(input_seq)
+
         if bucket_id == -1:
             raise Exception('No suitable bucket found for samples of length %i in %s' % (
                             len(input_seq[0]), buckets))
