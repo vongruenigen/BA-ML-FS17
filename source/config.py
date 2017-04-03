@@ -70,6 +70,9 @@ class Config(object):
         # Defines how much batches will be considered per epoch.
         'batches_per_epoch': 1000,
 
+        # Defines after how much epochs the model will be saved
+        'save_model_after_n_epochs': 10,
+
         # Defines wether we should train on actual sequence learning or rather
         # just learn to copy the input sequences to the output. This flag can
         # be used to debug the model and see if it still works as expected.
@@ -109,6 +112,11 @@ class Config(object):
         # Defines wether there should be examples printed to the console
         # of the input and respective output of the model as clear text.
         'show_predictions_while_training': False,
+
+        # Defines how much predictions show be shown after an epoch.
+        # If the value is set to zero, all examples from the last batch
+        # will be used.
+        'show_predictions_while_training_num': 5,
 
         # Defines the path to the word2vec embeddings to load (if used)
         'w2v_embeddings': None,

@@ -181,7 +181,13 @@ class Runner(object):
 
                 output_samples_idxs.append(sample_idxs)
 
-            feed_dict, bucket_id = model.make_inference_inputs(last_batch[0])
+            num_show_samples = self.config.get('show_predictions_while_training_num')
+            prediction_batch = last_batch[0]
+
+            if num_show_samples > 0 and num_show_samples < self.config.get('batch_size'):
+                prediction_batch = prediction_batch[:num_show_samples]
+
+            feed_dict, bucket_id = model.make_inference_inputs(prediction_batch)
             inference_op = model.get_inference_op(bucket_id)
 
             predicted_idxs = session.run(inference_op, feed_dict)
@@ -200,8 +206,6 @@ class Runner(object):
                 logger.info('    Input      > %s' % text_in)
                 logger.info('    Prediction > %s' % text_out)
                 logger.info('    Expected   > %s' % text_exp)
-
-                if i > 9: break
 
     @contextlib.contextmanager
     def __with_model(self):
@@ -236,9 +240,10 @@ class Runner(object):
         '''Stores the given model in the current results directory.
            This model can then later be reloaded with the __load_model()
            method.'''
-        model_path = self.__get_model_path()
-        self.saver.save(session, model_path, global_step=epoch_nr)
-        logger.info('Current version of the model stored after epoch #%i' % epoch_nr)
+        if epoch_nr % self.config.get('save_model_after_n_epochs') == 0:
+            model_path = self.__get_model_path()
+            self.saver.save(session, model_path, global_step=epoch_nr)
+            logger.info('Current version of the model stored after epoch #%i' % epoch_nr)
 
     def __store_metrics(self, loss_track, perplexity_track):
         '''This method is responsible for storing the metrics
