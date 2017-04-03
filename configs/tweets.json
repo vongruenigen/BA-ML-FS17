@@ -1,11 +1,14 @@
 {
-  "epochs": 1000,
+  "epochs": 5000,
   "batches_per_epoch": 100,
-  "batch_size": 32,
+  "batch_size": 16,
   "num_hidden_units": 1024,
   "show_predictions_while_training": true,
   "training_data": "data/tweets/chats_conversational.txt",
-  "vocabulary": "data/vocabularies/vocab_tweets_10k.pickle",
+  "vocabulary": "data/vocabularies/vocab_tweets_25k.pickle",
   "max_random_embeddings_size": 1024,
-  "max_input_length": 50
+  "max_input_length": 30,
+  "reverse_input": true,
+  "dropout_input_keep": 0.8,
+  "model_path": "results/2017-04-03_14-55-54_tweets"
 }
