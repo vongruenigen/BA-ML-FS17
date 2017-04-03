@@ -69,7 +69,6 @@ class Runner(object):
             loss_track = []
             perplexity_track = []
 
-
             try:
                 for epoch_nr in range(1, self.config.get('epochs')+1):                    
                     # Run one epoch and get the resulting loss and perplexity
@@ -85,6 +84,7 @@ class Runner(object):
                         if all(map(lambda x: x > best_loss, loss_track[-3:])):
                             logger.info('Decaying learning rate because there was no progress in the last three epochs')
                             session.run(model.learning_rate_decay_op)
+                            logger.info('The new learning rate is %.5f' % model.learning_rate.eval())
                     
                     # Show predictions & store the model after one epoch
                     self.__show_predictions(session, model, last_batch, epoch_nr)
