@@ -22,6 +22,7 @@ class TSeq2SeqModel(object):
 
     def build(self):
         self.__build_model()
+        self.__output_vars = None
 
     def __build_model(self):
         max_inp_len = self.cfg.get('max_input_length')
@@ -36,7 +37,7 @@ class TSeq2SeqModel(object):
         # TODO: Make configurable!
         num_samples = 512
         num_layers = 3
-        learning_rate = 0.001
+        learning_rate = 0.0001
         learning_rate_decay_factor = 0.99
         use_lstm = True
         max_gradient_norm = 5.0
@@ -48,7 +49,7 @@ class TSeq2SeqModel(object):
         self.global_step = tf.Variable(0, trainable=False)
 
         # If we use sampled softmax, we need an output projection.
-        output_projection = None
+        self.output_projection = None
         softmax_loss_function = None
 
         # Sampled softmax only makes sense if we sample less than vocabulary size.
@@ -56,7 +57,7 @@ class TSeq2SeqModel(object):
           w_t = tf.get_variable('proj_w', [vocab_len, hidden_units], dtype=dtype)
           w = tf.transpose(w_t)
           b = tf.get_variable('proj_b', [vocab_len], dtype=dtype)
-          output_projection = (w, b)
+          self.output_projection = (w, b)
 
           def sampled_loss(labels, logits):
             labels = tf.reshape(labels, [-1, 1])
@@ -105,7 +106,7 @@ class TSeq2SeqModel(object):
               num_encoder_symbols=vocab_len,
               num_decoder_symbols=vocab_len,
               embedding_size=hidden_units,
-              output_projection=output_projection,
+              output_projection=self.output_projection,
               feed_previous=do_decode,
               dtype=dtype)
 
@@ -135,10 +136,10 @@ class TSeq2SeqModel(object):
               softmax_loss_function=softmax_loss_function)
           
           # If we use output projection, we need to project outputs for decoding.
-          if output_projection is not None:
+          if self.output_projection is not None:
             for b in range(len(buckets)):
               self.outputs[b] = [
-                  tf.matmul(output, output_projection[0]) + output_projection[1]
+                  tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
                   for output in self.outputs[b]
               ]
         else:
@@ -261,9 +262,22 @@ class TSeq2SeqModel(object):
         '''Returns the op which can be used for inference using the current model.'''
         _, decoder_size = self.cfg.get('buckets')[bucket_id]
         outputs_list = []
+        buckets = self.cfg.get('buckets')
+
+        if self.__output_vars is None and self.output_projection is not None:
+            self.__output_vars = self.outputs
+
+            # Only restore when we're doing inference while training, otherwise
+            # the restore of the logits is done when constructing the graph
+            if self.cfg.get('train'):
+                for b in range(len(buckets)):
+                  self.__output_vars[b] = [
+                      tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
+                      for output in self.__output_vars[b]
+                  ]
 
         for i in range(decoder_size):
-            outputs_list.append(self.outputs[bucket_id][i])
+            outputs_list.append(self.__output_vars[bucket_id][i])
 
         return outputs_list
 

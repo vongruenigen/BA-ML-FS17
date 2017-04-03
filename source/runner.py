@@ -77,6 +77,14 @@ class Runner(object):
 
                     loss_track.append(loss)
                     perplexity_track.append(perplexity)
+
+                    # Decay learning rate in case that there was no progress for the last three epochs
+                    if len(loss_track) % 3 == 0 and len(loss_track) > 0:
+                        best_loss = min(loss_track)
+
+                        if all(map(lambda x: x > best_loss, loss_track[-3:])):
+                            logger.info('Decaying learning rate because there was no progress in the last three epochs')
+                            session.run(model.learning_rate_decay_op)
                     
                     # Show predictions & store the model after one epoch
                     self.__show_predictions(session, model, last_batch, epoch_nr)
@@ -98,7 +106,6 @@ class Runner(object):
            a list of texts. It returns a single answer from the
            machine.'''
         with self.__with_model() as (session, model):
-
             vocabulary = self.config.get('vocabulary_dict')
             text_idxs = self.data_loader.convert_text_to_indices(text, vocabulary)
             feed_dict, bucket_id = model.make_inference_inputs([text_idxs])
