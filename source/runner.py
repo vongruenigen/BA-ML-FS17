@@ -321,9 +321,6 @@ class Runner(object):
            to the name of the stored file. If a model_path is set
            in the config, this will be returned and version will be
            ignored.'''
-        if self.config.get('model_path'):
-            return self.config.get('model_path')
-
         if not self.curr_exp_path:
             raise Exception('__prepare_results_directory() must be called before using __get_model_path()')
 
