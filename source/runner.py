@@ -190,9 +190,7 @@ class Runner(object):
             feed_dict = model.make_inference_inputs([text_idxs])
 
             answer_idxs = session.run(model.decode_outputs_test, feed_dict)
-            import pdb
-            pdb.set_trace()
-            answer_idxs = np.array(answer_idxs[0]).transpose([1, 0, 2])
+            answer_idxs = np.array(answer_idxs).transpose([1, 0, 2])
             answer_idxs = np.argmax(answer_idxs, axis=2)[0]
 
             return self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
