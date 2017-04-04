@@ -131,44 +131,42 @@ class TSeq2SeqModel(object):
         targets = [self.decoder_inputs[i + 1]
                    for i in range(len(self.decoder_inputs) - 1)]
 
-        # Training outputs and losses.
-        if not self.cfg.get('train'):
-          self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
-              self.encoder_inputs, self.decoder_inputs, targets,
-              self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
-              softmax_loss_function=softmax_loss_function)
-          
-          # If we use output projection, we need to project outputs for decoding.
-          if self.output_projection is not None:
-            for b in range(len(buckets)):
-              self.outputs[b] = [
-                  tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
-                  for output in self.outputs[b]
-              ]
-        else:
-          self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
-              self.encoder_inputs, self.decoder_inputs, targets,
-              self.target_weights, buckets,
-              lambda x, y: seq2seq_f(x, y, False),
-              softmax_loss_function=softmax_loss_function)
+    self.test_outputs, self.test_losses = tf.contrib.legacy_seq2seq.model_with_buckets(
+                                            self.encoder_inputs, self.decoder_inputs, targets,
+                                            self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
+                                            softmax_loss_function=softmax_loss_function)
 
-        # Gradients and SGD update operation for training the model.
-        params = tf.trainable_variables()
-
-        self.gradient_norms = []
-        self.updates = []
-
-        opt = tf.train.AdamOptimizer(self.learning_rate)
-        
+    # If we use output projection, we need to project outputs for decoding.
+    if self.output_projection is not None:
         for b in range(len(buckets)):
-          gradients = tf.gradients(self.losses[b], params)
-          clipped_gradients, norm = tf.clip_by_global_norm(gradients,
-                                                           max_gradient_norm)
-          self.gradient_norms.append(norm)
-          self.updates.append(opt.apply_gradients(
-              zip(clipped_gradients, params), global_step=self.global_step))
+            self.test_outputs[b] = [
+                tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
+                for output in self.test_outputs[b]
+            ]
 
-        self.train_op = self.updates
+    self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
+                                    self.encoder_inputs, self.decoder_inputs, targets,
+                                    self.target_weights, buckets,
+                                    lambda x, y: seq2seq_f(x, y, False),
+                                    softmax_loss_function=softmax_loss_function)
+
+    # Gradients and SGD update operation for training the model.
+    params = tf.trainable_variables()
+
+    self.gradient_norms = []
+    self.updates = []
+
+    opt = tf.train.AdamOptimizer(self.learning_rate)
+
+    for b in range(len(buckets)):
+      gradients = tf.gradients(self.losses[b], params)
+      clipped_gradients, norm = tf.clip_by_global_norm(gradients,
+                                                       max_gradient_norm)
+      self.gradient_norms.append(norm)
+      self.updates.append(opt.apply_gradients(
+          zip(clipped_gradients, params), global_step=self.global_step))
+
+    self.train_op = self.updates
 
     def make_train_inputs(self, input_seq, target_seq):
         batch_size = self.cfg.get('batch_size')
@@ -265,26 +263,7 @@ class TSeq2SeqModel(object):
 
     def get_inference_op(self, bucket_id):
         '''Returns the op which can be used for inference using the current model.'''
-        _, decoder_size = self.cfg.get('buckets')[bucket_id]
-        outputs_list = []
-        buckets = self.cfg.get('buckets')
-
-        if self.__output_vars is None and self.output_projection is not None:
-            self.__output_vars = self.outputs
-
-            # Only restore when we're doing inference while training, otherwise
-            # the restore of the logits is done when constructing the graph
-            if self.cfg.get('train'):
-                for b in range(len(buckets)):
-                  self.__output_vars[b] = [
-                      tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
-                      for output in self.__output_vars[b]
-                  ]
-
-        for i in range(decoder_size):
-            outputs_list.append(self.__output_vars[bucket_id][i])
-
-        return outputs_list
+        return self.test_outputs[bucket_id]
 
     def get_train_ops(self, bucket_id):
         '''Returns the train op for the given bucket id from the current model.'''
