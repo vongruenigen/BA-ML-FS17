@@ -85,7 +85,7 @@ class Config(object):
         'num_decoder_layers': 1,
 
         # Number of hidden units in each of the layers in each cell
-        'num_hidden_units': 1000,
+        'num_hidden_units': 1024,
 
         # Defines the cell type which will be used, either 'RNN', 'LSTM' or 'GRU'
         'cell_type': 'LSTM',
@@ -100,15 +100,10 @@ class Config(object):
         'vocabulary_dict': None,
 
         # Defines the buckets to use if the model allows for bucketing.
-        'buckets': [(30, 30)],
+        'buckets': [(50, 50)],
 
         # Defines wether the input data should be batch-major or time-major.
         'time_major': True,
-
-        # Defines wether bucketing should be used. This flag allows the
-        # data loader to pad input sequences to the minimum length required
-        # and available in the list of possible buckets.
-        'use_bucketing': False,
 
         # Defines wether there should be examples printed to the console
         # of the input and respective output of the model as clear text.
@@ -153,30 +148,25 @@ class Config(object):
         # in case no embeddings are provided.
         'max_vocabulary_size': 10000,
 
-        # Defines how much words should be samples when using samples softmax.
-        # The sampled softmax is only used if the number of words in the vocabulary
-        # exceeds the value in 'max_vocabulary_size'.
-        'sampled_softmax_number_of_samples': 10000,
+        # Defines the number of words sampled when using sampled softmax
+        # while training. It is disabled if the value is set zo zero.
+        'sampled_softmax_number_of_samples': 0,
 
         # Defines how much dimensions should be used when using random embeddings.
-        'max_random_embeddings_size': 10,
+        'max_random_embeddings_size': 512,
 
         # Defines the optimizer and the hyperparameters to use
         'optimizer_name': 'AdaDelta',
         'optimizer_parameters': {},
 
-        # Defines how much checkpoints should be kept at max. Defaults to 5.
-        'checkpoint_max_to_keep': 5,
+        # Defines how much checkpoints should be kept at max.
+        'checkpoint_max_to_keep': 3,
 
-        # Defines how much of the input neurons should still be considered
-        # when applying the dropout mechanism. The value 1.0 means that all
-        # neurons are used and none is dropped.
-        'dropout_input_keep': 1.0,
+        # Defines the probability to keep inputs when applying dropout.
+        'dropout_input_keep_prob': 1.0,
 
-        # Defines how much of the output neurons should still be considered
-        # when applying the dropout mechanism. The value 1.0 means that all
-        # neurons are used and none is dropped.
-        'dropout_output_keep': 1.0,
+        # Defines the probability to keep output when applying dropout.
+        'dropout_input_keep_prob': 1.0,
 
         # Defines which tokenizer should be used to parse the conversational
         # texts. The default tokenizers is the 'word_tokenizer' of the ntlk

@@ -32,6 +32,7 @@ class TSeq2SeqModel(object):
         embeddings_m = self.cfg.get('embeddings_matrix')
         embeddings_size = self.cfg.get('max_random_embeddings_size')
         buckets = self.cfg.get('buckets')
+        num_samples = self.cfg.get('sampled_softmax_number_of_samples')
         dtype = tf.float32
 
         # TODO: Make configurable!
@@ -54,48 +55,50 @@ class TSeq2SeqModel(object):
 
         # Sampled softmax only makes sense if we sample less than vocabulary size.
         if num_samples > 0 and num_samples < vocab_len:
-          w_t = tf.get_variable('proj_w', [vocab_len, hidden_units], dtype=dtype)
-          w = tf.transpose(w_t)
-          b = tf.get_variable('proj_b', [vocab_len], dtype=dtype)
-          self.output_projection = (w, b)
+            w_t = tf.get_variable('proj_w', [vocab_len, hidden_units], dtype=dtype)
+            w = tf.transpose(w_t)
+            b = tf.get_variable('proj_b', [vocab_len], dtype=dtype)
+            
+            self.output_projection = (w, b)
 
-          def sampled_loss(labels, logits):
-            labels = tf.reshape(labels, [-1, 1])
-            # We need to compute the sampled_softmax_loss using 32bit floats to
-            # avoid numerical instabilities.
-            local_w_t = tf.cast(w_t, tf.float32)
-            local_b = tf.cast(b, tf.float32)
-            local_inputs = tf.cast(logits, tf.float32)
-            return tf.cast(
-                tf.nn.sampled_softmax_loss(
-                    weights=local_w_t,
-                    biases=local_b,
-                    labels=labels,
-                    inputs=local_inputs,
-                    num_sampled=num_samples,
-                    num_classes=vocab_len),
-                dtype)
-          softmax_loss_function = sampled_loss
+            def sampled_loss(labels, logits):
+                labels = tf.reshape(labels, [-1, 1])
 
-        # Create the internal multi-layer cell for our RNN.
+                # We need to compute the sampled_softmax_loss using 32bit floats to
+                # avoid numerical instabilities.
+                local_w_t = tf.cast(w_t, tf.float32)
+                local_b = tf.cast(b, tf.float32)
+                local_inputs = tf.cast(logits, tf.float32)
+
+                return tf.cast(
+                    tf.nn.sampled_softmax_loss(
+                        weights=local_w_t,
+                        biases=local_b,
+                        labels=labels,
+                        inputs=local_inputs,
+                        num_sampled=num_samples,
+                        num_classes=vocab_len),
+                    dtype)
+              softmax_loss_function = sampled_loss
+
         def single_cell():
-          return tf.contrib.rnn.GRUCell(hidden_units)
+            return tf.contrib.rnn.GRUCell(hidden_units)
 
         def wrap_dropout(cell):
-            return rnn.DropoutWrapper(cell, input_keep_prob=self.cfg.get('dropout_input_keep'),
-                                            output_keep_prob=self.cfg.get('dropout_output_keep'))
+            if not self.cfg.get('train'):
+                return cell
+
+            return rnn.DropoutWrapper(cell, input_keep_prob=self.cfg.get('dropout_input_keep_prob'),
+                                            output_keep_prob=self.cfg.get('dropout_input_keep_prob'))
         
         if use_lstm:
           def single_cell():
-            return tf.contrib.rnn.BasicLSTMCell(hidden_units)
-        
-        cell = single_cell()
-
-        if self.cfg.get('train'):
-            cell = wrap_dropout(cell)
+            return wrap_dropout(tf.contrib.rnn.BasicLSTMCell(hidden_units))
         
         if num_layers > 1:
-          cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)])
+            cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)])
+        else:
+            cell = single_cell()
 
         # The seq2seq function: we use embedding for the input and attention.
         def seq2seq_f(encoder_inputs, decoder_inputs, do_decode):
@@ -155,16 +158,15 @@ class TSeq2SeqModel(object):
         self.gradient_norms = []
         self.updates = []
 
-        if self.cfg.get('train'):
-            opt = tf.train.AdamOptimizer(self.learning_rate)
-            
-            for b in range(len(buckets)):
-              gradients = tf.gradients(self.losses[b], params)
-              clipped_gradients, norm = tf.clip_by_global_norm(gradients,
-                                                               max_gradient_norm)
-              self.gradient_norms.append(norm)
-              self.updates.append(opt.apply_gradients(
-                  zip(clipped_gradients, params), global_step=self.global_step))
+        opt = tf.train.AdamOptimizer(self.learning_rate)
+        
+        for b in range(len(buckets)):
+          gradients = tf.gradients(self.losses[b], params)
+          clipped_gradients, norm = tf.clip_by_global_norm(gradients,
+                                                           max_gradient_norm)
+          self.gradient_norms.append(norm)
+          self.updates.append(opt.apply_gradients(
+              zip(clipped_gradients, params), global_step=self.global_step))
 
         self.train_op = self.updates
 

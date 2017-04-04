@@ -45,6 +45,10 @@ class Runner(object):
 
         self.data_loader = DataLoader(self.config)
 
+        self.graph = None
+        self.session = None
+        self.model = None
+
     def train(self):
         '''This method is responsible for training a model
            with the settings defined in the config.'''
@@ -321,17 +325,11 @@ class Runner(object):
         embeddings = None
 
         vocabulary = utils.load_vocabulary(self.config.get('vocabulary'))
-
-        if self.config.get('w2v_embeddings'):
-            embeddings = utils.load_w2v_embeddings(self.config.get('w2v_embeddings'))
-        elif self.config.get('ft_embeddings'):
-            embeddingsy = utils.load_ft_embeddings(self.config.get('ft_embeddings'))
-        else:
-            embeddings = np.random.uniform(
-                -1.0, 1.0,
-                size=(len(vocabulary),
-                      self.config.get('max_random_embeddings_size'))
-            )
+        embeddings = np.random.uniform(
+            -1.0, 1.0,
+            size=(len(vocabulary),
+                  self.config.get('max_random_embeddings_size'))
+        )
 
         # Prepare the vocabulary and embeddings (e.g. add embedding for unknown words)
         embeddings, vocabulary = utils.prepare_embeddings_and_vocabulary(embeddings, vocabulary)
