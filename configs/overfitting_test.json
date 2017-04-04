@@ -1,0 +1,12 @@
+{
+  "epochs": 3000,
+  "batches_per_epoch": 100,
+  "batch_size": 16,
+  "num_hidden_units": 1024,
+  "show_predictions_while_training": true,
+  "training_data": "data/small_tweets_corpus.txt",
+  "vocabulary": "data/small_tweets_vocab.pickle",
+  "max_random_embeddings_size": 1024,
+  "max_input_length": 30,
+  "buckets": [[30, 30]]
+}
