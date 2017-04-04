@@ -24,6 +24,7 @@ class PSeq2SeqModel(object):
         self.__build_model()
 
     def __build_model(self):
+        num_layers = self.cfg.get('num_encoder_layers') + self.cfg.get('num_decoder_layers')
         max_inp_len = self.cfg.get('max_input_length')
         max_out_len = self.cfg.get('max_output_length')
         hidden_units = self.cfg.get('num_hidden_units')
@@ -54,7 +55,7 @@ class PSeq2SeqModel(object):
         )
 
         # stack cells together : n layered model
-        stacked_lstm = tf.nn.rnn_cell.MultiRNNCell([basic_cell]*3, state_is_tuple=True)
+        stacked_lstm = tf.nn.rnn_cell.MultiRNNCell([basic_cell]*num_layers, state_is_tuple=True)
 
         # for parameter sharing between training model
         #  and testing model
@@ -97,7 +98,7 @@ class PSeq2SeqModel(object):
         feed_dict = {self.encoder_inputs[t]: input_seq_batched[t] for t in range(max_input_length)}
         feed_dict.update({self.labels[t]: target_seq_batched[t] for t in range(max_output_length)})
 
-        feed_dict[self.keep_prob] = 0.5
+        feed_dict[self.keep_prob] = 1.0
 
         return feed_dict
 
