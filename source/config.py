@@ -119,12 +119,6 @@ class Config(object):
         # will be used.
         'show_predictions_while_training_num': 5,
 
-        # Defines the path to the word2vec embeddings to load (if used)
-        'w2v_embeddings': None,
-
-        # Defines the path to the fasttext embeddings to load (if used)
-        'ft_embeddings': None,
-
         # The matrix for the embeddings is stored in this value. It is loaded
         # by the Runner class when starting an experiment.
         'embeddings_matrix': None,
