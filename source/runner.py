@@ -63,12 +63,6 @@ class Runner(object):
                     self.config.get('training_data'),
                     self.config.get('vocabulary_dict')
                 )
-
-            if self.config.get('validation_data'):
-                validation_batches = self.data_loader.load_conversations(
-                    self.config.get('validation_data'),
-                    self.config.get('vocabulary_dict')
-                )
             
             loss_track = []
             val_loss_track = []
@@ -93,7 +87,12 @@ class Runner(object):
                     # Show predictions & store the model after one epoch
                     self.__show_predictions(session, model, last_batch, epoch_nr)
 
-                    if epoch_nr % epochs_per_validation == 0:
+                    if epoch_nr % epochs_per_validation == 0 and self.config.get('validation_data'):
+                        validation_batches = self.data_loader.load_conversations(
+                            self.config.get('validation_data'),
+                            self.config.get('vocabulary_dict')
+                        )
+
                         val_loss, val_perplexity, _ = self.__run_eval(session, model, validation_batches, epoch_nr)
                         
                         val_loss_track.append(val_loss)
