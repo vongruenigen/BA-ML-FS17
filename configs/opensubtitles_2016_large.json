@@ -2,7 +2,7 @@
   "epochs": 600000,
   "batches_per_epoch": 100,
   "batches_per_validation": 10000,
-  "epochs_per_validation": 50,
+  "epochs_per_validation": 25,
   "batch_size": 16,
   "cell_type": "LSTM",
   "num_hidden_units": 4096,
