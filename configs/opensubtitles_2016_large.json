@@ -1,6 +1,6 @@
 {
-  "epochs": 300000,
-  "batches_per_epoch": 200,
+  "epochs": 600000,
+  "batches_per_epoch": 100,
   "batches_per_validation": 10000,
   "epochs_per_validation": 50,
   "batch_size": 16,
