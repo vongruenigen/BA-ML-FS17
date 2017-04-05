@@ -73,6 +73,8 @@ class DataLoader(object):
 
         if tokenizer_name == 'word_tokenize':
             return nltk.word_tokenize
+        elif tokenizer_name == 'none':
+            return (lambda x: x.split(' '))
         else:
             raise Exception('unknown tokenizer %s set in configuration' % tokenizer_name)
 
