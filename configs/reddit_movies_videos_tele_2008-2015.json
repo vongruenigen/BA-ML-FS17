@@ -1,0 +1,15 @@
+{
+  "epochs": 1500,
+  "batches_per_epoch": 100,
+  "batch_size": 16,
+  "num_hidden_units": 4096,
+  "show_predictions_while_training": true,
+  "training_data": "data/reddit_movies/reddit_corpus_movies_videos_tele_2008-2015_train.0.txt",
+  "validation_data": "data/reddit_movies/reddit_corpus_movies_videos_tele_2008-2015_valid.0.txt",
+  "vocabulary": "data/vocabularies/pickle_50000_reddit_corpus_movies_videos_tele_2008-2015.txt",
+  "max_random_embeddings_size": 1024,
+  "max_input_length": 30,
+  "reverse_input": true,
+  "dropout_input_keep": 1.0,
+  "model_path": "results/2017-04-01_19-59-28_reddit_movies_2014_2015"
+}
