@@ -35,17 +35,38 @@ class DataLoader(object):
            a Config object as the first and only parameter.'''
         self.cfg = cfg
 
-    def load_conversations(self, path, vocabulary):
+    def load_conversations(self, path, vocabulary, disable_forwarding=False):
         '''Loads the conversations and returns a generator which
            yields one whole conversation with possibly multiple
            turns.'''
         all_convs = []
         curr_conv = []
         turn_flag = False
+        
+        forward_to = self.cfg.get('global_step')
+        use_last_output_as_input = self.cfg.get('use_last_output_as_input')
+
+        if not disable_forwarding and not self.cfg.get('start_training_from_beginning'):
+            # We need to half the forward_to value in case
+            # that outputs are used as new inputs
+            if use_last_output_as_input:
+                forward_to /= 2
+                forward_to = int(forward_to)
+
+            if forward_to > 0:
+                logger.info('Forwarding to sample %i as indicated by global_step' % forward_to)
+        else:
+            forward_to = 0
+
+        last_sentence = None
 
         while True:
             for i, line in enumerate(open(path, 'r')):
-                if line.strip() == self.SPLIT_CONV_SYM:
+                # Skip as much samples as we've already seen indicated by the global_step
+                if i < forward_to:
+                    continue
+
+                if line.strip() == self.SPLIT_CONV_SYM or len(curr_conv) >= self.cfg.get('batch_size'):
                     # TODO: How to fix the problem that a conversation of an odd
                     #       number of turns cannot be easily converted to a training sample?
                     if len(curr_conv) % 2 != 0:
@@ -53,14 +74,18 @@ class DataLoader(object):
 
                     yield curr_conv
                     curr_conv = []
-                else:
-                    text_indices = self.convert_text_to_indices(line, vocabulary)
+                
+                text_indices = self.convert_text_to_indices(line, vocabulary)
 
-                    # shorten the text in case it's longer than configured to be allowed to
-                    if len(text_indices) > self.cfg.get('max_input_length'):
-                        text_indices = text_indices[:self.cfg.get('max_input_length')]
+                # shorten the text in case it's longer than configured to be allowed to
+                if len(text_indices) > self.cfg.get('max_input_length'):
+                    text_indices = text_indices[:self.cfg.get('max_input_length')]
 
-                    curr_conv.append(text_indices)
+                if use_last_output_as_input and last_sentence is not None and len(curr_conv) > 1:
+                    curr_conv.append(last_sentence)
+
+                curr_conv.append(text_indices)
+                last_sentence = text_indices
 
             logger.warn('WARNING: Went through all the data, starting from the beginning again!')
 

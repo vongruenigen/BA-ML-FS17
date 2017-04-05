@@ -58,6 +58,8 @@ class Runner(object):
             training_batches = []
             validation_batches = []
 
+            self.__update_global_step(session, model)
+
             if self.config.get('training_data'):
                 training_batches = self.data_loader.load_conversations(
                     self.config.get('training_data'),
@@ -72,12 +74,10 @@ class Runner(object):
 
             epochs_per_validation = self.config.get('epochs_per_validation')
 
-            if model.learning_rate.eval() < 0.001:
-                session.run(model.learning_rate.assign(0.001))
-                logger.info('Resetting learning rate when starting new training')
-
             try:
-                for epoch_nr in range(1, self.config.get('epochs')+1):                    
+                for epoch_nr in range(1, self.config.get('epochs')+1):
+                    self.__update_global_step(session, model)
+
                     # Run one epoch and get the resulting loss and perplexity
                     loss, perplexity, last_batch = self.__run_epoch(session, model, training_batches, epoch_nr)
 
@@ -90,7 +90,8 @@ class Runner(object):
                     if epoch_nr % epochs_per_validation == 0 and self.config.get('validation_data'):
                         validation_batches = self.data_loader.load_conversations(
                             self.config.get('validation_data'),
-                            self.config.get('vocabulary_dict')
+                            self.config.get('vocabulary_dict'),
+                            disable_forwarding=True
                         )
 
                         val_loss, val_perplexity, _ = self.__run_eval(session, model, validation_batches, epoch_nr)
@@ -131,6 +132,11 @@ class Runner(object):
             answer_idxs = np.argmax(answer_idxs, axis=2)[0]
 
             return self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
+
+    def __update_global_step(self, session, model):
+        '''Updates the global_step value in the config.'''
+        curr_global_step = session.run(model.global_step)
+        self.config.set('global_step', curr_global_step)  
 
     def __run_eval(self, session, model, validation_batches, epoch_nr):
         '''This method is responsible for evaluating a trained
@@ -304,7 +310,7 @@ class Runner(object):
         '''Stores the given model in the current results directory.
            This model can then later be reloaded with the __load_model()
            method.'''
-        if epoch_nr % self.config.get('save_model_after_n_epochs') == 0:
+        if (epoch_nr % self.config.get('save_model_after_n_epochs') == 0) or self.config.get('validation_data'):
             # Update the global step of the model
             session.run(model.global_step.assign(model.global_step + 1))
 

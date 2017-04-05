@@ -152,6 +152,15 @@ class Config(object):
         # while training. It is disabled if the value is set zo zero.
         'sampled_softmax_number_of_samples': 512,
 
+        # Defines wether the training should start at the first training
+        # sample or not. If set to true, it starts at the first sample, if set
+        # to false, it starts at the sample indicated by the global_step variable.
+        # The number of the sample to start with is than calculated as follows:
+        # 
+        #     n_start = global_step * batch_size
+        #
+        'start_training_from_beginning': True,
+
         # Defines how much dimensions should be used when using random embeddings.
         'max_random_embeddings_size': 512,
 
@@ -176,6 +185,14 @@ class Config(object):
 
         # Defines how much batches should be used for validation.
         'batches_per_validation': 0,
+
+        # Defines wether the dataloader should consider the end-conv flags
+        # or should simply use the last output sentence as the new input.
+        'use_last_output_as_input': False,
+
+        # Stores the global step value. This may not be set via the config
+        # as it is simply overwritten when loading a model.
+        'global_step': 0,
 
         # Defines which tokenizer should be used to parse the conversational
         # texts. The default tokenizers is the 'word_tokenizer' of the ntlk
