@@ -1,0 +1,20 @@
+{
+  "epochs": 1500,
+  "batches_per_epoch": 100,
+  "batch_size": 16,
+  "cell_type": "LSTM",
+  "num_hidden_units": 4096,
+  "num_encoder_layers": 1,
+  "num_decoder_layers": 1,
+  "show_predictions_while_training": true,
+  "training_data": "data/opensubtitles_2016/opensubtitles_2016.train.0.txt",
+  "validation_data": "data/opensubtitles_2016/opensubtitles_2016.valid.0.txt",
+  "vocabulary": "data/vocabularies/vocab_opensubtitles_100k.pickle",
+  "max_random_embeddings_size": 1024,
+  "max_input_length": 50,
+  "max_output_length": 50,
+  "reverse_input": true,
+  "buckets": [[50, 50]],
+  "sampled_softmax_number_of_samples": 512,
+  "word_tokenizer": "none"
+}
