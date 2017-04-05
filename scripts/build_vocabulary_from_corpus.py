@@ -28,7 +28,7 @@ for i, line in enumerate(open(corpus_in, 'r')):
     if (i == 0 and line.startswith('#')) or line.startswith('<<<'):
         continue
 
-    words = word_tokenize(line.lower().strip('\n'))
+    words = line.lower().strip('\n').split(' ')
 
     for w in words:
         if w in vocab_dict:
