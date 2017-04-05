@@ -10,7 +10,7 @@
   "num_decoder_layers": 1,
   "training_data": "data/opensubtitles-2016/opensubtitles_2016.train.0.txt",
   "validation_data": "data/opensubtitles-2016/opensubtitles_2016.valid.0.txt",
-  "vocabulary": "data/opensubtitles-2016/vocab_opensubtitles_2016_50k.pickle",
+  "vocabulary": "data/opensubtitles-2016/vocab_opensubtitles_2016_25k.pickle",
   "max_random_embeddings_size": 1024,
   "max_input_length": 50,
   "max_output_length": 50,
