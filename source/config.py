@@ -150,7 +150,7 @@ class Config(object):
 
         # Defines the number of words sampled when using sampled softmax
         # while training. It is disabled if the value is set zo zero.
-        'sampled_softmax_number_of_samples': 0,
+        'sampled_softmax_number_of_samples': 512,
 
         # Defines how much dimensions should be used when using random embeddings.
         'max_random_embeddings_size': 512,
@@ -166,7 +166,16 @@ class Config(object):
         'dropout_input_keep_prob': 1.0,
 
         # Defines the probability to keep output when applying dropout.
-        'dropout_input_keep_prob': 1.0,
+        'dropout_output_keep_prob': 1.0,
+
+        # Defines how much batches should be used for evaluating the model.
+        'batches_for_validation_while_training': 10,
+
+        # Defines after how much epochs the model should be evaluated.
+        'epochs_per_validation': 10,
+
+        # Defines how much batches should be used for validation.
+        'batches_per_validation': 0,
 
         # Defines which tokenizer should be used to parse the conversational
         # texts. The default tokenizers is the 'word_tokenizer' of the ntlk
@@ -178,10 +187,10 @@ class Config(object):
         # described in the DataLoader class.
         'training_data': None,
 
-        # Defines which test data to load. It tries to load the conversation
+        # Defines which validation data to load. It tries to load the conversation
         # of the file at the given path, this file must obey the correct format
         # described in the DataLoader class.
-        'test_data': None,
+        'validation_data': None,
 
         # Defines the maximum allowed length of the input sentences. Longer inputs
         # will be reduced to this maximum.

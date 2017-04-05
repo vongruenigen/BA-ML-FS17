@@ -22,7 +22,7 @@ from subprocess import Popen, PIPE
 #
 vocabulary_path = ''
 embeddings_path = ''
-test_data = ''
+validation_data = ''
 validation_data_path = ''
 verbose = False
 git_sha = ''

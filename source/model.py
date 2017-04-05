@@ -17,6 +17,13 @@ from tensorflow.contrib import rnn, seq2seq, layers
 from config import Config
 
 class TSeq2SeqModel(object):
+    # List of possible style of RNN cells
+    CELL_FN = {
+        'LSTM': rnn.BasicLSTMCell,
+        'GRU': rnn.GRUCell,
+        'RNN': rnn.BasicRNNCell
+    }
+
     def __init__(self, cfg):
         self.cfg = cfg
 
@@ -25,6 +32,7 @@ class TSeq2SeqModel(object):
         self.__output_vars = None
 
     def __build_model(self):
+        num_layers = self.cfg.get('num_encoder_layers') + self.cfg.get('num_decoder_layers')
         max_inp_len = self.cfg.get('max_input_length')
         max_out_len = self.cfg.get('max_output_length')
         hidden_units = self.cfg.get('num_hidden_units')
@@ -33,11 +41,10 @@ class TSeq2SeqModel(object):
         embeddings_size = self.cfg.get('max_random_embeddings_size')
         buckets = self.cfg.get('buckets')
         num_samples = self.cfg.get('sampled_softmax_number_of_samples')
+        cell_type = self.cfg.get('cell_type')
         dtype = tf.float32
 
         # TODO: Make configurable!
-        num_samples = 512
-        num_layers = 3
         learning_rate = 0.001
         learning_rate_decay_factor = 0.99
         use_lstm = True
@@ -58,18 +65,15 @@ class TSeq2SeqModel(object):
             w_t = tf.get_variable('proj_w', [vocab_len, hidden_units], dtype=dtype)
             w = tf.transpose(w_t)
             b = tf.get_variable('proj_b', [vocab_len], dtype=dtype)
-            
             self.output_projection = (w, b)
-
+  
             def sampled_loss(labels, logits):
                 labels = tf.reshape(labels, [-1, 1])
-
                 # We need to compute the sampled_softmax_loss using 32bit floats to
                 # avoid numerical instabilities.
                 local_w_t = tf.cast(w_t, tf.float32)
                 local_b = tf.cast(b, tf.float32)
                 local_inputs = tf.cast(logits, tf.float32)
-
                 return tf.cast(
                     tf.nn.sampled_softmax_loss(
                         weights=local_w_t,
@@ -79,21 +83,25 @@ class TSeq2SeqModel(object):
                         num_sampled=num_samples,
                         num_classes=vocab_len),
                     dtype)
-              softmax_loss_function = sampled_loss
 
-        def single_cell():
-            return tf.contrib.rnn.GRUCell(hidden_units)
+            softmax_loss_function = sampled_loss
+
+        cell_class = self.CELL_FN[cell_type]
 
         def wrap_dropout(cell):
-            if not self.cfg.get('train'):
-                return cell
-
             return rnn.DropoutWrapper(cell, input_keep_prob=self.cfg.get('dropout_input_keep_prob'),
-                                            output_keep_prob=self.cfg.get('dropout_input_keep_prob'))
-        
-        if use_lstm:
-          def single_cell():
-            return wrap_dropout(tf.contrib.rnn.BasicLSTMCell(hidden_units))
+                                            output_keep_prob=self.cfg.get('dropout_output_keep_prob'))
+
+        # Create the internal multi-layer cell for our RNN.
+        def single_cell():
+            cell_obj = cell_class(hidden_units)
+
+            if self.cfg.get('train'):
+                cell_obj = wrap_dropout(cell_obj)
+
+            return cell_obj
+
+        cell = None
         
         if num_layers > 1:
             cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)])
@@ -102,16 +110,16 @@ class TSeq2SeqModel(object):
 
         # The seq2seq function: we use embedding for the input and attention.
         def seq2seq_f(encoder_inputs, decoder_inputs, do_decode):
-          return tf.contrib.legacy_seq2seq.embedding_attention_seq2seq(
-              encoder_inputs,
-              decoder_inputs,
-              cell,
-              num_encoder_symbols=vocab_len,
-              num_decoder_symbols=vocab_len,
-              embedding_size=hidden_units,
-              output_projection=self.output_projection,
-              feed_previous=do_decode,
-              dtype=dtype)
+            return tf.contrib.legacy_seq2seq.embedding_attention_seq2seq(
+                encoder_inputs,
+                decoder_inputs,
+                cell,
+                num_encoder_symbols=vocab_len,
+                num_decoder_symbols=vocab_len,
+                embedding_size=hidden_units,
+                output_projection=self.output_projection,
+                feed_previous=do_decode,
+                dtype=dtype)
 
         # Feeds for inputs.
         self.encoder_inputs = []
@@ -119,54 +127,57 @@ class TSeq2SeqModel(object):
         self.target_weights = []
 
         for i in range(buckets[-1][0]):  # Last bucket is the biggest one.
-          self.encoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
+            self.encoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
                                                     name="encoder{0}".format(i)))
         for i in range(buckets[-1][1] + 1):
-          self.decoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
-                                                    name="decoder{0}".format(i)))
-          self.target_weights.append(tf.placeholder(dtype, shape=[None],
-                                                    name="weight{0}".format(i)))
+            self.decoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
+                                                      name="decoder{0}".format(i)))
+            self.target_weights.append(tf.placeholder(dtype, shape=[None],
+                                                      name="weight{0}".format(i)))
 
         # Our targets are decoder inputs shifted by one.
         targets = [self.decoder_inputs[i + 1]
                    for i in range(len(self.decoder_inputs) - 1)]
 
-    self.test_outputs, self.test_losses = tf.contrib.legacy_seq2seq.model_with_buckets(
-                                            self.encoder_inputs, self.decoder_inputs, targets,
-                                            self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
-                                            softmax_loss_function=softmax_loss_function)
+        # Training outputs and losses.
+        if not self.cfg.get('train'):
+            self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
+                self.encoder_inputs, self.decoder_inputs, targets,
+                self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
+                softmax_loss_function=softmax_loss_function)
+          
+            # If we use output projection, we need to project outputs for decoding.
+            if self.output_projection is not None:
+                for b in range(len(buckets)):
+                    self.outputs[b] = [
+                        tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
+                        for output in self.outputs[b]
+                    ]
+        else:
+            self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
+                self.encoder_inputs, self.decoder_inputs, targets,
+                self.target_weights, buckets,
+                lambda x, y: seq2seq_f(x, y, False),
+                softmax_loss_function=softmax_loss_function)
 
-    # If we use output projection, we need to project outputs for decoding.
-    if self.output_projection is not None:
-        for b in range(len(buckets)):
-            self.test_outputs[b] = [
-                tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
-                for output in self.test_outputs[b]
-            ]
+        params = tf.trainable_variables()
 
-    self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
-                                    self.encoder_inputs, self.decoder_inputs, targets,
-                                    self.target_weights, buckets,
-                                    lambda x, y: seq2seq_f(x, y, False),
-                                    softmax_loss_function=softmax_loss_function)
+        self.gradient_norms = []
+        self.updates = []
 
-    # Gradients and SGD update operation for training the model.
-    params = tf.trainable_variables()
+        # Apply gradient clipping if we're in training mode
+        if self.cfg.get('train'):
+            opt = tf.train.AdamOptimizer(self.learning_rate)
+            
+            for b in range(len(buckets)):
+              gradients = tf.gradients(self.losses[b], params)
+              clipped_gradients, norm = tf.clip_by_global_norm(gradients,
+                                                               max_gradient_norm)
+              self.gradient_norms.append(norm)
+              self.updates.append(opt.apply_gradients(
+                  zip(clipped_gradients, params), global_step=self.global_step))
 
-    self.gradient_norms = []
-    self.updates = []
-
-    opt = tf.train.AdamOptimizer(self.learning_rate)
-
-    for b in range(len(buckets)):
-      gradients = tf.gradients(self.losses[b], params)
-      clipped_gradients, norm = tf.clip_by_global_norm(gradients,
-                                                       max_gradient_norm)
-      self.gradient_norms.append(norm)
-      self.updates.append(opt.apply_gradients(
-          zip(clipped_gradients, params), global_step=self.global_step))
-
-    self.train_op = self.updates
+        self.train_op = self.updates
 
     def make_train_inputs(self, input_seq, target_seq):
         batch_size = self.cfg.get('batch_size')
@@ -263,7 +274,26 @@ class TSeq2SeqModel(object):
 
     def get_inference_op(self, bucket_id):
         '''Returns the op which can be used for inference using the current model.'''
-        return self.test_outputs[bucket_id]
+        _, decoder_size = self.cfg.get('buckets')[bucket_id]
+        outputs_list = []
+        buckets = self.cfg.get('buckets')
+
+        if self.__output_vars is None and self.output_projection is not None:
+            self.__output_vars = self.outputs
+
+            # Only restore when we're doing inference while training, otherwise
+            # the restore of the logits is done when constructing the graph
+            if self.cfg.get('train'):
+                for b in range(len(buckets)):
+                  self.__output_vars[b] = [
+                      tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
+                      for output in self.__output_vars[b]
+                  ]
+
+        for i in range(decoder_size):
+            outputs_list.append(self.__output_vars[bucket_id][i])
+
+        return outputs_list
 
     def get_train_ops(self, bucket_id):
         '''Returns the train op for the given bucket id from the current model.'''

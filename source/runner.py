@@ -15,7 +15,7 @@ import sys
 import logger
 import tqdm
 
-from model import Model, PSeq2SeqModel, TSeq2SeqModel
+from model import TSeq2SeqModel
 from config import Config
 from os import path
 from data_loader import DataLoader
@@ -56,7 +56,7 @@ class Runner(object):
             self.__store_config()
 
             training_batches = []
-            test_batches = []
+            validation_batches = []
 
             if self.config.get('training_data'):
                 training_batches = self.data_loader.load_conversations(
@@ -64,14 +64,19 @@ class Runner(object):
                     self.config.get('vocabulary_dict')
                 )
 
-            if self.config.get('test_data'):
-                test_batches = self.data_loader.load_conversations(
-                    self.config.get('test_data'),
+            if self.config.get('validation_data'):
+                validation_batches = self.data_loader.load_conversations(
+                    self.config.get('validation_data'),
                     self.config.get('vocabulary_dict')
                 )
             
             loss_track = []
+            val_loss_track = []
             perplexity_track = []
+            val_perplexity_track = []
+            curr_min_perplexity = float('inf')
+
+            epochs_per_validation = self.config.get('epochs_per_validation')
 
             if model.learning_rate.eval() < 0.001:
                 session.run(model.learning_rate.assign(0.001))
@@ -85,29 +90,32 @@ class Runner(object):
                     loss_track.append(loss)
                     perplexity_track.append(perplexity)
 
-                    # Decay learning rate in case that there was no progress for the last three epochs
-                    if len(loss_track) % 3 == 0 and len(loss_track) > 0:
-                        best_loss = min(loss_track)
-
-                        if all(map(lambda x: x > best_loss, loss_track[-3:])):
-                            logger.info('Decaying learning rate because there was no progress in the last three epochs')
-                            session.run(model.learning_rate_decay_op)
-                            logger.info('The new learning rate is %.5f' % model.learning_rate.eval())
-                    
                     # Show predictions & store the model after one epoch
                     self.__show_predictions(session, model, last_batch, epoch_nr)
-                    self.__store_model(session, model, epoch_nr)
+
+                    if epoch_nr % epochs_per_validation == 0:
+                        val_loss, val_perplexity, _ = self.__run_eval(session, model, validation_batches, epoch_nr)
+                        
+                        val_loss_track.append(val_loss)
+                        val_perplexity_track.append(val_perplexity)
+
+                        # Store metrics each time we evaluate the model
+                        self.__store_metrics(loss_track, perplexity_track, val_loss_track, val_perplexity_track)
+                    else:
+                        logger.info('Skipping validation since %i mod %i != 0' % (epoch_nr, epochs_per_validation))
+                    
+                    if len(val_perplexity_track) > 0 and val_perplexity_track[-1] < curr_min_perplexity:
+                        logger.info('Storing model since the validation perplexity improved from %f to %f' % (
+                            curr_min_perplexity, val_perplexity_track[-1]
+                        ))
+                        
+                        self.__store_model(session, model, epoch_nr)
+                        curr_min_perplexity = val_perplexity_track[-1]
             except KeyboardInterrupt:
-                logger.warn('training interrupted')
-                # TODO: Save state when the training is interrupted?
+                logger.warn('Training interrupted by user')
 
-            self.__store_metrics(loss_track, perplexity_track)
-
-    def test(self):
-        '''This method is responsible for evaluating a trained
-           model with the settings defined in the config.'''
-        with self.__with_model() as (session, model):
-            pass
+            # Store the final metrics
+            self.__store_metrics(loss_track, perplexity_track, val_loss_track, val_perplexity_track)
 
     def inference(self, text):
         '''This method is responsible for doing inference on
@@ -125,6 +133,45 @@ class Runner(object):
 
             return self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
 
+    def __run_eval(self, session, model, validation_batches, epoch_nr):
+        '''This method is responsible for evaluating a trained
+           model with the settings defined in the config. It returns
+           the loss on the test batch and the respecting perplexity'''
+        feed_dict = {}
+
+        batches_per_validation = self.config.get('batches_per_validation')
+
+        if batches_per_validation <= 0:
+            logger.info('Skipping evaluation because batches_per_validation is set to zero')
+            return
+
+        val_batch_data_x = None
+        val_batch_data_y = None
+        
+        val_sum_losses = 0.0
+        val_sum_iters = 0
+
+        logger.info('[Starting validation for epoch #%i]' % epoch_nr)
+        
+        for batch in tqdm.tqdm(range(batches_per_validation)):
+            val_batch_data_x, val_batch_data_y = self.__prepare_data_batch(validation_batches)
+            feed_dict, bucket_id = model.make_train_inputs(val_batch_data_x, val_batch_data_y)
+
+            loss_op = model.get_loss_op(bucket_id)
+            val_loss = session.run(loss_op, feed_dict)
+
+            val_sum_losses += val_loss
+            val_sum_iters += 1
+
+        val_avg_loss = val_sum_losses / val_sum_iters
+        val_perplexity = self.__calculate_perplexity(val_avg_loss)
+
+        logger.info('[Finished validation after #%i]' % epoch_nr)
+        logger.info('    Validation Loss       > %f' % val_loss)
+        logger.info('    Validation Perplexity > %f' % val_perplexity)
+
+        return val_avg_loss, val_perplexity, (val_batch_data_x, val_batch_data_y)
+
     def __run_epoch(self, session, model, training_batches, epoch_nr):
         '''Runs one epoch of the training.'''
         feed_dict = {}
@@ -139,7 +186,6 @@ class Runner(object):
         
         for batch in tqdm.tqdm(range(self.config.get('batches_per_epoch'))):
             batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
-
             feed_dict, bucket_id = model.make_train_inputs(batch_data_x, batch_data_y)
 
             all_ops = model.get_train_ops(bucket_id)
@@ -153,9 +199,9 @@ class Runner(object):
             sum_iters += 1
 
         avg_loss = sum_losses / sum_iters
-        perplexity = np.power(avg_loss, 2)
+        perplexity = self.__calculate_perplexity(avg_loss)
 
-        logger.info('[Finished Epoch #%i]' % epoch_nr)
+        logger.info('[Finished epoch #%i]' % epoch_nr)
         logger.info('    Loss       > %f' % loss)
         logger.info('    Perplexity > %f' % perplexity)
 
@@ -209,11 +255,10 @@ class Runner(object):
                 text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
                 text_out = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
 
-                logger.info('Last three samples with predictions:')
-                logger.info('[Sample #%i of epoch #%i]' % (i+1, epoch_nr))
-                logger.info('    Input      > %s' % text_in)
-                logger.info('    Prediction > %s' % text_out)
-                logger.info('    Expected   > %s' % text_exp)
+                logger.info('[sample #%i of epoch #%i]' % (i+1, epoch_nr))
+                logger.info('    input      > %s' % text_in)
+                logger.info('    prediction > %s' % text_out)
+                logger.info('    expected   > %s' % text_exp)
 
     @contextlib.contextmanager
     def __with_model(self):
@@ -228,6 +273,10 @@ class Runner(object):
                 self.__setup_saver_and_restore_model(session)
 
                 yield (session, model)
+
+    def __calculate_perplexity(self, loss):
+        '''Returns the perplexity for the given loss value.'''
+        return np.power(2, loss)
 
     @contextlib.contextmanager
     def __with_tf_session(self):
@@ -264,18 +313,23 @@ class Runner(object):
             self.saver.save(session, model_path, global_step=model.global_step)
             logger.info('Current version of the model stored after epoch #%i' % epoch_nr)
 
-    def __store_metrics(self, loss_track, perplexity_track):
+    def __store_metrics(self, loss_track, perplexity_track, val_loss_track, val_perplexity_track):
         '''This method is responsible for storing the metrics
            collected while training the model. Currently, this
            only includes the losses and perplexities.'''
         metrics_path = path.join(self.curr_exp_path, 'metrics.json')
-        
-        conv_to_float = lambda x: float(x)
-        perplexity_track = list(map(conv_to_float, perplexity_track))
-        loss_track = list(map(conv_to_float, loss_track))
+
+        loss_track = list(map(float, loss_track))
+        perplexity_track = list(map(float, perplexity_track))
+
+        val_loss_track = list(map(float, val_loss_track))
+        val_perplexity_track = list(map(float, val_perplexity_track))
 
         with open(metrics_path, 'w+') as f:
-            json.dump({'loss': loss_track, 'perplexity': perplexity_track},
+            json.dump({'loss': loss_track,
+                       'val_loss': val_loss_track,
+                       'perplexity': perplexity_track,
+                       'val_perplexity': val_perplexity_track},
                       f, indent=4, sort_keys=True)
 
     def __setup_saver_and_restore_model(self, session):
