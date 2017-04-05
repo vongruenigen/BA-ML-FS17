@@ -9,21 +9,7 @@ import pickle
 import itertools
 
 from os import path
-from gensim.models import Word2Vec
 from config import Config
-
-def load_w2v_embeddings(path):
-    '''Loads the word2vec embeddings at the given path. It returns
-       the embedding matrix as a numpy ndarray and the vocabulary as
-       a dict object.'''
-    w2v_model = Word2Vec.load(path)
-    return w2v_model.syn0
-
-def load_ft_embeddings(path):
-    '''Loads the fastTrack embeddings at the given path. It returns
-       the embedding matrix as a numpy ndarray and the vocabulary as
-       a dict object.'''
-    raise Exception('Loading of ft embeddings is not implemented yet!')
 
 def load_vocabulary(path):
     '''Loads the vocabulary at the given path. The specification the
