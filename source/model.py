@@ -73,6 +73,7 @@ class TSeq2SeqModel(object):
                 local_w_t = tf.cast(w_t, tf.float32)
                 local_b = tf.cast(b, tf.float32)
                 local_inputs = tf.cast(logits, tf.float32)
+
                 return tf.cast(
                     tf.nn.sampled_softmax_loss(
                         weights=local_w_t,
