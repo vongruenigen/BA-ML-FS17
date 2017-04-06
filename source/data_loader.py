@@ -10,7 +10,6 @@ import nltk
 import re
 import utils
 import logger
-import string
 
 from config import Config
 
@@ -30,7 +29,6 @@ class DataLoader(object):
 
     # Regular expression which is used to filter unwanted characters
     WHITELIST_REGEX = '[^A-Za-z0-9\.,\?\!\s]+'
-    PRINTABLE_CHARS = set(string.printable)
 
     def __init__(self, cfg):
         '''Constructor of the DataLoader class. It only expects
@@ -63,7 +61,7 @@ class DataLoader(object):
         last_sentence = None
 
         while True:
-            for i, line in enumerate(open(path, 'r')):
+            for i, line in enumerate(open(path, 'r', encoding='utf8')):
                 # Skip as much samples as we've already seen indicated by the global_step
                 if i < forward_to:
                     continue
@@ -153,8 +151,6 @@ class DataLoader(object):
            tokenizes it and returns it.'''
         tknz = self.__get_tokenizer()
         line = re.sub(self.WHITELIST_REGEX, '', line)
-        line = filter(lambda x: x in self.PRINTABLE_CHARS, line)
-        line = str(list(line))
 
         line_parts = tknz(line)
         line_parts = map(lambda x: x.lower().strip(), line_parts)
