@@ -166,7 +166,7 @@ class TSeq2SeqModel(object):
 
         # Apply gradient clipping if we're in training mode
         if self.cfg.get('train'):
-            opt = tf.train.AdamOptimizer(self.learning_rate)
+            opt = tf.train.AdagradOptimizer(0.01)
             
             for b in range(len(buckets)):
               gradients = tf.gradients(self.losses[b], params)
