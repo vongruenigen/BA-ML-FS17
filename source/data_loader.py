@@ -72,7 +72,9 @@ class DataLoader(object):
                     if len(curr_conv) % 2 != 0:
                         del curr_conv[-1]
 
-                    yield curr_conv
+                    if len(curr_conv) > 0:
+                        yield curr_conv
+                    
                     curr_conv = []
                 
                 text_indices = self.convert_text_to_indices(line, vocabulary)
