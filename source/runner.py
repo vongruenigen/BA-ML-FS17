@@ -49,6 +49,15 @@ class Runner(object):
         self.__session = None
         self.__model = None
 
+    def close(self):
+        '''Destroys all ressources acquired by this runner.'''
+        if self.__session:
+            self.__session.close()
+
+            self.__session = None
+            self.__graph = None
+            self.__model = None
+
     def train(self):
         '''This method is responsible for training a model
            with the settings defined in the config.'''
