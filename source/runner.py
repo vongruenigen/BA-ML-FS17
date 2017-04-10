@@ -45,9 +45,9 @@ class Runner(object):
 
         self.data_loader = DataLoader(self.config)
 
-        self.graph = None
-        self.session = None
-        self.model = None
+        self.__graph = None
+        self.__session = None
+        self.__model = None
 
     def train(self):
         '''This method is responsible for training a model
@@ -108,7 +108,7 @@ class Runner(object):
                         logger.info('Storing model since the validation perplexity improved from %f to %f' % (
                             curr_min_perplexity, val_perplexity_track[-1]
                         ))
-                        
+
                         self.__store_model(session, model, epoch_nr)
                         curr_min_perplexity = val_perplexity_track[-1]
             except KeyboardInterrupt:
@@ -272,12 +272,12 @@ class Runner(object):
            or inference.'''
         with tf.device(self.config.get('device')):
             with self.__with_tf_session() as session:
-                model = TSeq2SeqModel(self.config)
-                model.build()
+                if self.__model is None:
+                    self.__model = TSeq2SeqModel(self.config)
+                    self.__model.build()
+                    self.__setup_saver_and_restore_model(session)
 
-                self.__setup_saver_and_restore_model(session)
-
-                yield (session, model)
+                yield (session, self.__model)
 
     def __calculate_perplexity(self, loss):
         '''Returns the perplexity for the given loss value.'''
@@ -287,9 +287,11 @@ class Runner(object):
     def __with_tf_session(self):
         '''This method is responsible for wrapping the execution
            of a given block within a tensorflow session.'''
-        with tf.Graph().as_default():
-            with tf.Session() as session:
-                yield session
+        if self.__graph is None or self.__session is None:
+            self.__graph = tf.Graph().as_default()
+            self.__session = tf.Session()
+
+        yield self.__session
 
     @contextlib.contextmanager
     def __with_tf_saver(self, session):
