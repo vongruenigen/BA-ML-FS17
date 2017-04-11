@@ -56,8 +56,8 @@ def start_session(model):
         return 'The selected model does not exist!', 404
 
     current_model = model
-    cfg_path = path.join(RESULTS_DIRECTORY, current_model, 'config.json')
-    current_runner = Runner(cfg_path)
+    cfg_obj = get_config(path.join(RESULTS_DIRECTORY, model))
+    current_runner = Runner(cfg_obj)
 
     # Run one sample before returning to ensure that the
     # graph and model are already loaded when the user starts
@@ -85,14 +85,14 @@ def run_inference():
         text = request.get_data().decode('utf-8')
         return current_runner.inference(text), 200
 
-@app.route('/stop_session')
+@app.route('/stop_session', methods=['POST'])
 def stop_session():
     global current_runner, current_model
 
     if current_runner is None:
         return 'No session started yet!', 403
     else:
-        current_runner.stop()
+        current_runner.close()
         current_runner = None
         current_model = None
 
@@ -103,6 +103,22 @@ def get_models():
 def expand_results_path(res_dir):
     '''Expands the given model name to the full results path.'''
     return path.join(RESULTS_DIRECTORY, res_dir)
+
+def get_config(result_dir):
+    full_path = path.join(result_dir, 'config.json')
+    config_dict = {}
+
+    try:
+        with open(full_path, 'r') as f:
+            config_dict = json.load(f)
+    except:
+        logger.error('Error while loading json config')
+
+    config_dict['train'] = False
+    config_dict['device'] = 'cpu:0'
+    config_dict['model_path'] = result_dir
+
+    return Config(config_dict)
 
 def get_available_models():
     '''Returns the list of available models in results/.'''

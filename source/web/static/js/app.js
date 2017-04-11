@@ -33,6 +33,16 @@ $(function () {
     }
   };
 
+  var enableInputControls = function (enable) {
+    if (enable) {
+      $inputText.removeAttr('disabled');
+      $sendButton.removeAttr('disabled');
+    } else {
+      $inputText.attr('disabled', 'disabled');
+      $sendButton.attr('disabled', 'disabled');
+    }
+  };
+
   // Build models drodown on page load
   $.get(getModelsPath, function (models) {
     models.forEach(function (m) {
@@ -105,11 +115,13 @@ $(function () {
 
   $sendButton.click(function () {
     var newText = $inputText.val();
+    enableInputControls(false);
 
     $.post(runInferencePath, newText, function (responseText) {
       newEntry = 'Input:\t' + newText + '\n';
       newEntry += 'Answer:\t' + responseText + '\n\n';
       $modelAnswers.val($modelAnswers.val() + newEntry);
+      enableInputControls(true);
     }).fail(function (err) {
       alert('Error while stopping the session: ' + err.responseText);
     })
