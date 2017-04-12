@@ -32,17 +32,12 @@ class TSeq2SeqModel(object):
         self.__output_vars = None
 
     def __build_model(self):
-        num_layers = self.cfg.get('num_encoder_layers') + self.cfg.get('num_decoder_layers')
         max_inp_len = self.cfg.get('max_input_length')
         max_out_len = self.cfg.get('max_output_length')
         hidden_units = self.cfg.get('num_hidden_units')
         vocab_len = len(self.cfg.get('vocabulary_dict'))
-        embeddings_m = self.cfg.get('embeddings_matrix')
         embeddings_size = self.cfg.get('max_random_embeddings_size')
         buckets = self.cfg.get('buckets')
-        num_samples = self.cfg.get('sampled_softmax_number_of_samples')
-        cell_type = self.cfg.get('cell_type')
-        dtype = tf.float32
 
         # TODO: Make configurable!
         learning_rate = 0.001
@@ -50,76 +45,18 @@ class TSeq2SeqModel(object):
         max_gradient_norm = 10.0
 
         self.learning_rate = tf.Variable(
-            float(learning_rate), trainable=False, dtype=dtype)
+            float(learning_rate), trainable=False, dtype=Config.DEFAULT_DTYPE)
+
+        # Allows for decaying of the learning rate if requested
         self.learning_rate_decay_op = self.learning_rate.assign(
             self.learning_rate * learning_rate_decay_factor)
+
+        # Global step, is updated with each backprop step
         self.global_step = tf.Variable(0, trainable=False)
 
         # If we use sampled softmax, we need an output projection.
         self.output_projection = None
-        softmax_loss_function = None
-
-        # Sampled softmax only makes sense if we sample less than vocabulary size.
-        if num_samples > 0 and num_samples < vocab_len:
-            w_t = tf.get_variable('proj_w', [vocab_len, hidden_units], dtype=dtype)
-            w = tf.transpose(w_t)
-            b = tf.get_variable('proj_b', [vocab_len], dtype=dtype)
-            self.output_projection = (w, b)
-  
-            def sampled_loss(labels, logits):
-                labels = tf.reshape(labels, [-1, 1])
-                # We need to compute the sampled_softmax_loss using 32bit floats to
-                # avoid numerical instabilities.
-                local_w_t = tf.cast(w_t, tf.float32)
-                local_b = tf.cast(b, tf.float32)
-                local_inputs = tf.cast(logits, tf.float32)
-
-                return tf.cast(
-                    tf.nn.sampled_softmax_loss(
-                        weights=local_w_t,
-                        biases=local_b,
-                        labels=labels,
-                        inputs=local_inputs,
-                        num_sampled=num_samples,
-                        num_classes=vocab_len),
-                    dtype)
-
-            softmax_loss_function = sampled_loss
-
-        cell_class = self.CELL_FN[cell_type]
-
-        def wrap_dropout(cell):
-            return rnn.DropoutWrapper(cell, input_keep_prob=self.cfg.get('dropout_input_keep_prob'),
-                                            output_keep_prob=self.cfg.get('dropout_output_keep_prob'))
-
-        # Create the internal multi-layer cell for our RNN.
-        def single_cell():
-            cell_obj = cell_class(hidden_units)
-
-            if self.cfg.get('train'):
-                cell_obj = wrap_dropout(cell_obj)
-
-            return cell_obj
-
-        cell = None
-        
-        if num_layers > 1:
-            cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)])
-        else:
-            cell = single_cell()
-
-        # The seq2seq function: we use embedding for the input and attention.
-        def seq2seq_f(encoder_inputs, decoder_inputs, do_decode):
-            return tf.contrib.legacy_seq2seq.embedding_attention_seq2seq(
-                encoder_inputs,
-                decoder_inputs,
-                cell,
-                num_encoder_symbols=vocab_len,
-                num_decoder_symbols=vocab_len,
-                embedding_size=hidden_units,
-                output_projection=self.output_projection,
-                feed_previous=do_decode,
-                dtype=dtype)
+        softmax_loss_function = self.__create_loss_function()
 
         # Feeds for inputs.
         self.encoder_inputs = []
@@ -128,11 +65,12 @@ class TSeq2SeqModel(object):
 
         for i in range(buckets[-1][0]):  # Last bucket is the biggest one.
             self.encoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
-                                                    name="encoder{0}".format(i)))
+                                                      name="encoder{0}".format(i)))
         for i in range(buckets[-1][1] + 1):
             self.decoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
                                                       name="decoder{0}".format(i)))
-            self.target_weights.append(tf.placeholder(dtype, shape=[None],
+            
+            self.target_weights.append(tf.placeholder(Config.DEFAULT_DTYPE, shape=[None],
                                                       name="weight{0}".format(i)))
 
         # Our targets are decoder inputs shifted by one.
@@ -143,7 +81,7 @@ class TSeq2SeqModel(object):
         if not self.cfg.get('train'):
             self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
                 self.encoder_inputs, self.decoder_inputs, targets,
-                self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
+                self.target_weights, buckets, lambda x, y: self.__create_seq2seq_fn(x, y, True),
                 softmax_loss_function=softmax_loss_function)
           
             # If we use output projection, we need to project outputs for decoding.
@@ -157,7 +95,7 @@ class TSeq2SeqModel(object):
             self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
                 self.encoder_inputs, self.decoder_inputs, targets,
                 self.target_weights, buckets,
-                lambda x, y: seq2seq_f(x, y, False),
+                lambda x, y: self.__create_seq2seq_fn(x, y, False),
                 softmax_loss_function=softmax_loss_function)
 
         params = tf.trainable_variables()
@@ -321,4 +259,98 @@ class TSeq2SeqModel(object):
 
         return bucket_id
 
+    def __create_rnn_cells(self):
+        '''Creates an RNN cell according to the configuration.'''
+        num_layers = self.cfg.get('num_encoder_layers') + self.cfg.get('num_decoder_layers')
+        inp_prob = self.cfg.get('dropout_input_keep_prob')
+        out_prob = self.cfg.get('dropout_output_keep_prob')
+        cell_type = self.cfg.get('cell_type')
+        hidden_units = self.cfg.get('num_hidden_units')
+        cell_class = self.CELL_FN[cell_type]
+
+        def wrap_dropout(cell):
+            return rnn.DropoutWrapper(cell, input_keep_prob=inp_prob,
+                                            output_keep_prob=out_prob)
+
+        def current_device():
+            devices = self.cfg.get('devices')
+            curr_idx = self.cfg.get('device_idx')
+
+            if curr_idx is None or curr_idx == len(devices):
+                curr_idx = 0
+
+            curr_dev = devices[curr_idx]
+            self.cfg.set('device_idx', curr_idx+1)
+            
+            return curr_dev
+
+        # Create the internal multi-layer cell for our RNN.
+        def single_cell():
+            with tf.device(current_device()):
+                cell_obj = cell_class(hidden_units)
+
+                if self.cfg.get('train'):
+                    cell_obj = wrap_dropout(cell_obj)
+
+                return cell_obj
+
+        cell = None
+        
+        if num_layers > 1:
+            cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)])
+        else:
+            cell = single_cell()
+
+        return cell
+
+    def __create_seq2seq_fn(self, enc_inputs, dec_inputs, do_decode):
+        '''Creates the seq2seq function according to the configuration.'''
+        cell = self.__create_rnn_cells()
+        vocab_len = len(self.cfg.get('vocabulary_dict'))
+        hidden_units = self.cfg.get('num_hidden_units')
+        do_decode = not self.cfg.get('train')
+
+        return tf.contrib.legacy_seq2seq.embedding_attention_seq2seq(enc_inputs,dec_inputs, cell,
+                                                                     num_encoder_symbols=vocab_len,
+                                                                     num_decoder_symbols=vocab_len,
+                                                                     embedding_size=hidden_units,
+                                                                     output_projection=self.output_projection,
+                                                                     feed_previous=do_decode,
+                                                                     dtype=Config.DEFAULT_DTYPE)
+
+    def __create_loss_function(self):
+        '''Creates the loss function to be used while training.'''
+        vocab_len = len(self.cfg.get('vocabulary_dict'))
+        hidden_units = self.cfg.get('num_hidden_units')
+        num_samples = self.cfg.get('sampled_softmax_number_of_samples')
+
+        softmax_loss_function = None
+
+        # Sampled softmax only makes sense if we sample less than vocabulary size.
+        if num_samples > 0 and num_samples < vocab_len:
+            w_t = tf.get_variable('proj_w', [vocab_len, hidden_units], dtype=Config.DEFAULT_DTYPE)
+            w = tf.transpose(w_t)
+            b = tf.get_variable('proj_b', [vocab_len], dtype=Config.DEFAULT_DTYPE)
+            
+            self.output_projection = (w, b)
+  
+            def sampled_loss(labels, logits):
+                labels = tf.reshape(labels, [-1, 1])
+                # We need to compute the sampled_softmax_loss using 32bit floats to
+                # avoid numerical instabilities.
+                local_w_t = tf.cast(w_t, tf.float32)
+                local_b = tf.cast(b, tf.float32)
+                local_inputs = tf.cast(logits, tf.float32)
+
+                return tf.cast(tf.nn.sampled_softmax_loss(
+                                    weights=local_w_t,
+                                    biases=local_b,
+                                    labels=labels,
+                                    inputs=local_inputs,
+                                    num_sampled=num_samples,
+                                    num_classes=vocab_len), Config.DEFAULT_DTYPE)
+
+            softmax_loss_function = sampled_loss
+
+        return softmax_loss_function
 

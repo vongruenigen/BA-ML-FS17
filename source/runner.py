@@ -279,7 +279,7 @@ class Runner(object):
         '''This method is responsible for setting up the device,
            session and model which can then be used for training
            or inference.'''
-        with tf.device(self.config.get('device')):
+        with tf.device(self.config.get('devices')[0]):
             with self.__with_tf_session() as session:
                 if self.__model is None:
                     self.__model = TSeq2SeqModel(self.config)

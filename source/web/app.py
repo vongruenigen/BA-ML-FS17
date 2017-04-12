@@ -115,7 +115,7 @@ def get_config(result_dir):
         logger.error('Error while loading json config')
 
     config_dict['train'] = False
-    config_dict['device'] = 'cpu:0'
+    config_dict['devices'] = 'cpu:0'
     config_dict['model_path'] = result_dir
 
     return Config(config_dict)
