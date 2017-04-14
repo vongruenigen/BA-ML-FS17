@@ -1,5 +1,5 @@
 #
-# BA ML FS17 - Dirk von Grünigen & Martin Weilenmann
+# BA ML FS17 - Dirk von Gruenigen & Martin Weilenmann
 #
 # Description: Generates a list of tokens from the given
 #              corpus which can be used as the vocabulary.

@@ -1,5 +1,5 @@
 #
-# BA ML FS17 - Dirk von Grünigen & Martin Weilenmann
+# BA ML FS17 - Dirk von Gruenigen & Martin Weilenmann
 #
 # Description: This module contains the Model class which
 #              is responsible for creating the tensorflow

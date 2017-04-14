@@ -1,5 +1,5 @@
 #
-# BA ML FS17 - Dirk von Grünigen & Martin Weilenmann
+# BA ML FS17 - Dirk von Gruenigen & Martin Weilenmann
 #
 # Description: Creates a source and target file from a
 #              a given conversational corpus to a format
