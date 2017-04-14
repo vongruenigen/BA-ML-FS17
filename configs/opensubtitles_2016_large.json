@@ -3,6 +3,7 @@
   "batches_per_epoch": 100,
   "batches_per_validation": 2500,
   "epochs_per_validation": 25,
+  "save_model_after_n_epochs": 100,
   "batch_size": 64,
   "cell_type": "LSTM",
   "num_hidden_units": 1024,
