@@ -74,7 +74,7 @@ class Runner(object):
                     self.config.get('training_data'),
                     self.config.get('vocabulary_dict')
                 )
-            
+
             loss_track = []
             val_loss_track = []
             perplexity_track = []
@@ -104,7 +104,7 @@ class Runner(object):
                         )
 
                         val_loss, val_perplexity, _ = self.__run_eval(session, model, validation_batches, epoch_nr)
-                        
+
                         val_loss_track.append(val_loss)
                         val_perplexity_track.append(val_perplexity)
 
@@ -112,14 +112,16 @@ class Runner(object):
                         self.__store_metrics(loss_track, perplexity_track, val_loss_track, val_perplexity_track)
                     else:
                         logger.info('Skipping validation since %i mod %i != 0' % (epoch_nr, epochs_per_validation))
-                    
+
                     if len(val_perplexity_track) > 0 and val_perplexity_track[-1] < curr_min_perplexity:
                         logger.info('Storing model since the validation perplexity improved from %f to %f' % (
                             curr_min_perplexity, val_perplexity_track[-1]
                         ))
 
-                        self.__store_model(session, model, epoch_nr)
+                        self.__store_model(session, model, epoch_nr, tag='validation')
                         curr_min_perplexity = val_perplexity_track[-1]
+
+                    self.__store_model(session, model, epoch_nr, tag='validation')
             except KeyboardInterrupt:
                 logger.warn('Training interrupted by user')
 
@@ -145,7 +147,7 @@ class Runner(object):
     def __update_global_step(self, session, model):
         '''Updates the global_step value in the config.'''
         curr_global_step = session.run(model.global_step)
-        self.config.set('global_step', curr_global_step)  
+        self.config.set('global_step', curr_global_step)
 
     def __run_eval(self, session, model, validation_batches, epoch_nr):
         '''This method is responsible for evaluating a trained
@@ -161,12 +163,12 @@ class Runner(object):
 
         val_batch_data_x = None
         val_batch_data_y = None
-        
+
         val_sum_losses = 0.0
         val_sum_iters = 0
 
         logger.info('[Starting validation for epoch #%i]' % epoch_nr)
-        
+
         for batch in tqdm.tqdm(range(batches_per_validation)):
             val_batch_data_x, val_batch_data_y = self.__prepare_data_batch(validation_batches)
             feed_dict, bucket_id = model.make_train_inputs(val_batch_data_x, val_batch_data_y)
@@ -192,12 +194,12 @@ class Runner(object):
 
         batch_data_x = None
         batch_data_y = None
-        
+
         sum_losses = 0.0
         sum_iters = 0
 
         logger.info('[Starting epoch #%i]' % epoch_nr)
-        
+
         for batch in tqdm.tqdm(range(self.config.get('batches_per_epoch'))):
             batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
             feed_dict, bucket_id = model.make_train_inputs(batch_data_x, batch_data_y)
@@ -306,7 +308,7 @@ class Runner(object):
     def __with_tf_saver(self, session):
         '''This method is responsible for ensuring that the state
            of the model is saved at all times using the tf.Saver
-           class''' 
+           class'''
         pass
 
     def __store_config(self):
@@ -317,15 +319,12 @@ class Runner(object):
             json.dump(self.config.get_dict(), f,
                       indent=4, sort_keys=True)
 
-    def __store_model(self, session, model, epoch_nr):
+    def __store_model(self, session, model, epoch_nr, tag=''):
         '''Stores the given model in the current results directory.
            This model can then later be reloaded with the __load_model()
            method.'''
-        if (epoch_nr % self.config.get('save_model_after_n_epochs') == 0) or self.config.get('validation_data'):
-            # Update the global step of the model
-            session.run(model.global_step.assign(model.global_step + 1))
-
-            model_path = self.__get_model_path()
+        if (epoch_nr % self.config.get('save_model_after_n_epochs') == 0) or tag != '':
+            model_path = self.__get_model_path(tag=tag)
             self.saver.save(session, model_path, global_step=model.global_step)
             logger.info('Current version of the model stored after epoch #%i' % epoch_nr)
 
@@ -353,7 +352,7 @@ class Runner(object):
            training. It also loads a previous model if referenced in the
            current configuration.'''
         model_path = self.config.get('model_path')
-            
+
         self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=self.config.get('checkpoint_max_to_keep'))
 
         # Load model if referenced in the config, otherwise freshly initialize it
@@ -410,7 +409,7 @@ class Runner(object):
         # revert the vocabulary for the idx -> text usages
         self.rev_vocabulary = utils.reverse_vocabulary(vocabulary)
 
-    def __get_model_path(self, version=0):
+    def __get_model_path(self, version=0, tag=''):
         '''Returns the path to store the model at as a string. An
            optional version can be specified and will be appended
            to the name of the stored file. If a model_path is set
@@ -419,7 +418,14 @@ class Runner(object):
         if not self.curr_exp_path:
             raise Exception('__prepare_results_directory() must be called before using __get_model_path()')
 
-        return path.join(self.curr_exp_path, 'model-%s.chkp' % str(version))
+        model_name = None
+
+        if tag == '':
+            model_name = 'model-%s.chkp' % str(version)
+        else:
+            model_name = 'model-%s-%s.chkp' % (str(tag), str(version))
+
+        return path.join(self.curr_exp_path, model_name)
 
     def __prepare_data_batch(self, all_data):
         '''Returns two lists, each of the size of the configured batch size. The first contains
