@@ -1,5 +1,5 @@
 #
-# BA ML FS17 - Dirk von Grünigen & Martin Weilenmann
+# BA ML FS17 - Dirk von Gruenigen & Martin Weilenmann
 #
 # Description: Simple wrapper for the python logging library.
 #

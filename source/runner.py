@@ -1,5 +1,5 @@
 #
-# BA ML FS17 - Dirk von Grünigen & Martin Weilenmann
+# BA ML FS17 - Dirk von Gruenigen & Martin Weilenmann
 #
 # Description: This module is responsible for training
 #              and running of a given model.

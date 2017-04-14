@@ -1,5 +1,5 @@
 #
-# BA ML FS17 - Dirk von Grünigen & Martin Weilenmann
+# BA ML FS17 - Dirk von Gruenigen & Martin Weilenmann
 #
 # Description: This script is responsible for bringing
 #              the unprocessed data of the cornell movie
@@ -42,6 +42,34 @@ data_dir = argv[0]
 
 all_lines = {}
 
+regex = re.compile('\{.+?\}')
+allowed_chars = re.compile('[^\w , . ! ?]')
+
+def clean_text(t):
+    t = t.replace('[spoilers]', '')
+    t = t.replace(str('\r\''), '')
+    t = http_regex.sub('', t)
+    t = ' '.join(word_tokenize(t))
+    t = allowed_chars.sub('', t)
+    t = t.strip('-')
+    t = t.lstrip()
+    t = t.strip('[')
+    t = t.strip(']')
+    t = t.lower()
+    t = t.strip('\"')
+    t = regex.sub('', t)
+    t = t.replace("~", "")
+    t = t.strip(' ')
+    t = t.replace('...', '')
+    t = t.replace('#', '')
+    t = t.replace('&gt', '')
+    t = t.replace('\r', '')
+    t = t.replace('\n', '')
+    t = t.replace('  ', ' ')
+    t = re.sub(' +',' ',t)
+    
+    return t
+
 file_lines = path.join(data_dir, LINES_FILE_NAME)
 file_convs = path.join(data_dir, CONVS_FILE_NAME)
 
@@ -54,7 +82,7 @@ for line in open(file_lines, 'r'):
     line_no = line_parts[0]
     line_txt = line_parts[-1]
 
-    all_lines[line_no] = line_txt
+    all_lines[line_no] = clean_text(line_txt.lower()))
 
 with open(output_file, 'w+') as f:
     all_convs = list(open(file_convs, 'r').read().split('\n'))
