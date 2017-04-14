@@ -74,7 +74,7 @@ class Runner(object):
                     self.config.get('training_data'),
                     self.config.get('vocabulary_dict')
                 )
-            
+
             loss_track = []
             val_loss_track = []
             perplexity_track = []
@@ -104,7 +104,7 @@ class Runner(object):
                         )
 
                         val_loss, val_perplexity, _ = self.__run_eval(session, model, validation_batches, epoch_nr)
-                        
+
                         val_loss_track.append(val_loss)
                         val_perplexity_track.append(val_perplexity)
 
@@ -112,7 +112,7 @@ class Runner(object):
                         self.__store_metrics(loss_track, perplexity_track, val_loss_track, val_perplexity_track)
                     else:
                         logger.info('Skipping validation since %i mod %i != 0' % (epoch_nr, epochs_per_validation))
-                    
+
                     if len(val_perplexity_track) > 0 and val_perplexity_track[-1] < curr_min_perplexity:
                         logger.info('Storing model since the validation perplexity improved from %f to %f' % (
                             curr_min_perplexity, val_perplexity_track[-1]
@@ -145,7 +145,7 @@ class Runner(object):
     def __update_global_step(self, session, model):
         '''Updates the global_step value in the config.'''
         curr_global_step = session.run(model.global_step)
-        self.config.set('global_step', curr_global_step)  
+        self.config.set('global_step', curr_global_step)
 
     def __run_eval(self, session, model, validation_batches, epoch_nr):
         '''This method is responsible for evaluating a trained
@@ -161,12 +161,12 @@ class Runner(object):
 
         val_batch_data_x = None
         val_batch_data_y = None
-        
+
         val_sum_losses = 0.0
         val_sum_iters = 0
 
         logger.info('[Starting validation for epoch #%i]' % epoch_nr)
-        
+
         for batch in tqdm.tqdm(range(batches_per_validation)):
             val_batch_data_x, val_batch_data_y = self.__prepare_data_batch(validation_batches)
             feed_dict, bucket_id = model.make_train_inputs(val_batch_data_x, val_batch_data_y)
@@ -192,12 +192,12 @@ class Runner(object):
 
         batch_data_x = None
         batch_data_y = None
-        
+
         sum_losses = 0.0
         sum_iters = 0
 
         logger.info('[Starting epoch #%i]' % epoch_nr)
-        
+
         for batch in tqdm.tqdm(range(self.config.get('batches_per_epoch'))):
             batch_data_x, batch_data_y = self.__prepare_data_batch(training_batches)
             feed_dict, bucket_id = model.make_train_inputs(batch_data_x, batch_data_y)
@@ -298,7 +298,7 @@ class Runner(object):
            of a given block within a tensorflow session.'''
         if self.__graph is None or self.__session is None:
             self.__graph = tf.Graph().as_default()
-            self.__session = tf.Session()
+            self.__session = tf.Session(tf.ConfigProto(allow_soft_placement=True))
 
         yield self.__session
 
@@ -306,7 +306,7 @@ class Runner(object):
     def __with_tf_saver(self, session):
         '''This method is responsible for ensuring that the state
            of the model is saved at all times using the tf.Saver
-           class''' 
+           class'''
         pass
 
     def __store_config(self):
@@ -353,7 +353,7 @@ class Runner(object):
            training. It also loads a previous model if referenced in the
            current configuration.'''
         model_path = self.config.get('model_path')
-            
+
         self.saver = tf.train.Saver(tf.global_variables(), max_to_keep=self.config.get('checkpoint_max_to_keep'))
 
         # Load model if referenced in the config, otherwise freshly initialize it
