@@ -300,7 +300,7 @@ class Runner(object):
            of a given block within a tensorflow session.'''
         if self.__graph is None or self.__session is None:
             self.__graph = tf.Graph().as_default()
-            self.__session = tf.Session()
+            self.__session = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 
         yield self.__session
 
