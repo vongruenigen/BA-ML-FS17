@@ -121,7 +121,7 @@ class Runner(object):
                         self.__store_model(session, model, epoch_nr, tag='validation')
                         curr_min_perplexity = val_perplexity_track[-1]
 
-                    self.__store_model(session, model, epoch_nr, tag='validation')
+                    self.__store_model(session, model, epoch_nr)
             except KeyboardInterrupt:
                 logger.warn('Training interrupted by user')
 
