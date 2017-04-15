@@ -360,10 +360,14 @@ class Runner(object):
             session.run(tf.global_variables_initializer())
         else:
             logger.info('Loading model from the path %s' % model_path)
-            ckpt = tf.train.get_checkpoint_state(self.config.get('model_path'))
 
-            if ckpt and ckpt.model_checkpoint_path:
-                self.saver.restore(session, ckpt.model_checkpoint_path)
+            if path.isdir(model_path):
+                ckpt = tf.train.get_checkpoint_state(self.config.get('model_path'))
+
+                if ckpt and ckpt.model_checkpoint_path:
+                    self.saver.restore(session, ckpt.model_checkpoint_path)
+            else:
+                self.saver.restore(session, model_path)
 
     def __prepare_results_directory(self):
         '''This method is responsible for preparing the results
