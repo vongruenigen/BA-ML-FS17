@@ -33,7 +33,8 @@ for entry in os.listdir(results_dir):
     find_model = lambda file: 'chkp' in file and 'data' in file
 
     if path.isdir(full_entry):
-        found_models = list(filter(find_model, os.listdir(full_entry)))
+        found_models = filter(find_model, os.listdir(full_entry))
+        found_models = list(map(lambda x: '.'.join(x.split('.')[:-1]), found_models))
 
         if any(found_models):
             found_models = [path.join(results_dir, full_entry, m) for m in found_models]
