@@ -26,24 +26,24 @@ from config import Config
 argv = sys.argv[1:]
 results_dir = path.abspath(path.join(path.dirname(__file__), '..', 'results'))
 
-if len(argv) == 0:
-    print('ERROR: Expected a config to load the model with')
-    print('       (e.g. python scripts/talk_to_model.py <json-config>')
-    sys.exit(2)
-
 available_models = []
 
 for entry in os.listdir(results_dir):
     full_entry = path.join(results_dir, entry)
+    find_model = lambda file: 'chkp' in file and 'data' in file
 
-    if path.isdir(full_entry) and any(map(lambda x: 'chkp' in x, os.listdir(full_entry))):
-        available_models.append(path.join(results_dir, entry))
+    if path.isdir(full_entry):
+        found_models = list(filter(find_model, os.listdir(full_entry)))
+
+        if any(found_models):
+            found_models = [path.join(results_dir, full_entry, m) for m in found_models]
+            available_models += found_models
 
 if len(available_models) > 0:
     print('The following models are available, please specify which one you want to load:\n')
 
     for i, avm in enumerate(available_models):
-        print('\t[%i] %s' % (i, avm.split('/')[-1]))
+        print('\t[%i] %s' % (i, '/'.join(avm.split('/')[-2:])))
 else:
     print('No models available in results/, exiting!')
     sys.exit(2)
@@ -52,7 +52,7 @@ model_nr = int(input('\n(Model-Nr.)  > '))
 selected_model = available_models[model_nr]
 print('You have selected the model stored at %s' % selected_model)
 
-config_path = argv[0]
+config_path = path.join('/'.join(selected_model.split('/')[:-1]), 'config.json')
 config = Config.load_from_json(config_path)
 
 config.set('train', False) # == inference
