@@ -1,6 +1,6 @@
 FROM gcr.io/tensorflow/tensorflow:latest-gpu-py3
 
-LABEL authors="Dirk von Grünigen, Martin Weilenmann"
+LABEL authors="Dirk von Gruenigen, Martin Weilenmann"
 
 # Clean
 RUN apt-get clean && \

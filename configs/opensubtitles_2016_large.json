@@ -3,6 +3,7 @@
   "batches_per_epoch": 100,
   "batches_per_validation": 2500,
   "epochs_per_validation": 25,
+  "save_model_after_n_epochs": 100,
   "batch_size": 64,
   "cell_type": "LSTM",
   "num_hidden_units": 1024,
@@ -20,5 +21,6 @@
   "sampled_softmax_number_of_samples": 512,
   "word_tokenizer": "none",
   "use_last_output_as_input": true,
-  "start_training_from_beginning": false
+  "start_training_from_beginning": false,
+  "model_path": "results/2017-04-06_20-41-58_opensubtitles_2016_large"
 }
