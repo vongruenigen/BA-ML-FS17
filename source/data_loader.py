@@ -129,6 +129,10 @@ class DataLoader(object):
         skip_idxs = [Config.UNKNOWN_WORD_IDX, Config.PAD_WORD_IDX,
                      Config.EOS_WORD_IDX, Config.GO_WORD_IDX]
 
+        # Remove anything after the first EOS token
+        if Config.EOS_WORD_IDX in text_idxs:
+            text_idxs = text_idxs[:text_idxs.index(Config.EOS_WORD_IDX)]
+
         rev_text_idxs = list(reversed(text_idxs))
         shortened_idxs = []
 
