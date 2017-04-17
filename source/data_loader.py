@@ -128,6 +128,7 @@ class DataLoader(object):
            used to encode the text via convert_text_to_indices().'''
         skip_idxs = [Config.UNKNOWN_WORD_IDX, Config.PAD_WORD_IDX,
                      Config.EOS_WORD_IDX, Config.GO_WORD_IDX]
+        text_idxs = list(text_idxs)
 
         # Remove anything after the first EOS token
         if Config.EOS_WORD_IDX in text_idxs:
