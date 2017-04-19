@@ -42,31 +42,54 @@ output_file = argv[1]
 allowed_chars = re.compile('[^\w , . ! ?]')
 multi_comma_chars = re.compile('\.+')
 multi_whitespace = re.compile(' +')
+dash_regex = re.compile('\s+-\s+')
 
 def clean_text(t):
+    orig_t = t
     t = t.lower()
     t = allowed_chars.sub('', t)
     t = multi_comma_chars.sub(',', t)
     t = multi_whitespace.sub(' ', t)
+    t = dash_regex.sub(' ', t)
     t = t.strip()
+
+    if t.endswith(','):
+        t = '%s.' % t[:-1]
+
     return t
 
 print('Starting to gather all directories and files...')
 for d, _, _ in os.walk(data_dir):
-    if len(files) % 1000 == 0:
+    if len(files) % 10000 == 0:
         print('(Found %i files until now)' % len(files))
     files.extend(glob.glob(os.path.join(d, pattern)))
 print('Found %i files which need to preprocessed!' % len(files))
 
 files = set(files)
 last_text = None
+count_combined_sentences = 0
+
+def write_to_file(file, line):
+    text = clean_text(line)
+    file.write('%s\n' % text)
 
 with open(output_file, 'w+') as f:
     for i, fname in tqdm(enumerate(files), total=len(files)):
         with gzip.open(fname, 'rb') as gzf:
-            tree = ET.fromstring(gzf.read())
+            content = ET.fromstring(gzf.read())
 
-            for child in tree.getchildren():
+            triple_dot_pred = lambda t1, t2: t1.endswith('...') and t2.startswith('...')
+            comma_pred = lambda t1, t2: t1.endswith(',') and t2[0].islower()
+
+            # We've to write out the last sentence from the last file in case that
+            # there were an even number of lines, otherwise drop it
+            if last_text is not None and not last_text.startswith('...') and texts_count % 2 != 0:
+                write_to_file(f, last_text)
+
+            texts_count = 0
+            last_text = None
+
+            for child in content.getchildren():
                 if child.tag != 's':
                     continue
 
@@ -74,22 +97,22 @@ with open(output_file, 'w+') as f:
 
                 for node in child.getchildren():
                     if node.tag == 'w':
-                        words.append(node.text.replace('-', ''))
+                        words.append(node.text)
 
-                if len(words) < 2:
-                    continue # skip sentences with less than two words
+                text = ' '.join(words)
 
-                text = clean_text(' '.join(words))
+                if text == last_text or len(words) < 2:
+                    continue # skip double sentences and with less than 2 words
 
-                if text != last_text:
-                    last_text = text
+                if last_text is not None:
+                    if triple_dot_pred(last_text, text) or comma_pred(last_text, text):
+                        last_text += text
+                        count_combined_sentences += 1
+                    else:
+                        write_to_file(f, last_text)
+                        texts_count += 1
+                        last_text = text
                 else:
-                    continue # skip double sentences
+                    last_text = text
 
-                try:
-                    if text[0] != '[' and text[-1] != ':':
-                        f.write(text + "\n")
-                except IndexError:
-                    pass
-
-print('Converted all conversational text and stored it in %s' % output_file)
+print('Converted all conversational text and stored it in %s (with %i combined sentences)' % (output_file, count_combined_sentences))
