@@ -67,24 +67,43 @@ print('Found %i files which need to preprocessed!' % len(files))
 
 files = set(files)
 last_text = None
+texts_count = 0
 count_combined_sentences = 0
+count_total_sentences = 0
+count_skipped_sentences = 0
+count_skipped_files = 0
+seen_document_ids = []
 
-def write_to_file(file, line):
+def write_to_file(f, line):
     text = clean_text(line)
-    file.write('%s\n' % text)
+    f.write('%s\n' % text)
+
+def write_if_necessary(f, line, count):
+    if line is not None:
+        if not line.startswith('...') and texts_count % 2 != 0:
+            write_to_file(f, line)
+            return True
+        else:
+            return False
+
+triple_dot_pred = lambda t1, t2: t1.endswith('...') and t2.startswith('...')
+comma_pred = lambda t1, t2: t1.endswith(',') and t2[0].islower()
 
 with open(output_file, 'w+') as f:
-    for i, fname in tqdm(enumerate(files), total=len(files)):
+    for i, fname in tqdm(enumerate(sorted(files)), total=len(files)):        
         with gzip.open(fname, 'rb') as gzf:
             content = ET.fromstring(gzf.read())
+            content_id = int(content.get('id'))
 
-            triple_dot_pred = lambda t1, t2: t1.endswith('...') and t2.startswith('...')
-            comma_pred = lambda t1, t2: t1.endswith(',') and t2[0].islower()
+            if content_id in seen_document_ids:
+                print('Skipping document with the id %i as it was already processed', content_id)
+                count_skipped_files += 1
+                continue
 
             # We've to write out the last sentence from the last file in case that
-            # there were an even number of lines, otherwise drop it
-            if last_text is not None and not last_text.startswith('...') and texts_count % 2 != 0:
-                write_to_file(f, last_text)
+            # there were an odd number of lines, otherwise drop it
+            if last_text is not None and not write_if_necessary(f, last_text, texts_count):
+                count_skipped_sentences += 1
 
             texts_count = 0
             last_text = None
@@ -93,6 +112,7 @@ with open(output_file, 'w+') as f:
                 if child.tag != 's':
                     continue
 
+                count_total_sentences += 1
                 words = []
 
                 for node in child.getchildren():
@@ -102,6 +122,7 @@ with open(output_file, 'w+') as f:
                 text = ' '.join(words)
 
                 if text == last_text or len(words) < 2:
+                    count_skipped_sentences += 1
                     continue # skip double sentences and with less than 2 words
 
                 if last_text is not None:
@@ -115,4 +136,10 @@ with open(output_file, 'w+') as f:
                 else:
                     last_text = text
 
-print('Converted all conversational text and stored it in %s (with %i combined sentences)' % (output_file, count_combined_sentences))
+    if not write_if_necessary(f, last_text, texts_count):
+        count_skipped_sentences += 1
+
+print('Converted all conversational text and stored it in %s (combined=%i, skipped=%i, skipped_files=%i, total=%i)' % (
+        output_file, count_combined_sentences, count_skipped_sentences, count_skipped_files, count_total_sentences
+    )
+)
