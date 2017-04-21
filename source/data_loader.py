@@ -42,7 +42,7 @@ class DataLoader(object):
         all_convs = []
         curr_conv = []
         turn_flag = False
-        
+
         forward_to = self.cfg.get('global_step')
         use_last_output_as_input = self.cfg.get('use_last_output_as_input')
 
@@ -74,9 +74,11 @@ class DataLoader(object):
 
                     if len(curr_conv) > 0:
                         yield curr_conv
-                    
+
                     curr_conv = []
-                
+
+                    continue
+
                 text_indices = self.convert_text_to_indices(line, vocabulary)
 
                 # shorten the text in case it's longer than configured to be allowed to
