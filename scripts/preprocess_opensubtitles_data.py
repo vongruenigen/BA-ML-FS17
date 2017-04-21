@@ -15,19 +15,22 @@
 #
 #
 
+from __future__ import print_function
+
 import sys
 import os
 import re
 import gzip
 import glob
 import xml.etree.ElementTree as ET
+import hashlib
 
 from tqdm import tqdm
 from os import path
 from nltk import word_tokenize
 
 files = []
-pattern = "*.gz"
+pattern = '*.gz'
 
 argv = sys.argv[1:]
 
@@ -58,11 +61,20 @@ def clean_text(t):
 
     return t
 
+def md5(fname):
+    hash_md5 = hashlib.md5()
+    with open(fname, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+    return hash_md5.hexdigest()
+
 print('Starting to gather all directories and files...')
 for d, _, _ in os.walk(data_dir):
     if len(files) % 10000 == 0:
         print('(Found %i files until now)' % len(files))
+
     files.extend(glob.glob(os.path.join(d, pattern)))
+
 print('Found %i files which need to preprocessed!' % len(files))
 
 files = set(files)
@@ -72,7 +84,7 @@ count_combined_sentences = 0
 count_total_sentences = 0
 count_skipped_sentences = 0
 count_skipped_files = 0
-seen_document_ids = []
+seen_document_ids = {}
 
 def write_to_file(f, line):
     text = clean_text(line)
@@ -86,19 +98,46 @@ def write_if_necessary(f, line, count):
         else:
             return False
 
+def md5(fname):
+    hash_md5 = hashlib.md5()
+
+    with open(fname, 'rb') as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_md5.update(chunk)
+
+    return hash_md5.hexdigest()
+
 triple_dot_pred = lambda t1, t2: t1.endswith('...') and t2.startswith('...')
 comma_pred = lambda t1, t2: t1.endswith(',') and t2[0].islower()
 
 with open(output_file, 'w+') as f:
-    for i, fname in tqdm(enumerate(sorted(files)), total=len(files)):        
+    for i, fname in tqdm(enumerate(sorted(files)), total=len(files)):
         with gzip.open(fname, 'rb') as gzf:
             content = ET.fromstring(gzf.read())
-            content_id = int(content.get('id'))
+            content_id = content.get('id')
 
-            if content_id in seen_document_ids:
-                print('Skipping document with the id %i as it was already processed', content_id)
-                count_skipped_files += 1
-                continue
+            if len(content_id) > 0:
+                content_id = int(content_id)
+            else:
+                content_id = None
+
+            if content_id is not None:
+                if content_id in seen_document_ids:
+                    new_doc_md5 = md5(fname)
+
+                    if seen_document_ids[content_id] == new_doc_md5:
+                        print('Skipping document %s as it was already processed before! (md5: stored=%s, new=%s)' % (
+                                fname, seen_document_ids[content_id], new_doc_md5
+                            )
+                        )
+                        count_skipped_files += 1
+                        continue
+                    else:
+                        print('Processing document %s even though the ids are same, the md5 hashes are not! (md5: stored=%s, new=%s)' % (
+                            fname, seen_document_ids[content_id], new_doc_md5
+                        ))
+                else:
+                    seen_document_ids[content_id] = md5(fname)
 
             # We've to write out the last sentence from the last file in case that
             # there were an odd number of lines, otherwise drop it
