@@ -1,87 +1,95 @@
 #
 # BA ML FS17 - Dirk von Gruenigen & Martin Weilenmann
 #
-# Description: This script is responsible for bringing
-#              the unprocessed data of the OpenSubtitles
-#              dialogue dataset into a format which can
-#              be used for training.
+# Description: This script extracts n-grams (specific n can be supplied as arguments)
+#              from the given corpus and stores it in a shelve dictionary.
 #
-# How to use:  1. Download raw data via the following command:
-#                 > wget http://opus.lingfil.uu.se/download.php?f=OpenSubtitles/en.tar.gz -O opensubtitles.tar.gz
-#                 Have to check the raw data format from the other OpenSubtitles versions later.
-#              2. Run this file with the top lvl path of your raw data as parameter.
-#              3. You will find the output file in your given path.
-#
-#
-#
+
 import sys
 import os
 import shelve
+import time
 
 from os import path
-reload(sys)
-sys.setdefaultencoding('utf-8')
 
 argv = sys.argv[1:]
+
 if len(argv) < 2 or not path.isfile(argv[0]):
     print('ERROR: Expected the path to the file to be analyzed and the n-gram dimension')
+    print('       (python scripts/generate_ngrams.py <corpus-in> <shelve-dir> <ngram-dim1,ngram-dim2,...> [<continue-line-nr>])')
     sys.exit(2)
 
-data_dir = argv[0]
-
-_, tail = os.path.split(data_dir)
-data_name = os.path.splitext(tail)[0]
+corpus_in = argv[0]
+shelve_dir = argv[1]
+ngram_dims = argv[2]
+ngrams_dims_str = []
+shelve_open_flag = 'n'
+corpus_name = corpus_in.split('/')[-1].split('.')[0]
 
 try:
-    ngram_dim = int(argv[1])
+    ngram_dims = list(map(int, ngram_dims.split(',')))
+    ngram_dims_str = list(map(str, ngram_dims))
 except ValueError:
-    print('ERROR: Expected the numeric ngram dimension argument.')
+    print('ERROR: The n-gram dimensions must be positive integers, optionally separated by a comma. (e.g. "2,3,4")')
     sys.exit(2)
 
-if len(argv) == 3:
+if len(argv) == 4:
     try:
-        continue_line = int(argv[2])
-        selv_flag = 'c'
+        continue_line = int(argv[3])
+        shelve_open_flag = 'c'
     except ValueError:
-        print('ERROR: Expected a line number as optional second argument.')
+        print('ERROR: Expected a line number as an optional third argument.')
         sys.exit(2)
 else:
     continue_line = 0
-    selv_flag = 'n'
 
 def find_ngrams(input_list, n):
-  return zip(*[input_list[i:] for i in range(n)])
+    '''Generates n-grams with the definde size n from the given input list.'''
+    return zip(*[input_list[i:] for i in range(n)])
 
-# See https://docs.python.org/3/library/shelve.html#shelve-example
+def log(msg, out_file=sys.stdout):
+    '''Logs a message to the specified file (defaults to stdout).'''
+    out_file.write('%s\n' % msg)
+    out_file.flush()
 
-MY_DICT_PATH = "E:/BA/analyze_results/"
-FILE_NAME = data_name
+shelve_dict_path = os.path.join(shelve_dir, corpus_name)
+ngram_count = 0
 
-my_dict = os.path.join(MY_DICT_PATH, FILE_NAME)
+with open(corpus_in, 'r') as in_f:
+    with shelve.open(shelve_dict_path, shelve_open_flag) as ngram_dict:
+        try:
+            if continue_line > 0:
+                log('Forwarding to line %i!' % continue_line)
 
-with open(data_dir, 'r+') as in_f:
-    data_dict = shelve.open(my_dict,selv_flag)
-    try:
-        for i, line in enumerate(in_f):
-            if i < continue_line:
-                continue
-            words = line.split()
-            ngram_list = find_ngrams(words, ngram_dim)
-            for entry in ngram_list:
-                cur_item = ' : '.join(map(str, entry))
-                
-                if cur_item in data_dict:
-                    oldValue = data_dict[cur_item]
-                    data_dict[cur_item] = oldValue + 1
-                else:
-                    data_dict[cur_item] = 1
-            if (i+1) % 10**5 == 0:
-                print('Generated %s entries...' % str(i+1))
-                data_dict.sync()
-    except KeyboardInterrupt:
-        print("W: interrupt received, stopping...")
-    finally:
-        data_dict.sync()
-        data_dict.close()
-        print("Stopped on line number %d" % i)
-    data_dict.close()
+            start_time = time.time()
+
+            for i, line in enumerate(in_f):
+                if i < continue_line:
+                    continue
+
+                words = line.split()
+
+                for ngram_dim in ngram_dims:
+                    ngram_list = find_ngrams(words, ngram_dim)
+
+                    for ngram in ngram_list:
+                        curr_item = ':'.join(ngram)
+
+                        if curr_item in ngram_dict:
+                            ngram_dict[curr_item] += 1
+                        else:
+                            ngram_dict[curr_item] = 1
+                            ngram_count += 1
+
+                if (i+1) % 10**5 == 0:
+                    log('Processed %i lines and extracted %i n-grams... (lengths: [%s], took: %.2fs)' % (
+                        i+1, ngram_count, ', '.join(ngram_dims_str), (time.time() - start_time)
+                    ))
+                    start_time = time.time()
+                    ngram_dict.sync()
+
+        except KeyboardInterrupt:
+            print('WARNING: interrupt received, stopping...')
+        finally:
+            ngram_dict.sync()
+            log('WARNING: Stopped on line number %d' % i)
