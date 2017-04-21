@@ -267,6 +267,8 @@ class Runner(object):
             inp_out_pred = zip(input_samples_idxs, output_samples_idxs, predicted_idxs)
 
             for i, (e_in, dt_exp, dt_pred) in enumerate(inp_out_pred):
+                if self.config.get('reverse_input'): e_in = reversed(e_in)
+
                 text_in = self.data_loader.convert_indices_to_text(e_in, self.rev_vocabulary)
                 text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
                 text_out = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
