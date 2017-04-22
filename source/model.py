@@ -12,8 +12,9 @@ import logger
 import math
 import tensorflow as tf
 import numpy as np
+import seq2seq
 
-from tensorflow.contrib import rnn, seq2seq, layers
+from tensorflow.contrib import rnn, layers
 from config import Config
 
 class TSeq2SeqModel(object):
@@ -39,6 +40,7 @@ class TSeq2SeqModel(object):
         vocab_len = len(self.cfg.get('vocabulary_dict'))
         embeddings_m = self.cfg.get('embeddings_matrix')
         embeddings_size = self.cfg.get('max_random_embeddings_size')
+        hidden_state_reduction_size = self.cfg.get('hidden_state_reduction_size')
         buckets = self.cfg.get('buckets')
         num_samples = self.cfg.get('sampled_softmax_number_of_samples')
         cell_type = self.cfg.get('cell_type')
@@ -58,14 +60,44 @@ class TSeq2SeqModel(object):
         # If we use sampled softmax, we need an output projection.
         self.output_projection = None
         softmax_loss_function = None
+        cell_class = self.CELL_FN[cell_type]
+
+        def wrap_dropout(cell):
+            return rnn.DropoutWrapper(cell, input_keep_prob=self.cfg.get('dropout_input_keep_prob'),
+                                            output_keep_prob=self.cfg.get('dropout_output_keep_prob'))
+
+        # Create the internal multi-layer cell for our RNN.
+        def single_cell():
+            cell_obj = cell_class(hidden_units)
+
+            if self.cfg.get('train'):
+                cell_obj = wrap_dropout(cell_obj)
+
+            return cell_obj
+
+        cell = None
+
+        if num_layers > 1:
+            cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)])
+        else:
+            cell = single_cell()
 
         # Sampled softmax only makes sense if we sample less than vocabulary size.
         if num_samples > 0 and num_samples < vocab_len:
-            w_t = tf.get_variable('proj_w', [vocab_len, hidden_units], dtype=dtype)
+            inner_hidden_units = hidden_units
+            hidden_state_proj = None
+
+            if hidden_state_reduction_size is not None:
+                inner_hidden_units = hidden_state_reduction_size
+                hidden_state_proj = tf.get_variable('hidden_state_proj',
+                                                    [hidden_units, hidden_state_reduction_size],
+                                                     dtype=dtype)
+
+            w_t = tf.get_variable('proj_w', [vocab_len, inner_hidden_units], dtype=dtype)
             w = tf.transpose(w_t)
             b = tf.get_variable('proj_b', [vocab_len], dtype=dtype)
-            self.output_projection = (w, b)
-  
+            self.output_projection = (w, b, hidden_state_proj)
+
             def sampled_loss(labels, logits):
                 labels = tf.reshape(labels, [-1, 1])
                 # We need to compute the sampled_softmax_loss using 32bit floats to
@@ -86,31 +118,9 @@ class TSeq2SeqModel(object):
 
             softmax_loss_function = sampled_loss
 
-        cell_class = self.CELL_FN[cell_type]
-
-        def wrap_dropout(cell):
-            return rnn.DropoutWrapper(cell, input_keep_prob=self.cfg.get('dropout_input_keep_prob'),
-                                            output_keep_prob=self.cfg.get('dropout_output_keep_prob'))
-
-        # Create the internal multi-layer cell for our RNN.
-        def single_cell():
-            cell_obj = cell_class(hidden_units)
-
-            if self.cfg.get('train'):
-                cell_obj = wrap_dropout(cell_obj)
-
-            return cell_obj
-
-        cell = None
-        
-        if num_layers > 1:
-            cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)])
-        else:
-            cell = single_cell()
-
         # The seq2seq function: we use embedding for the input and attention.
         def seq2seq_f(encoder_inputs, decoder_inputs, do_decode):
-            return tf.contrib.legacy_seq2seq.embedding_attention_seq2seq(
+            return seq2seq.embedding_attention_seq2seq(
                 encoder_inputs,
                 decoder_inputs,
                 cell,
@@ -145,7 +155,7 @@ class TSeq2SeqModel(object):
                 self.encoder_inputs, self.decoder_inputs, targets,
                 self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
                 softmax_loss_function=softmax_loss_function)
-          
+
             # If we use output projection, we need to project outputs for decoding.
             if self.output_projection is not None:
                 for b in range(len(buckets)):
@@ -168,7 +178,7 @@ class TSeq2SeqModel(object):
         # Apply gradient clipping if we're in training mode
         if self.cfg.get('train'):
             opt = tf.train.AdagradOptimizer(0.01)
-            
+
             for b in range(len(buckets)):
               gradients = tf.gradients(self.losses[b], params)
               clipped_gradients, norm = tf.clip_by_global_norm(gradients,
@@ -218,7 +228,7 @@ class TSeq2SeqModel(object):
                 max_output_length = self.cfg.get('max_output_length')
                 padding_parts = [Config.PAD_WORD_IDX for i in range(max_output_length - len(current_target_seq))]
                 current_target_seq += padding_parts
-            
+
             current_target_seq.insert(0, Config.GO_WORD_IDX)
 
             if len(current_target_seq) > max_out_len:
@@ -242,10 +252,10 @@ class TSeq2SeqModel(object):
             batch_decoder_inputs.append(
                 np.array([target_seq[batch_idx][length_idx]
                           for batch_idx in range(batch_size)], dtype=np.int32))
-  
+
             # Create target_weights to be 0 for targets that are padding.
             batch_weight = np.ones(batch_size, dtype=np.float32)
-  
+
             for batch_idx in range(batch_size):
               # We set weight to 0 if the corresponding target is a PAD symbol.
               # The corresponding target is decoder_input shifted by 1 forward.
@@ -278,17 +288,18 @@ class TSeq2SeqModel(object):
         outputs_list = []
         buckets = self.cfg.get('buckets')
 
-        if self.__output_vars is None and self.output_projection is not None:
+        if self.__output_vars is None:
             self.__output_vars = self.outputs
 
-            # Only restore when we're doing inference while training, otherwise
-            # the restore of the logits is done when constructing the graph
-            if self.cfg.get('train'):
-                for b in range(len(buckets)):
-                  self.__output_vars[b] = [
-                      tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
-                      for output in self.__output_vars[b]
-                  ]
+            if self.output_projection is not None:
+                # Only restore when we're doing inference while training, otherwise
+                # the restore of the logits is done when constructing the graph
+                if self.cfg.get('train'):
+                    for b in range(len(buckets)):
+                      self.__output_vars[b] = [
+                          tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
+                          for output in self.__output_vars[b]
+                      ]
 
         for i in range(decoder_size):
             outputs_list.append(self.__output_vars[bucket_id][i])
@@ -320,5 +331,3 @@ class TSeq2SeqModel(object):
                 break
 
         return bucket_id
-
-

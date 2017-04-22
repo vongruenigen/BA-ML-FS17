@@ -84,6 +84,11 @@ class Config(object):
         'num_encoder_layers': 1,
         'num_decoder_layers': 1,
 
+        # Defines the size the hidden state should be projected down to
+        # before it is fed to the classification layer. No projection will
+        # be applied if this value is set to `None`.
+        'hidden_state_reduction_size': None,
+
         # Number of hidden units in each of the layers in each cell
         'num_hidden_units': 1024,
 
@@ -156,7 +161,7 @@ class Config(object):
         # sample or not. If set to true, it starts at the first sample, if set
         # to false, it starts at the sample indicated by the global_step variable.
         # The number of the sample to start with is than calculated as follows:
-        # 
+        #
         #     n_start = global_step * batch_size
         #
         'start_training_from_beginning': True,
