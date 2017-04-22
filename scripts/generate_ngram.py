@@ -81,7 +81,7 @@ with open(corpus_in, 'r') as in_f:
                             ngram_dict[curr_item] = 1
                             ngram_count += 1
 
-                if (i+1) % 10**5 == 0:
+                if (i+1) % 10**6 == 0:
                     log('Processed %i lines and extracted %i n-grams... (lengths: [%s], took: %.2fs)' % (
                         i+1, ngram_count, ', '.join(ngram_dims_str), (time.time() - start_time)
                     ))
