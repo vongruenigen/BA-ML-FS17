@@ -1,19 +1,9 @@
 #
 # BA ML FS17 - Dirk von Gruenigen & Martin Weilenmann
 #
-# Description: This script is responsible for bringing
-#              the unprocessed data of the OpenSubtitles
-#              dialogue dataset into a format which can
-#              be used for training.
-#
-# How to use:  1. Download raw data via the following command:
-#                 > wget http://opus.lingfil.uu.se/download.php?f=OpenSubtitles/en.tar.gz -O opensubtitles.tar.gz
-#                 Have to check the raw data format from the other OpenSubtitles versions later.
-#              2. Run this file with the top lvl path of your raw data as parameter.
-#              3. You will find the output file in your given path.
-#
-#
-#
+# Description: This script sorts a shelve n-gram file and prints the top 100 entries.
+
+
 import sys
 import os
 import shelve
