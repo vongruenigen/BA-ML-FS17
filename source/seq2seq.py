@@ -95,6 +95,9 @@ def _extract_argmax_and_embed(embedding,
 
   def loop_function(prev, _):
     if output_projection is not None:
+      # Do the down-projection of the hidden state if one is available
+      if len(output_projection) == 3:
+        prev = math_ops.matmul(prev, output_projection[2])
       prev = nn_ops.xw_plus_b(prev, output_projection[0], output_projection[1])
     prev_symbol = math_ops.argmax(prev, 1)
     # Note that gradients will not propagate through the second parameter of
