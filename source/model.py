@@ -126,7 +126,7 @@ class TSeq2SeqModel(object):
                 cell,
                 num_encoder_symbols=vocab_len,
                 num_decoder_symbols=vocab_len,
-                embedding_size=hidden_units,
+                embedding_size=embeddings_size,
                 output_projection=self.output_projection,
                 feed_previous=do_decode,
                 dtype=dtype)
