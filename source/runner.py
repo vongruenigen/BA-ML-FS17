@@ -81,6 +81,15 @@ class Runner(object):
             val_perplexity_track = []
             curr_min_perplexity = float('inf')
 
+            if self.config.get('metrics') is not None:
+                logger.info('Loading existing metrics before starting the training')
+                metrics = self.config.get('metrics')
+                loss_track = metrics['loss']
+                val_loss_track = metrics['val_loss']
+                perplexity_track = metrics['perplexity']
+                val_perplexity_track = metrics['val_perplexity']
+                curr_min_perplexity = min(val_perplexity_track)
+
             epochs_per_validation = self.config.get('epochs_per_validation')
 
             try:
@@ -362,14 +371,26 @@ class Runner(object):
             session.run(tf.global_variables_initializer())
         else:
             logger.info('Loading model from the path %s' % model_path)
+            model_dir = None
 
             if path.isdir(model_path):
                 ckpt = tf.train.get_checkpoint_state(self.config.get('model_path'))
 
                 if ckpt and ckpt.model_checkpoint_path:
                     self.saver.restore(session, ckpt.model_checkpoint_path)
+
+                model_dir = model_path
             else:
                 self.saver.restore(session, model_path)
+                model_dir = '/'.join(model_path.split('/')[:-1])
+
+            metrics_path = path.join(model_dir, 'metrics.json')
+
+            if path.isfile(metrics_path):
+                logger.info('Loading metrics from %s' % metrics_path)
+
+                with open(metrics_path, 'r') as f:
+                    self.config.set('metrics', json.load(f))
 
     def __prepare_results_directory(self):
         '''This method is responsible for preparing the results

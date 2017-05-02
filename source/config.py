@@ -137,6 +137,9 @@ class Config(object):
         # decoder part of the sequence-to-sequence model.
         'use_attention': False,
 
+        # Stores the metrics when they're loaded in case an existing model is used.
+        'metrics': None,
+
         # Defines wether the input sample should be reversed before it's
         # fed to the encoder. This is a trick used in the original seq2seq
         # paper.
