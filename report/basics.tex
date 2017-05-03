@@ -1,0 +1,183 @@
+\chapter{Fundamentals}
+\label{chapter:fundamental}
+In this first chapter, we lay out the fundamentals used in the rest of this thesis. At the beginning, we will introduce basic definitions such as \emph{sample} and \emph{conversation}. We will then follow up with an introduction into machine learning using neural networks (NN) and a special variation, called recurrent neural networks (RNN). We then show how RNNs can be used to build models, called Sequence-To-Sequence (Seq2Seq) models !REFERENZ SEQ2SEQ PAPER!, which are capable of learning and using a language in a conversational context.
+
+The following introduction only covers a small part of the spectrum of possibilities with regard to the tasks these models can perform. Basically, we are restricting our explanations to the supervised learning use-case and ignore the unsupervised ones, even though they have a wide area of applications (e.g. dimensionality reduction, regression) as shown by !REFERENZ FÜR UNSUPERVISED LEARNING?!.
+
+\section{Definitions}
+\paragraph{Conversation} \blindtext
+\paragraph{Utterance} \blindtext
+\paragraph{Sample} \blindtext
+
+\section{Recurrent Neural Networks}
+\emph{Recurrent neural networks} (RNN) are a special variation of the NNs described before. The main difference is, that an RNN has also a temporal dimension with a recurrence, where a vanilla NN only works on the data it can currently ''see''. This allows such models to work on data which also has a temporal dimension, such as stock prices, x and y. We're going to describe the inner workings of such networks in the following paragraphs. We're also describing problems which vanilla RNNs have because of the temporal recurrence and how this problems can be solved by exploiting another RNN architecture called \emph{Long Short-Term Memory Networks} (LSTM).
+
+\paragraph{Vanilla RNNs} \blindtext
+\paragraph{Vanishing / Exploding Gradient Problem} \blindtext
+\paragraph{Long Short-Term Memory Networks} \blindtext
+
+\section{Sequence-To-Sequence Learning}
+\paragraph{Model} \blindtext
+\paragraph{Decoding Approaches} \blindtext
+\paragraph{Soft-Attention Mechanism} \blindtext
+
+\iffalse
+\section{Convolutional Neural Network}
+Convolutional Neural Networks (CNN) sind eine spezielle Form der zuvor beschriebenen NN. Der grundlegende Unterschied besteht darin, dass die einzelnen Schichten nicht fully-connected sind, sondern mittels Filter über lokale Konnektivität versucht wird, Muster zu erkennen. Im Folgenden werden die einzelnen Komponenten des in dieser Arbeit verwendeten CNNs erläutert.
+
+\paragraph{Filter}\label{basic:cnn:filter} Anstatt Neuronen, wie im klassischen Neuronalen Netzwerk, lernt eine CNN über die sogenannten Filter. Dabei handelt es sich um $n\times m$-Matrizen, welche Gewichte enthalten, analog zu den Gewichten der eingehenden Verbindungen bei Neuronen. Dabei werden die Filter-Matrizen über die Eingabedaten bewegt und es wird jeweils das innere Produkt der aktuellen Filter-Matrix, und dem aktuellen Ausschnitt der Eingabedaten berechnet, auf welchem der Filter positioniert ist. Das Bewegungsmuster des Filters wird \emph{Stride} (dt. durchschreiten) genannt. Im Rahmen dieser Arbeit wird ein eindimensionaler Stride entlang der Satz-Matrix verwendet. Es ist aber durchaus möglich, mehrdimensionale Convolution-Operationen mit entsprechenden Strides zu definieren.
+
+Die durch diese Convolution-Operation resultierenden Werte werden in der Form einer Resultat-Matrix, der sogenannten \emph{Feature Map}, zwischengespeichert. Diese stellen also das Äquivalent zur Aktivierung einer Schicht in einem NN dar. Dabei werden alle resultierenden Feature-Maps einfach hintereinander gereiht und dienen als Eingabewerte für die nächste Schicht. 
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=10cm]{img/filter_feature_map}
+	\caption{Schematische Darstellung der Funktionsweise von Filter und Feature-Map innerhalb eines CNNs.\protect\footnotemark}
+\end{figure}
+\footnotetext{https://www.quora.com/What-is-meant-by-feature-maps-in-convolutional-neural-networks}
+
+Eine Schicht, welche diese Art von Berechnung verwendet, wird Convolutional (dt. sich falltend) Schicht genannt.
+
+\paragraph{Max-Pooling Schicht} In der \emph{Max-Pooling} Schicht, manchmal auch \emph{Subsampling} Schicht genannt, wird ein Grossteil der in den Feature-Maps vorhandenen Informationen verworfen. Dabei wird ein Fenster über die resultierenden Feature-Maps der vorhergehenden Schicht bewegt und der jeweils maximale Wert des entsprechenden Ausschnitts der aktuellen Feature-Map als Wert in die gepoolte Repräsentation übernommen. Das Fenster, welches über die Feature-Map bewegt wird, ist definiert durch die Dimensionalität des Fensters und dem Stride. Der Stride steht für das Bewegunsmuster des Fensters analog zum Filter. Die gepoolten Repräsentationen der Feature-Maps dienen dann als Eingabewerte für die nächste Schicht.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{img/max_pooling}
+	\caption{Schematische Funktionsweise der Max-Pooling Schicht}
+\end{figure}
+
+Die Max-Pooling Schicht erfüllt zwei Aufgaben: Einerseits reduziert sie die Dimensionalität der zu verarbeitenden Daten, was Rechenzeit spart. Andererseits verwirft sie \quotes{unwichtige} Informationen indem sie nur die maximalen Werte der zuletzt berechneten Aktivierungen behält.
+
+\paragraph{Convolutional+Max-Pooling Schicht} Die Convolutional und Max-Pooling Schichten bilden die Grundbausteine der meisten CNN. Diese werden dabei mehrfach hintereinander gereiht. Das im Rahmen dieser Arbeit vewendete CNN hat beispielsweise zwei solcher aufeinanderfolgenden Convolutional+Max-Pooling Schichten.
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[width=10cm]{img/full_cnn_example}
+	\caption{Beispielhafte Darstellung eines kompletten CNN mit allen Schichten.\protect\footnotemark}
+\end{figure}
+\footnotetext{https://www.semanticscholar.org/paper/f5f1beada9e269b2a7faed8dfe936919ac0c2397}
+
+\paragraph{Ausgabeschicht}\label{basic:cnn:output_layer} Die Ausgabeschicht des CNN ist gleich aufgebaut wie die eines \quotes{traditionellen} NN. Dabei wird eine fully-connected Schicht verwendet, bei welcher jedes Neuronen als Eingabewerte mit allen Aktivierungen der letzten Max-Pooling Schicht verknüpft sind. Die Anzahl Neuronen in der Ausgabeschicht entspricht dabei der Anzahl zu unterscheidenden Klassen. In dieser Arbeit entsprechen die drei verschiedenen Sentiments \emph{neutral}, \emph{negativ} und \emph{positiv} den zu unterscheidenden Klassen.
+
+\section{3-Phasen Lernen}
+Das Training der CNNs wird mithilfe des 3-stufigen Lernverfahren von Severyn et. al. \cite{Severyn:2015kta} durchgeführt. Im Folgenden werden die einzelnen Schritte im Detail erläutert.
+
+\paragraph{Word-Embeddings und Satz-Matrix} Zuerst werden mithilfe von \emph{word2vec}~\cite{mikolov2013distributed} und einem grossen Text-Corpus Word-Embeddings generiert. Dabei werden die gegebenen Wörter eines Vokabulars $v$ so in einen reellen Vektorraum $\mathbb{R}^d$ eingebettet, dass die semantischen Beziehungen innerhalb der Wörter erhalten bleiben. Dies wird am Beispiel in Abbildung \ref{fig:king_queen_example} ersichtlich: Die Wortvektoren für \quotes{Man} and \quotes{Woman} stehen in gleicher Weise zueinander wie die Wortvektoren \quotes{Uncle} zu \quotes{Aunt} bzw. \quotes{King} zu \quotes{Queen}.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{img/king_queen_example_word_embeddings}
+	\caption{Beispiel für semantische Beziehung von Wort-Vektoren. Die Wort-Vektoren für \quotes{Uncle} zu \quotes{Aunt} stehen in der gleichen Weise zueinander wie die Wort-Vektoren \quotes{King} zu \quotes{Queen}}
+	\label{fig:king_queen_example}
+\end{figure}
+
+Mithilfe der Word-Embeddings kann ein gegebener Satz nun als Konkatenation der Wort-Vektoren der einzelnen Wörter aufgefasst werden. Das bedeutet, dass ein Satz als $d \times n$ Matrix dargestellt werden kann, wenn $n$ die Anzahl Wörter des Satzes darstellt und $d$ die Anzahl Dimensionen der Word-Embeddings ist. Die $i$-te Spalte in der resultierenden Satz-Matrix entspricht dann dem Wort-Vektor für das $i$-te Wort im abzubildenden Satz.
+
+\paragraph{Distant-Supervised Phase} In einem zweiten Schritt wird die sogenannte \emph{Distant-Super\-vised Phase} durchgeführt, im Folgenden \emph{Distant-Phase} genannt. Wir verwenden einen ähnlichen Ansatz wie in \cite{Go:2009}. Dabei wird das CNN mit einer grossen Menge an \emph{weakly-labeled} (dt. schwach annotiert) Texten über eine Epoche hinweg vortrainiert. Weakly labeled bedeutet, dass der Sentiment eines Textes aus der Eigenschaft des Textes abgeleitet wird und nicht von einem Menschen annotiert wurde. Beispiele für solche Eigenschaften, aus welchen sich ein Sentiment ableiten lässt, sind Emoticons in Tweets oder die Anzahl der vergebenen Sterne bei einem Review. Bei Emoticons lässt sich zum Beispiel aus dem lachenden Emoticon \quotes{:-)} ein positiver bzw. aus dem traurigen Emoticon \quotes{:-(} ein negativer Sentiment ableiten.
+
+Eine genaue Erläuterung zur Generierung der Trainingsdaten für die Distant-Phase befindet sich im Kapitel \ref{chapter:data}. Das Training wird mit dem weiter oben beschriebenen Backpropagation Algorithmus durchgeführt.
+
+\paragraph{Supervised Phase} Im letzten Schritt wird das CNN mit den von Menschen annotierten Texten trainiert. Dieses Training wird mithilfe von Backpropagation mit AdaDelta durchgeführt. Dabei wird das sogenannte \emph{Early Stopping} verwendet: Das Netzwerk wird solange trainiert, bis sich eine definierte Metrik über eine bestimmte Anzahl Epochen nicht mehr verbessert hat. In unserem Fall ist diese Metrik der F1-Score (siehe \ref{sec:metric}) über die positiven und negativen Datensätze. Auch hier wird der oben beschrieben Backpropagation-Algorithmus durchgeführt.
+
+\section{Evaluierungsmetrik}\label{sec:metric}
+Im Folgenden wird die verwendete Evaluierungsmetrik, der \emph{F1-Score}, erläutert.
+
+\paragraph{Präzision {\&} Ausbeute} \emph{Präzision} (engl. precision) und \emph{Ausbeute} (engl. recall) sind Metriken, mit welchen die Performanz eines Klassifizierungs-Systems bezüglich einer der zu klassifizierenden Klassen evaluiert werden kann. Die Abkürzungen $\textit{tp}$, $\textit{fp}$, $\textit{fn}$ stehen in diesem Zusammenhang für \emph{true positives}, \emph{false positives} und \emph{false negatives}. Dabei ist die Präzision das Verhältnis von richtig klassifizierten ($\textit{tp}$) zu allen klassifizierten Datensätze der entsprechenden Klasse ($\textit{tp} + \textit{fp}$):
+\begin{equation}
+\textit{precision} = \frac{\textit{tp}}{\textit{tp} + \textit{fp}}
+\end{equation}
+Die Ausbeute ist das Verhältnis von richtig klassifizierten Datensätzen zur Anzahl aller vorhandenen Datensätze der entsprechenden Klasse ($\textit{tp} + \textit{fn}$):
+\begin{equation}
+\textit{recall} = \frac{\textit{tp}}{\textit{tp} + \textit{fn}}
+\end{equation}
+Mit diesen beiden Metriken kann die Performanz eines Klassifizierungs-Systems bezüglich einer der vorhandenen Klassen bewertet werden, allerdings haben diese zwei Nachteile: Einerseits sind es zwei Werte anstatt eines einzelnen Wertes. Dies macht die Beurteilung über die Performanz des Systems komplizierter. Ausserdem kann mittels \quotes{schummeln} eine sehr hohe Ausbeute erreicht werden, indem immer nur eine bestimmte Klasse zurückgegeben wird. Eine hohe Präzision kann erreicht werden indem das System sehr \quotes{konservativ} arbeitet und nur in Fällen, bei denen die Klassifizierung eindeutig ist, die entsprechende Klasse zurückgibt.
+\paragraph{F1-Score} Um das oben beschriebene Problem zu lösen, wird der F1-Score verwendet. Dieser ist das harmonische Mittel von Präzision und Ausbeute:
+\begin{equation}
+\label{basic:metrics:f1_eq}
+\operatorname{F1} = \frac{2 \times \textit{precision} \times recall}{\textit{precision} + \textit{recall}}
+\end{equation}
+Durch diese Metrik kann die Performanz eines Systems bezüglich einer bestimmten Klasse mittels eines Wertes quantifiziert werden. Ausserdem löst dies das Problem, dass eine hohe Präzision bzw. Ausbeute erzielt werden kann, wenn das System \quotes{schummelt}.
+\paragraph{F1-Score über mehrere Klassen} Der F1-Score selbst kann nur jeweils für eine einzelne Klasse bestimmt werden. Um nun aber eine einzige Metrik für die Messung der Performanz des Systems über mehrere Klassen hinweg zu erhalten, werden die F1-Scores der einzelnen Klassen summiert und durch die Anzahl der Klassen dividiert. Durch dieses Vorgehen erhält man folgende Gleichung, wobei $k_i$ für eine einzelnen Klasse und $n$ für die Anzahl der beachteten Klassen:
+\begin{equation}
+\operatorname{F1}_{k_0, k_1, \dots, k_n} = \frac{\sum_{i=0}^{n} \operatorname{F1}_{k_i}}{n}
+\end{equation}
+Diese Art des F1-Score über mehrere Klassen hinweg wird auch \emph{macro-averaged} F1-Score genannt.
+
+\section{Technischer Aufbau}
+\label{technical_setup}
+Im folgenden Abschnitt wird der technische Aufbau erläutert, welcher verwendet wird, um die in Kapitel \ref{sec:Experimente_Resultate} beschriebenen Experimente durchzuführen. Eine Beschreibung zur Verwendung des Systems befindet sich in Anhang \ref{appendix:software_usage}.
+
+\paragraph{Vorarbeiten}
+\label{technichal_setup:prework}
+Der Grundaufbau der verwendeten Software wurde vom InIT mithilfe von \texttt{keras}\footnote{https://keras.io/} implementiert und zur Durchführung dieser Arbeit zur Verfügung gestellt. Im Rahmen dieses Grundaufbaus wurden die folgenden Funktionalitäten bereits implementiert:
+
+\begin{itemize}[noitemsep]
+	\item Implementation des CNN in \texttt{keras} und verwendung von \texttt{theano} \cite{theanoCitShort} als Backend für die \gls{GPU}s.
+	\item Implementation von Evaluations-Metriken.
+	\item Skripte mit den folgenden Funktionalitäten: Trainieren des CNN, Laden von TSV Dateien, Vorverarbeiten von Word-Embeddings.
+\end{itemize}
+
+\paragraph{Anforderungen}
+\label{technical_setup:requirements}
+Ein zu implementierendes System, mit welchem die Experimente durchgeführt werden können, soll die folgenden Eigenschaften aufweisen:
+
+\begin{itemize}
+	\item \textbf{Parametrisierbarkeit}: Dadurch, dass eine grosse Anzahl kleiner Experimente durchgeführt werden muss, soll das System die Möglichkeit bieten, Experimente parametrisiert durchzuführen.
+	\item \textbf{Wiederholbarkeit}: Experimente sollen mit einem minimalen Mehraufwand mehrfach durchgeführt werden können.  
+	\item \textbf{Übersichtlichkeit}: Resultate der Experimente sollen übersichtlich und einfach zugänglich sein.
+	\item \textbf{Auswertbarkeit}: Resultate sollen automatisiert ausgewertet werden können.
+\end{itemize}
+
+\paragraph{Funktionalität}
+\label{technical_setup:functionality}
+Um ein System, welches die oben beschriebenen Anforderungen erfüllt zu erhalten, werden die folgenden Komponenten implementiert:
+
+\begin{itemize}
+	\item \textbf{Executor}: Der \emph{Executor} ist zuständig für das Training der CNNs mithilfe von \texttt{keras}. Beim Start akzeptiert er die Konfiguration als Parameter. Das Experiment wird mit dem Laden der benötigten Daten und dem anschliessenden Training des CNN gestartet. Am Ende jeder Epoche wird das aktuelle CNN auf den Validierungsdaten getestet und die konfigurierten Metriken ausgewertet. Diese werden am Ende zusammen mit dem trainierten CNN (Gewichte im HDF5-Format\footnote{https://support.hdfgroup.org/HDF5/}, das CNN Model als JSON) in einen für das Experiment vorgesehenen Ordner gespeichert. Die Metriken werden ebenfalls in dem dafür vorgesehenen Ordner abgespeichert.
+	\item \textbf{Config Management}: Experimente werden über Konfigurationen im JSON-Format\footnote{http://www.json.org/} parametrisiert. Über diese Konfiguration können viele wichtige Parameter für die Ausführung festgelegt werden, so zum Beispiel: Anzahl Epochen, Trainings- und Validierungsdaten, Parameter für die k-fold Cross-Validation oder auch bereits trainierte Modelle können geladen werden. Detailierte Erläuterungen zu den einzelnen Parametern können im Anhang \ref{appendix:software_usage} gefunden werden.
+	\item \textbf{DataLoader}: Mithilfe des \emph{DataLoader} können Trainings- und Validierungsdaten im TSV\footnote{https://reference.wolfram.com/language/ref/format/TSV.html} Dateiformat geladen werden. Die zu ladenden Daten können dabei aus einer oder mehreren TSV-Dateien stammen. Im Falle, dass mehrere TSV Dateien angegeben werden, kann über die Konfiguration das Verhältnis angegeben werden, in welchem die Daten aus den einzelnen Dateien verschmischt werden sollen.
+	\item \textbf{Skripte}: Die Auswertung der einzelnen Experimente geschieht über dafür erstellte Skripte.
+	\item \textbf{Weboberfläche}: Auf die Resultate der Experimente kann über eine eigens dafür entwickelte Weboberfläche zugegriffen werden. Ausserdem besteht die Möglichkeit Plots über die Metriken, welche während des Trainings- und Validierungsprozess gesammelt werden, zu erstellen.
+	
+\end{itemize}
+Die oben beschriebenen Komponenten erlauben es, Experimente mittels JSON Konfigurationen zu starten und den gesamten Trainings- und Validierungsprozess mittels Metriken zu überwachen und zu dokumentieren.
+
+\paragraph{Skripte}
+\label{technical_setup:scripts}
+Für die Durchführung der Experimente wurden diverse Skripte erstellt, um die Handhabung zu vereinfachen und Auswertungen zu ermöglichen. Die Liste der implementierten Scripts umfasst unter anderem die folgenden:
+
+\begin{itemize}[noitemsep]
+	\item Erstellen von Plots der Lernkurven und Metriken
+	\item Erstellen von Word-Embeddings über einen Text-Corpus
+	\item Erstellen von Statistiken zu Trainings- und Validierungsdaten
+	\item Vorverarbeitung von Trainingsdaten für die Distant-Phase
+	\item Erstellen von Visualisierungen von Word-Embeddings mittels PCA
+	\item Diverse Wartungsskripte zur Generierung und Verwaltung von Experimenten
+\end{itemize}
+
+\paragraph{Weboberfläche}
+\label{technical_setup:webgui}
+Um die dritte Anforderung nach Übersichtlichkeit und Auswertbarkeit zu erfüllen, wird eine Weboberfläche umgesetzt, mit welchem die Parameter und Resultate aller durchgeführten Experimente übersichtlich und an einem Ort zur Verfügung gestellt werden. Für die Implementation wird die \texttt{python}\footnote{https://www.python.org/} Bibliothek \texttt{flask}\footnote{http://flask.pocoo.org/} verwendet.
+
+Zur Auswertung der Experimente stehen drei Funktionen zur Verfügung:
+\begin{itemize}
+	\item Die Oberfläche gewährt Zugriff auf alle JSON Konfigurationen, welche zu einem Experiment gehören. Dazu zählen die Konfiguration selbst, die gespeicherten Trainings- und Validierungsmetriken und das \texttt{keras} Model des CNN.
+	\item Mittels der Plotting Funktion können Plots von Trainings- und Validierungsmetriken erstellt werden.
+	\item Die gespeicherten Validierungs- und Trainingsmetriken können mithilfe von \texttt{math.js}\footnote{http://mathjs.org/} direkt im Browser ausgewertet werden.
+\end{itemize}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.7\textwidth]{img/web_gui}
+	\caption{Ansicht Experiment über Weboberfläche}
+	\label{fig:web_gui}
+\end{figure}
+
+\paragraph{Betriebssystem \& Softwarepakete}
+\label{technical_setup:software}
+Alle Experimente werden mit dem oben beschriebenen Software-System durchgeführt. Auf den beiden verwendeten Computer-Systemen wird als Betriebssystem Ubuntu 16.04 installiert. Dazu werden \texttt{python} in der Version 3.5.2, Nvidia GPU Treiber und \texttt{cuda}\footnote{https://developer.nvidia.com/cuda-toolkit} in der Version 8.0 als Abhängigkeiten von \texttt{theano} und \texttt{keras} installiert.
+
+\paragraph{Hardware}
+\label{technichal_setup:hardware}
+Zur Durchführung der Experimente werden zwei unterschiedliche Computer verwendet. Im ersten System (S1) ist eine Nvidia GTX970 GPU, einen Intel i7 4950K CPU und 16GB Arbeitsspeicher installiert. Das zweite System besitzt eine Nvidia GTX1070 GPU, einen Intel i7 6700K CPU und ebenfalls 16GB Arbeitsspeicher. Die Unterschiede in der Hardware haben keinen Einfluss auf die Resultate der Experimente, da auf beiden Systemen dasselbe Betriebssystem mit den gleichen Softwarepaketen verwendet wird.
+
+\fi

@@ -6,6 +6,28 @@ logs/*
 data/**/*
 !data/**/*.gitkeep
 
+# Ignore compiled tex files
+report/*.aux
+report/*.out
+report/*.lof
+report/*.synctex.gz
+report/*.tex.*
+report/*.glo
+report/*.ist
+report/*.lot
+report/*.pdf
+report/*.toc
+report/*.xml
+report/*.bbl
+report/*.bbg
+report/*.blg
+report/*blx.bib
+report/main.glsdefs
+report/*acr
+report/*acn
+report/*glg
+!report/img/**/*
+
 # Misc stuff
 .DS_Store
 

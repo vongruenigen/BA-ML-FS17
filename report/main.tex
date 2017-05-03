@@ -1,0 +1,121 @@
+\documentclass[12pt,
+	a4paper,
+	listof=totoc,
+	bibliography=totoc,
+	parskip=full*
+	]{scrreprt}
+
+\usepackage[utf8]{inputenc}
+\usepackage[ngerman]{babel}
+\usepackage[babel,german=quotes]{csquotes}
+\usepackage[hidelinks]{hyperref}
+\usepackage{amsmath}
+\usepackage{paralist}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{caption}
+\usepackage{pdfpages}
+\usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{tabu}
+\usepackage{enumerate}
+\usepackage{enumitem}
+\usepackage{adjustbox}
+\usepackage[toc,page]{appendix}
+\usepackage{subfigure}
+\usepackage[left=3.00cm, right=2.00cm, top=1cm, bottom=1.5cm,includeheadfoot]{geometry}
+\usepackage{scrpage2}
+\pagestyle{scrheadings}
+\usepackage{todonotes}
+\usepackage{fixltx2e}
+\usepackage[toc,nonumberlist,acronym,style=super]{glossaries}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{lscape}
+\usepackage{rotating}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[backend=bibtex,style=ieee,sorting=nty]{biblatex}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{courier}
+\usepackage{tablefootnote}
+\usepackage{slashbox}
+\usepackage{multirow}
+\usepackage{mathtools}
+\usepackage{blindtext}
+
+\renewcaptionname{ngerman}{\bibname}{References}
+\renewcommand\appendixtocname{Appendix}
+\renewcommand\appendixpagename{Appendix}
+\setcounter{secnumdepth}{3}
+
+\newcommand{\mytitle}{Building Conversational Dialog-Systems using Sequence-To-Sequence Learning}
+\newcommand{\myauthor}{Dirk von Grünigen, Martin Weilenmann}
+
+\newcommand{\ra}[1]{\renewcommand{\arraystretch}{#1}}
+\newcommand{\quotes}[1]{``#1''}
+\newcommand{\fixme}[1]{\todo[linecolor=red,backgroundcolor=red!25,bordercolor=red]{#1}}
+\newcolumntype{M}{>{\begin{varwidth}{4cm}}l<{\end{varwidth}}} %M is for Maximal column
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=python,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+\newcommand{\specialcell}[2][c]{%
+	\begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\bibliography{biblio}
+\nocite{*}
+
+\input{glossary}
+\makeglossaries
+
+\title{\mytitle}
+\author{\myauthor}
+
+\begin{document}
+
+\include{title_page}
+\includepdf{img/declaration_of_originality}
+
+% \newgeometry{top=0.75cm,bottom=1cm}
+\include{abstract}
+
+\tableofcontents
+\restoregeometry
+
+\include{preface}
+\include{introduction}
+\include{related_work}
+\include{basics}
+\include{data}
+\include{methods}
+\include{experiments_and_results}
+\include{conclusion}
+\include{appendix}
+\include{glossary}
+\glsaddall
+\printglossary[type=\acronymtype,title=Glossary]
+\listoftables
+\listoffigures
+\include{references}
+
+\end{document}
