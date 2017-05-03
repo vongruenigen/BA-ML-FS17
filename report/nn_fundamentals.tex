@@ -1,5 +1,5 @@
 \chapter{Neural Networks}
-\label{basics:neural_network}
+\label{fundamentals:neural_network}
 
 Neural networks, in the following referred to as NN, are a model used in the area of machine learning, which is biologically motivated and loosely mimics the function of the human brain. In the following paragraphs, we're going to explain the functions of all the components which make up a NN.
 
@@ -18,9 +18,9 @@ The activation function $\varphi$ is responsible for squeezing the result of the
 	\subfigure[$\tanh(x) = \frac{e^x - e^{-x}}{e^x + e^{-x}}$]{\includegraphics[width = 3in]{img/tanh_activation}}
 	\subfigure[$\operatorname{sigmoid}(x) = \frac{1}{1 + e^{-x}}$]{\includegraphics[width = 3in]{img/sigmoid_activation}}
 	\subfigure[$\operatorname{relu}(x) = \max\{0,x\}$]{\includegraphics[width = 3in]{img/relu_activation}}
-	\subfigure[$\operatorname{binarystep}(x) = \left\{\begin{array}{lr}0 & \text{for }x < 0\\1 & \text{for }x \geq 0\end{array}\right\}$]{\includegraphics[width = 3in]{img/binary_step_activation}}
+	\subfigure[blub]{\includegraphics[width = 3in]{img/binary_step_activation}}
 	\caption{Plots of several commonly used activation functions for neurons in NNs.}
-	\label{fundamentals:figures:activation_functions}
+	\label{fundamentals:nn:figures:activation_functions}
 \end{figure}
 
 \paragraph{Layer}\label{basic:neural_network:layer} With the neurons introduced one paragraph earlier, we can now start to build the layers of a NN. Each layer consists of multiple neurons stacked on top of each other, as seen in figure \ref{fundamentals:figures:neural_network}. These layers are then arranged in a sequential manner to form a full NN. Each NN usually has at least three of these layers: The first one is called the \emph{input layer}, the second the \emph{hidden layer} and the most right one is the \emph{output layer}.

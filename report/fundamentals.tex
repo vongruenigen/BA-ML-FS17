@@ -1,107 +1,92 @@
 \chapter{Fundamentals}
 \label{chapter:fundamental}
-In this first chapter, we lay out the fundamentals used in the rest of this thesis. At the beginning, we will introduce basic definitions such as \emph{sample} and \emph{conversation}. We will then follow up with an introduction into machine learning using neural networks (NN) and a special variation, called recurrent neural networks (RNN). We then show how RNNs can be used to build models, called Sequence-To-Sequence (Seq2Seq) models !REFERENZ SEQ2SEQ PAPER!, which are capable of learning and using a language in a conversational context.
+In this first chapter, we lay out the fundamentals used in the rest of this thesis. At the beginning, we will introduce basic definitions such as \emph{utterance}, \emph{sample} and \emph{conversation}. We will then follow up with an introduction into machine learning using a special variant of \emph{Neural Networks} (NN), called \emph{Recurrent Neural Network} (RNN). We show the basic principles behind it and explain problems this RNNs have in practice, and how the can be solved by utilizing other forms of RNNs. We then show how RNNs can be used to build models, called \emph{Sequence-To-Sequence} (seq2seq) models \cite{Sutskever:2014}, which are capable of learning and using a language in a conversational context.
 
-The following introduction only covers a small part of the spectrum of possibilities with regard to the tasks these models can perform. Basically, we are restricting our explanations to the supervised learning use-case and ignore the unsupervised ones, even though they have a wide area of applications (e.g. dimensionality reduction, regression) as shown by !REFERENZ FÜR UNSUPERVISED LEARNING?!.
+The following introduction only covers a small part of the spectrum of possibilities with regard to the tasks these models can perform. Basically, we are restricting our explanations to the supervised learning use-case and ignore the unsupervised ones, even though they have a wide area of applications (e.g. dimensionality reduction, regression) as shown by !REFERENZ FÜR UNSUPERVISED LEARNING?!. A basic introduction into the principles of neural networks can be found in appendix \ref{fundamentals:neural_networks}.
 
 \section{Definitions}
-\paragraph{Conversation} \blindtext
 \paragraph{Utterance} \blindtext
 \paragraph{Sample} \blindtext
+\paragraph{Conversation} \blindtext
 
 \section{Recurrent Neural Networks}
-\emph{Recurrent neural networks} (RNN) are a special variation of the NNs described before. The main difference is, that an RNN has also a temporal dimension with a recurrence, where a vanilla NN only works on the data it can currently ''see''. This allows such models to work on data which also has a temporal dimension, such as stock prices, x and y. We're going to describe the inner workings of such networks in the following paragraphs. We're also describing problems which vanilla RNNs have because of the temporal recurrence and how this problems can be solved by exploiting another RNN architecture called \emph{Long Short-Term Memory Networks} (LSTM).
+\emph{Recurrent neural networks} (RNN) are a special variation of the NNs described in appendix \ref{fundamentals:neural_networks}. The main difference between them is, that RNNs have a recurrence built into it, which allows them to adapt to problems which also have a temporal dimension and are dependent on data from differente timesteps to solve. We're also going into the problems such RNNs have due to their recurrence and how this problem can be solved by exploiting another form of RNN, called \emph{Long Short-Term Memory Networks} (LSMT).
 
-\paragraph{Vanilla RNNs} \blindtext
-\paragraph{Vanishing / Exploding Gradient Problem} \blindtext
-\paragraph{Long Short-Term Memory Networks} \blindtext
+\paragraph{RNNs in principle}
+One of the main restrictions of vanilla NNs is the following: Assume a task, where the NN is conditioned to output a prediction on tomorrows weather given yesterdays. Now, if one would use a vanilla NN as described in the appendix, the main restriction would be that the NN has to make its prediction solely based on the weather information of the day before. Such a model does not take into account, that weather is not only dependent on the weather of the previous day, but also on the days before. This could be solved by feeding, say, the weather of the last week to the network instead of just the weather of the previous day. But if new scientific evident now shows, that weather is not only dependent on last week, but also on the last month, probably the last year, we quickly get into problems due to the sheer size of a NN performing such tasks, because the input size grows rapidly. Also, such a NN would still be static in the way, that one cannot simply change the time-window used to feed to the network. If one settles with one month, it will always be able predict the weather based on the last month, but not any different time-window, otherwise the NN has to be retrained using another time-window in order to work again as before. RNNs (see figure \ref{fundamentals:rnn:rolled_vanilla}) try to solve this problem by introducing a recurrence into the network, which allows it to exploit informations not only from the current input, but also from inputs of the past. In a more formal way, one could say that this recurrence allows RNNs to ''exhibit dynamic behaviour across the temporal dimension of the input data''.
+
+\begin{figure}[h]
+	\label{fundamentals:rnn:rolled_vanilla}
+	\centering
+	\includegraphics[width=5cm]{img/rnn_rolled}
+	\caption{Basic layout of an RNN.\protect\footnotemark}
+\end{figure}
+\footnotetext{http://colah.github.io/posts/2015-08-Understanding-LSTMs/}
+
+Before explaining how this recurrence can be used to solve the weather prediction problem, let's first show the equations used for the forwared propagation in an RNN. This equations assume, that the inner part of the RNN consists of three distinct layers, called input, hidden and output layer. The internal structure is similar to the one of NNs, as explained in appendix \ref{fundamentals:neural_network}.
+
+\begin{equation}
+\begin{split}
+o_t  & =  \varphi(\mathbf{w} \cdot \mathbf{x}_t + \mathbf{u} \cdot \mathbf{h}_{t-1}) \\
+& = \varphi\bigg(\sum_{i=0}^{n} w_i x_{ti} + \sum_{i=0}^{n} u_i h_{t-1i}\bigg)
+\end{split}
+\label{fundamentals:rnn:forward_equation:hidden}
+\end{equation}
+
+
+\begin{equation}
+\begin{split}
+h_t  & =  \varphi(\mathbf{w} \cdot \mathbf{x}_t + \mathbf{u} \cdot \mathbf{h}_{t-1}) \\
+     & = \varphi\bigg(\sum_{i=0}^{n} w_i x_{ti} + \sum_{i=0}^{n} u_i h_{t-1i}\bigg)
+\end{split}
+\label{fundamentals:rnn:forward_equation:output}
+\end{equation}
+
+In the equations above, one can see different variables with different indices which we'll explain briefly:
+
+\begin{itemize}[noitemsep]
+	\item $x_t$ stands for the input at timestep $t$.
+	\item $o_t$ stands for the output of the network at timestep $t$.
+	\item $h_t$ stands for the output of the hidden layer before applying the activation function.
+	\item $\mathbf{w}$ and $\mathbf{u}$ stand for the weight matrices which are learnt while training.
+	\item $\varphi$ is the activation function to be used on the output of the neurons in the hidden layer.
+\end{itemize}
+
+\paragraph{Vanishing / Exploding Gradient Problem}
+\begin{itemize}
+	\item Problem RNNs face in practice
+	\item Explain unrolling briefly
+	\item Explain gradient descent with TBTT
+	\item Show how the identity function on the recurrence can solve this problem.
+	\item Reference formal proofs for the problem (with links to dynamical systems).
+\end{itemize}
+
+\paragraph{Long Short-Term Memory Networks}
+\begin{itemize}
+	\item Show basic structure with gates.
+	\item Explain that identity function solve the vanishing/exploding gradient problem.
+	\item Explain gradient descent with TBTT
+	\item Show how the identity function on the recurrence can solve this problem.
+	\item Adapt weather prediction problem to LSTM.
+\end{itemize}
 
 \section{Sequence-To-Sequence Learning}
-\paragraph{Model} \blindtext
-\paragraph{Decoding Approaches} \blindtext
-\paragraph{Soft-Attention Mechanism} \blindtext
+\paragraph{Model} 
+\begin{itemize}
+	\item Explain basic idea behind model.
+	\item Show different tasks which can be solved by using such models..
+\end{itemize}
 
-\iffalse
-\section{Convolutional Neural Network}
-Convolutional Neural Networks (CNN) sind eine spezielle Form der zuvor beschriebenen NN. Der grundlegende Unterschied besteht darin, dass die einzelnen Schichten nicht fully-connected sind, sondern mittels Filter über lokale Konnektivität versucht wird, Muster zu erkennen. Im Folgenden werden die einzelnen Komponenten des in dieser Arbeit verwendeten CNNs erläutert.
-
-\paragraph{Filter}\label{basic:cnn:filter} Anstatt Neuronen, wie im klassischen Neuronalen Netzwerk, lernt eine CNN über die sogenannten Filter. Dabei handelt es sich um $n\times m$-Matrizen, welche Gewichte enthalten, analog zu den Gewichten der eingehenden Verbindungen bei Neuronen. Dabei werden die Filter-Matrizen über die Eingabedaten bewegt und es wird jeweils das innere Produkt der aktuellen Filter-Matrix, und dem aktuellen Ausschnitt der Eingabedaten berechnet, auf welchem der Filter positioniert ist. Das Bewegungsmuster des Filters wird \emph{Stride} (dt. durchschreiten) genannt. Im Rahmen dieser Arbeit wird ein eindimensionaler Stride entlang der Satz-Matrix verwendet. Es ist aber durchaus möglich, mehrdimensionale Convolution-Operationen mit entsprechenden Strides zu definieren.
-
-Die durch diese Convolution-Operation resultierenden Werte werden in der Form einer Resultat-Matrix, der sogenannten \emph{Feature Map}, zwischengespeichert. Diese stellen also das Äquivalent zur Aktivierung einer Schicht in einem NN dar. Dabei werden alle resultierenden Feature-Maps einfach hintereinander gereiht und dienen als Eingabewerte für die nächste Schicht. 
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=10cm]{img/filter_feature_map}
-	\caption{Schematische Darstellung der Funktionsweise von Filter und Feature-Map innerhalb eines CNNs.\protect\footnotemark}
-\end{figure}
-\footnotetext{https://www.quora.com/What-is-meant-by-feature-maps-in-convolutional-neural-networks}
-
-Eine Schicht, welche diese Art von Berechnung verwendet, wird Convolutional (dt. sich falltend) Schicht genannt.
-
-\paragraph{Max-Pooling Schicht} In der \emph{Max-Pooling} Schicht, manchmal auch \emph{Subsampling} Schicht genannt, wird ein Grossteil der in den Feature-Maps vorhandenen Informationen verworfen. Dabei wird ein Fenster über die resultierenden Feature-Maps der vorhergehenden Schicht bewegt und der jeweils maximale Wert des entsprechenden Ausschnitts der aktuellen Feature-Map als Wert in die gepoolte Repräsentation übernommen. Das Fenster, welches über die Feature-Map bewegt wird, ist definiert durch die Dimensionalität des Fensters und dem Stride. Der Stride steht für das Bewegunsmuster des Fensters analog zum Filter. Die gepoolten Repräsentationen der Feature-Maps dienen dann als Eingabewerte für die nächste Schicht.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{img/max_pooling}
-	\caption{Schematische Funktionsweise der Max-Pooling Schicht}
-\end{figure}
-
-Die Max-Pooling Schicht erfüllt zwei Aufgaben: Einerseits reduziert sie die Dimensionalität der zu verarbeitenden Daten, was Rechenzeit spart. Andererseits verwirft sie \quotes{unwichtige} Informationen indem sie nur die maximalen Werte der zuletzt berechneten Aktivierungen behält.
-
-\paragraph{Convolutional+Max-Pooling Schicht} Die Convolutional und Max-Pooling Schichten bilden die Grundbausteine der meisten CNN. Diese werden dabei mehrfach hintereinander gereiht. Das im Rahmen dieser Arbeit vewendete CNN hat beispielsweise zwei solcher aufeinanderfolgenden Convolutional+Max-Pooling Schichten.
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=10cm]{img/full_cnn_example}
-	\caption{Beispielhafte Darstellung eines kompletten CNN mit allen Schichten.\protect\footnotemark}
-\end{figure}
-\footnotetext{https://www.semanticscholar.org/paper/f5f1beada9e269b2a7faed8dfe936919ac0c2397}
-
-\paragraph{Ausgabeschicht}\label{basic:cnn:output_layer} Die Ausgabeschicht des CNN ist gleich aufgebaut wie die eines \quotes{traditionellen} NN. Dabei wird eine fully-connected Schicht verwendet, bei welcher jedes Neuronen als Eingabewerte mit allen Aktivierungen der letzten Max-Pooling Schicht verknüpft sind. Die Anzahl Neuronen in der Ausgabeschicht entspricht dabei der Anzahl zu unterscheidenden Klassen. In dieser Arbeit entsprechen die drei verschiedenen Sentiments \emph{neutral}, \emph{negativ} und \emph{positiv} den zu unterscheidenden Klassen.
-
-\section{3-Phasen Lernen}
-Das Training der CNNs wird mithilfe des 3-stufigen Lernverfahren von Severyn et. al. \cite{Severyn:2015kta} durchgeführt. Im Folgenden werden die einzelnen Schritte im Detail erläutert.
-
-\paragraph{Word-Embeddings und Satz-Matrix} Zuerst werden mithilfe von \emph{word2vec}~\cite{mikolov2013distributed} und einem grossen Text-Corpus Word-Embeddings generiert. Dabei werden die gegebenen Wörter eines Vokabulars $v$ so in einen reellen Vektorraum $\mathbb{R}^d$ eingebettet, dass die semantischen Beziehungen innerhalb der Wörter erhalten bleiben. Dies wird am Beispiel in Abbildung \ref{fig:king_queen_example} ersichtlich: Die Wortvektoren für \quotes{Man} and \quotes{Woman} stehen in gleicher Weise zueinander wie die Wortvektoren \quotes{Uncle} zu \quotes{Aunt} bzw. \quotes{King} zu \quotes{Queen}.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=10cm]{img/king_queen_example_word_embeddings}
-	\caption{Beispiel für semantische Beziehung von Wort-Vektoren. Die Wort-Vektoren für \quotes{Uncle} zu \quotes{Aunt} stehen in der gleichen Weise zueinander wie die Wort-Vektoren \quotes{King} zu \quotes{Queen}}
-	\label{fig:king_queen_example}
-\end{figure}
-
-Mithilfe der Word-Embeddings kann ein gegebener Satz nun als Konkatenation der Wort-Vektoren der einzelnen Wörter aufgefasst werden. Das bedeutet, dass ein Satz als $d \times n$ Matrix dargestellt werden kann, wenn $n$ die Anzahl Wörter des Satzes darstellt und $d$ die Anzahl Dimensionen der Word-Embeddings ist. Die $i$-te Spalte in der resultierenden Satz-Matrix entspricht dann dem Wort-Vektor für das $i$-te Wort im abzubildenden Satz.
-
-\paragraph{Distant-Supervised Phase} In einem zweiten Schritt wird die sogenannte \emph{Distant-Super\-vised Phase} durchgeführt, im Folgenden \emph{Distant-Phase} genannt. Wir verwenden einen ähnlichen Ansatz wie in \cite{Go:2009}. Dabei wird das CNN mit einer grossen Menge an \emph{weakly-labeled} (dt. schwach annotiert) Texten über eine Epoche hinweg vortrainiert. Weakly labeled bedeutet, dass der Sentiment eines Textes aus der Eigenschaft des Textes abgeleitet wird und nicht von einem Menschen annotiert wurde. Beispiele für solche Eigenschaften, aus welchen sich ein Sentiment ableiten lässt, sind Emoticons in Tweets oder die Anzahl der vergebenen Sterne bei einem Review. Bei Emoticons lässt sich zum Beispiel aus dem lachenden Emoticon \quotes{:-)} ein positiver bzw. aus dem traurigen Emoticon \quotes{:-(} ein negativer Sentiment ableiten.
-
-Eine genaue Erläuterung zur Generierung der Trainingsdaten für die Distant-Phase befindet sich im Kapitel \ref{chapter:data}. Das Training wird mit dem weiter oben beschriebenen Backpropagation Algorithmus durchgeführt.
-
-\paragraph{Supervised Phase} Im letzten Schritt wird das CNN mit den von Menschen annotierten Texten trainiert. Dieses Training wird mithilfe von Backpropagation mit AdaDelta durchgeführt. Dabei wird das sogenannte \emph{Early Stopping} verwendet: Das Netzwerk wird solange trainiert, bis sich eine definierte Metrik über eine bestimmte Anzahl Epochen nicht mehr verbessert hat. In unserem Fall ist diese Metrik der F1-Score (siehe \ref{sec:metric}) über die positiven und negativen Datensätze. Auch hier wird der oben beschrieben Backpropagation-Algorithmus durchgeführt.
-
-\section{Evaluierungsmetrik}\label{sec:metric}
-Im Folgenden wird die verwendete Evaluierungsmetrik, der \emph{F1-Score}, erläutert.
-
-\paragraph{Präzision {\&} Ausbeute} \emph{Präzision} (engl. precision) und \emph{Ausbeute} (engl. recall) sind Metriken, mit welchen die Performanz eines Klassifizierungs-Systems bezüglich einer der zu klassifizierenden Klassen evaluiert werden kann. Die Abkürzungen $\textit{tp}$, $\textit{fp}$, $\textit{fn}$ stehen in diesem Zusammenhang für \emph{true positives}, \emph{false positives} und \emph{false negatives}. Dabei ist die Präzision das Verhältnis von richtig klassifizierten ($\textit{tp}$) zu allen klassifizierten Datensätze der entsprechenden Klasse ($\textit{tp} + \textit{fp}$):
-\begin{equation}
-\textit{precision} = \frac{\textit{tp}}{\textit{tp} + \textit{fp}}
-\end{equation}
-Die Ausbeute ist das Verhältnis von richtig klassifizierten Datensätzen zur Anzahl aller vorhandenen Datensätze der entsprechenden Klasse ($\textit{tp} + \textit{fn}$):
-\begin{equation}
-\textit{recall} = \frac{\textit{tp}}{\textit{tp} + \textit{fn}}
-\end{equation}
-Mit diesen beiden Metriken kann die Performanz eines Klassifizierungs-Systems bezüglich einer der vorhandenen Klassen bewertet werden, allerdings haben diese zwei Nachteile: Einerseits sind es zwei Werte anstatt eines einzelnen Wertes. Dies macht die Beurteilung über die Performanz des Systems komplizierter. Ausserdem kann mittels \quotes{schummeln} eine sehr hohe Ausbeute erreicht werden, indem immer nur eine bestimmte Klasse zurückgegeben wird. Eine hohe Präzision kann erreicht werden indem das System sehr \quotes{konservativ} arbeitet und nur in Fällen, bei denen die Klassifizierung eindeutig ist, die entsprechende Klasse zurückgibt.
-\paragraph{F1-Score} Um das oben beschriebene Problem zu lösen, wird der F1-Score verwendet. Dieser ist das harmonische Mittel von Präzision und Ausbeute:
-\begin{equation}
-\label{basic:metrics:f1_eq}
-\operatorname{F1} = \frac{2 \times \textit{precision} \times recall}{\textit{precision} + \textit{recall}}
-\end{equation}
-Durch diese Metrik kann die Performanz eines Systems bezüglich einer bestimmten Klasse mittels eines Wertes quantifiziert werden. Ausserdem löst dies das Problem, dass eine hohe Präzision bzw. Ausbeute erzielt werden kann, wenn das System \quotes{schummelt}.
-\paragraph{F1-Score über mehrere Klassen} Der F1-Score selbst kann nur jeweils für eine einzelne Klasse bestimmt werden. Um nun aber eine einzige Metrik für die Messung der Performanz des Systems über mehrere Klassen hinweg zu erhalten, werden die F1-Scores der einzelnen Klassen summiert und durch die Anzahl der Klassen dividiert. Durch dieses Vorgehen erhält man folgende Gleichung, wobei $k_i$ für eine einzelnen Klasse und $n$ für die Anzahl der beachteten Klassen:
-\begin{equation}
-\operatorname{F1}_{k_0, k_1, \dots, k_n} = \frac{\sum_{i=0}^{n} \operatorname{F1}_{k_i}}{n}
-\end{equation}
-Diese Art des F1-Score über mehrere Klassen hinweg wird auch \emph{macro-averaged} F1-Score genannt.
+\paragraph{Decoding Approaches}
+\begin{itemize}
+	\item Explain two approaches: Greedy and Beam-Search.
+	\item Explain why greedy might not give satisfactory results.
+\end{itemize}
+\paragraph{Soft-Attention Mechanism}
+\begin{itemize}
+	\item Draw link to "human" attention mechanism
+	\item Show how this works on a more formal level.
+\end{itemize}
 
 \section{Technischer Aufbau}
 \label{technical_setup}
@@ -165,12 +150,6 @@ Zur Auswertung der Experimente stehen drei Funktionen zur Verfügung:
 	\item Mittels der Plotting Funktion können Plots von Trainings- und Validierungsmetriken erstellt werden.
 	\item Die gespeicherten Validierungs- und Trainingsmetriken können mithilfe von \texttt{math.js}\footnote{http://mathjs.org/} direkt im Browser ausgewertet werden.
 \end{itemize}
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=0.7\textwidth]{img/web_gui}
-	\caption{Ansicht Experiment über Weboberfläche}
-	\label{fig:web_gui}
-\end{figure}
 
 \paragraph{Betriebssystem \& Softwarepakete}
 \label{technical_setup:software}
@@ -179,5 +158,3 @@ Alle Experimente werden mit dem oben beschriebenen Software-System durchgeführt
 \paragraph{Hardware}
 \label{technichal_setup:hardware}
 Zur Durchführung der Experimente werden zwei unterschiedliche Computer verwendet. Im ersten System (S1) ist eine Nvidia GTX970 GPU, einen Intel i7 4950K CPU und 16GB Arbeitsspeicher installiert. Das zweite System besitzt eine Nvidia GTX1070 GPU, einen Intel i7 6700K CPU und ebenfalls 16GB Arbeitsspeicher. Die Unterschiede in der Hardware haben keinen Einfluss auf die Resultate der Experimente, da auf beiden Systemen dasselbe Betriebssystem mit den gleichen Softwarepaketen verwendet wird.
-
-\fi
