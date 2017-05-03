@@ -10,7 +10,7 @@
   "hidden_state_reduction_size": 1024,
   "num_encoder_layers": 1,
   "num_decoder_layers": 0,
-  "training_data": "data/new_reddit_dialog_movies_videos_televisionw/reddit_tree_vid-tel-mov_2008-2015_train.0.txt",
+  "training_data": "data/new_reddit_dialog_movies_videos_television/reddit_tree_vid-tel-mov_2008-2015_train.0.txt",
   "validation_data": "data/new_reddit_dialog_movies_videos_television/reddit_tree_vid-tel-mov_2008-2015_valid.0.txt",
   "vocabulary": "data/new_reddit_dialog_movies_videos_television/50k_dialog_vocab_reddit_corpus_movies_videos_television_2008-2015.pickle",
   "max_random_embeddings_size": 1024,
