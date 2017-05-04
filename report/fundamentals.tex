@@ -71,7 +71,7 @@ In the equations above, one can see different variables with different indices w
 \end{itemize}
 
 \section{Sequence-To-Sequence Learning}
-\paragraph{Model} 
+\paragraph{Model}
 \begin{itemize}
 	\item Explain basic idea behind model.
 	\item Show different tasks which can be solved by using such models..
@@ -108,7 +108,7 @@ Ein zu implementierendes System, mit welchem die Experimente durchgeführt werde
 
 \begin{itemize}
 	\item \textbf{Parametrisierbarkeit}: Dadurch, dass eine grosse Anzahl kleiner Experimente durchgeführt werden muss, soll das System die Möglichkeit bieten, Experimente parametrisiert durchzuführen.
-	\item \textbf{Wiederholbarkeit}: Experimente sollen mit einem minimalen Mehraufwand mehrfach durchgeführt werden können.  
+	\item \textbf{Wiederholbarkeit}: Experimente sollen mit einem minimalen Mehraufwand mehrfach durchgeführt werden können.
 	\item \textbf{Übersichtlichkeit}: Resultate der Experimente sollen übersichtlich und einfach zugänglich sein.
 	\item \textbf{Auswertbarkeit}: Resultate sollen automatisiert ausgewertet werden können.
 \end{itemize}
@@ -123,7 +123,7 @@ Um ein System, welches die oben beschriebenen Anforderungen erfüllt zu erhalten
 	\item \textbf{DataLoader}: Mithilfe des \emph{DataLoader} können Trainings- und Validierungsdaten im TSV\footnote{https://reference.wolfram.com/language/ref/format/TSV.html} Dateiformat geladen werden. Die zu ladenden Daten können dabei aus einer oder mehreren TSV-Dateien stammen. Im Falle, dass mehrere TSV Dateien angegeben werden, kann über die Konfiguration das Verhältnis angegeben werden, in welchem die Daten aus den einzelnen Dateien verschmischt werden sollen.
 	\item \textbf{Skripte}: Die Auswertung der einzelnen Experimente geschieht über dafür erstellte Skripte.
 	\item \textbf{Weboberfläche}: Auf die Resultate der Experimente kann über eine eigens dafür entwickelte Weboberfläche zugegriffen werden. Ausserdem besteht die Möglichkeit Plots über die Metriken, welche während des Trainings- und Validierungsprozess gesammelt werden, zu erstellen.
-	
+
 \end{itemize}
 Die oben beschriebenen Komponenten erlauben es, Experimente mittels JSON Konfigurationen zu starten und den gesamten Trainings- und Validierungsprozess mittels Metriken zu überwachen und zu dokumentieren.
 
