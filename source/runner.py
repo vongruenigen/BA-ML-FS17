@@ -142,16 +142,43 @@ class Runner(object):
            a list of texts. It returns a single answer from the
            machine.'''
         with self.__with_model() as (session, model):
+            use_beam_search = self.config.get('use_beam_search')
+            beam_size = self.config.get('beam_size')
             vocabulary = self.config.get('vocabulary_dict')
             text_idxs = self.data_loader.convert_text_to_indices(text, vocabulary)
             feed_dict, bucket_id = model.make_inference_inputs([text_idxs])
             inference_op = model.get_inference_op(bucket_id)
+            output_list = session.run(inference_op, feed_dict)
 
-            answer_idxs = session.run(inference_op, feed_dict)
-            answer_idxs = np.array(answer_idxs).transpose([1, 0, 2])
-            answer_idxs = np.argmax(answer_idxs, axis=2)[0]
+            if use_beam_search:
+                beam_path = output_list[0][0]
+                beam_symbol = output_list[1]
+                log_beam_probs = output_list[2]
+                output_logits = output_list[2:]
 
-            return self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
+                beam_paths = [[] for _ in range(beam_size)]
+                curr = list(range(beam_size))
+                num_steps = len(beam_path)
+
+                for i in range(num_steps-1, -1, -1):
+                    for j in range(beam_size):
+                        beam_paths[j].append(beam_symbol[i][curr[j]])
+                        curr[j] = beam_path[i][curr[j]]
+
+                replies = set()
+
+                for i in range(beam_size):
+                    answer_idxs = [int(l) for l in beam_paths[i][::-1]]
+                    reply = self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
+
+                    if reply not in replies:
+                        replies.add(reply)
+
+                return 'Replies:\n%s' % ''.join(map(lambda x: '- %s\n' % x, replies))
+            else:
+                answer_idxs = np.array(output_list).transpose([1, 0, 2])
+                answer_idxs = np.argmax(answer_idxs, axis=2)[0]
+                return self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
 
     def __update_global_step(self, session, model):
         '''Updates the global_step value in the config.'''

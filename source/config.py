@@ -65,6 +65,13 @@ class Config(object):
         # Number of epochs to do while training
         'epochs': 1,
 
+        # Decides wether the beam-search or the greedy decoder should be used for decoding.
+        # Note that this value is automatically set to false in case "train" is true.
+        'use_beam_search': False,
+
+        # Defines the width of the beam used when doing beam-search.
+        'beam_size': 10,
+
         # Batch size which will be used when training
         'batch_size': 1,
 
@@ -256,6 +263,7 @@ class Config(object):
 
         del cfg_obj['vocabulary_dict']
         del cfg_obj['embeddings_matrix']
+        del cfg_obj['metrics']
 
         return cfg_obj
 

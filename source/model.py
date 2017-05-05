@@ -68,7 +68,7 @@ class TSeq2SeqModel(object):
 
         # Create the internal multi-layer cell for our RNN.
         def single_cell():
-            cell_obj = cell_class(hidden_units)
+            cell_obj = cell_class(hidden_units, state_is_tuple=False)
 
             if self.cfg.get('train'):
                 cell_obj = wrap_dropout(cell_obj)
@@ -78,7 +78,8 @@ class TSeq2SeqModel(object):
         cell = None
 
         if num_layers > 1:
-            cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)])
+            cell = tf.contrib.rnn.MultiRNNCell([single_cell() for _ in range(num_layers)],
+                                               state_is_tuple=False)
         else:
             cell = single_cell()
 
@@ -120,6 +121,8 @@ class TSeq2SeqModel(object):
 
         # The seq2seq function: we use embedding for the input and attention.
         def seq2seq_f(encoder_inputs, decoder_inputs, do_decode):
+            use_beam_search = self.cfg.get('use_beam_search') and not self.cfg.get('train')
+
             return seq2seq.embedding_attention_seq2seq(
                 encoder_inputs,
                 decoder_inputs,
@@ -129,7 +132,9 @@ class TSeq2SeqModel(object):
                 embedding_size=embeddings_size,
                 output_projection=self.output_projection,
                 feed_previous=do_decode,
-                dtype=dtype)
+                dtype=dtype,
+                beam_search=use_beam_search,
+                beam_size=self.cfg.get('beam_size'))
 
         # Feeds for inputs.
         self.encoder_inputs = []
@@ -139,6 +144,7 @@ class TSeq2SeqModel(object):
         for i in range(buckets[-1][0]):  # Last bucket is the biggest one.
             self.encoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
                                                     name="encoder{0}".format(i)))
+
         for i in range(buckets[-1][1] + 1):
             self.decoder_inputs.append(tf.placeholder(tf.int32, shape=[None],
                                                       name="decoder{0}".format(i)))
@@ -151,20 +157,27 @@ class TSeq2SeqModel(object):
 
         # Training outputs and losses.
         if not self.cfg.get('train'):
-            self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
-                self.encoder_inputs, self.decoder_inputs, targets,
-                self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
-                softmax_loss_function=softmax_loss_function)
+            if self.cfg.get('use_beam_search'):
+                self.outputs, self.beam_path, self.beam_symbol, self.log_beam_probs = \
+                    seq2seq.decode_model_with_buckets(
+                        self.encoder_inputs, self.decoder_inputs, targets,
+                        self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
+                        softmax_loss_function=softmax_loss_function)
+            else:
+                self.outputs, self.losses = seq2seq.model_with_buckets(
+                    self.encoder_inputs, self.decoder_inputs, targets,
+                    self.target_weights, buckets, lambda x, y: seq2seq_f(x, y, True),
+                    softmax_loss_function=softmax_loss_function)
 
-            # If we use output projection, we need to project outputs for decoding.
-            if self.output_projection is not None:
-                for b in range(len(buckets)):
-                    self.outputs[b] = [
-                        tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
-                        for output in self.outputs[b]
-                    ]
+                # If we use output projection, we need to project outputs for decoding.
+                if self.output_projection is not None:
+                    for b in range(len(buckets)):
+                        self.outputs[b] = [
+                            tf.matmul(output, self.output_projection[0]) + self.output_projection[1]
+                            for output in self.outputs[b]
+                        ]
         else:
-            self.outputs, self.losses = tf.contrib.legacy_seq2seq.model_with_buckets(
+            self.outputs, self.losses = seq2seq.model_with_buckets(
                 self.encoder_inputs, self.decoder_inputs, targets,
                 self.target_weights, buckets,
                 lambda x, y: seq2seq_f(x, y, False),
@@ -280,10 +293,16 @@ class TSeq2SeqModel(object):
 
     def get_loss_op(self, bucket_id):
         '''Returns the loss op for the given bucket id from the current model.'''
-        return self.losses[bucket_id]
+        use_bs = self.cfg.get('use_beam_search') and not self.cfg.get('train')
+
+        if use_bs:
+            return self.beam_path[bucket_id]
+        else:
+            return self.losses[bucket_id]
 
     def get_inference_op(self, bucket_id):
         '''Returns the op which can be used for inference using the current model.'''
+        use_beam_search = self.cfg.get('use_beam_search') and not self.cfg.get('train')
         _, decoder_size = self.cfg.get('buckets')[bucket_id]
         outputs_list = []
         buckets = self.cfg.get('buckets')
@@ -291,7 +310,7 @@ class TSeq2SeqModel(object):
         if self.__output_vars is None:
             self.__output_vars = self.outputs
 
-            if self.output_projection is not None:
+            if self.output_projection is not None and not use_beam_search:
                 # Only restore when we're doing inference while training, otherwise
                 # the restore of the logits is done when constructing the graph
                 if self.cfg.get('train'):
@@ -303,6 +322,11 @@ class TSeq2SeqModel(object):
 
         for i in range(decoder_size):
             outputs_list.append(self.__output_vars[bucket_id][i])
+
+        if use_beam_search:
+            outputs_list = [self.beam_path[bucket_id],
+                            self.beam_symbol[bucket_id],
+                            self.log_beam_probs[bucket_id]] + outputs_list
 
         return outputs_list
 
