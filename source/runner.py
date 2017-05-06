@@ -170,9 +170,7 @@ class Runner(object):
                 for i in range(beam_size):
                     answer_idxs = [int(l) for l in beam_paths[i][::-1]]
                     reply = self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
-
-                    if reply not in replies:
-                        replies.add(reply)
+                    replies.add(reply)
 
                 return 'Replies:\n%s' % ''.join(map(lambda x: '- %s\n' % x, replies))
             else:
