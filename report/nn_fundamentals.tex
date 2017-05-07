@@ -61,7 +61,7 @@ In practice, this computation is done in a vectorized manner to speed up the com
 
 One of the big drawbacks of gradient-descent is, that its success is highly dependent on the chosen learning rate $\eta$. When the learning rate is chosen too large, the algorithm might miss the optimium or the value of the loss function even diverges; if the learning rate is too small on the other hand, it might take a really long time until the final optimum is found. We've visualized this problem in figure \ref{fundamentals:figures:learning_rates}, where the development of an arbitrary loss function with different learning rates is plotted over time.
 
-To mitigate this issue, there exist several different advancements to gradient-descent, such as \emph{AdaGrad} \cite{Duchi:2011} or \emph{AdaDelta} \cite{Zeile:2012}. An exceptionally well done overview of different gradient-descent algorithms and their behaviour, including the two mentioned before, can be found in \cite{Ruder:2016}.
+To mitigate this issue, there exist several different advancements to gradient-descent, such as \emph{AdaGrad} \cite{Duchi:2011} or \emph{AdaDelta} \cite{Zeiler:2012}, which adapt the learning rate according to the updates done in the past. A comprehensible overview of different gradient-descent algorithms and their variations, including the two mentioned before, can be found in \cite{Ruder:2016}.
 
 \begin{figure}[h]
 	\centering
