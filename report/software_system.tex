@@ -1,16 +1,19 @@
 \chapter{Software System}
-We had to develop a software system which allows us to conduct experiments for this thesis. The following paragraphs will therefore give a brief explanation on how we've decided to develop the system in order to enable us to conduct experiments with seq2seq models.
+In the following chapter, we are going to discuss the development of the software system used to conduct the experiments described later in this thesis. First, we are going to describe the basic requirements for such a system and then go into the ''story'' behind the development, show where we have been stuck and how we solved this problems. Then we are going to describe the environment in which this software system can be used and what kind of external software and hardware was used to run the experiments on.
+
+\section{Requirements}
+We started the development of the system by defining which requirements it has to fulfill in order to be suitable for conducting the experiments of this thesis. The following properties were identified which the developed system should fulfill:
 
 \begin{itemize}
-	\item Introduce basic idea behind system
-	\item Tell that we're using TensorFlow
+	\item \textbf{Parameterizable}: All experiments should be allowed to run in parameterized manner, which means that all important hyperparameters, training data and places to store the different results should be parameterizable through a JSON\footnote{http://www.json.org/} configuration file.
+	\item \textbf{Reproducable}: It should be possible to run experiments multiple times without having to put additional efforts into it.
+	\item \textbf{Analyzable}: This means that all results from all experiments should be stored in a distinct place for analysis later. This includes the trained models, all metrics collected while training and also the configuration used.
+	\item \textbf{Recoverable}: Due to the fact, that we knew that the environment in which the experiments were going to be conducted (see chapter \ref{} on the hardware) is kind of volatile with regard to stability, we decided that we must design the system in such a way, that the unexpected termination of a running experiment should be easily recoverable. This means, that it should be possible to load the most recent model from the previous training and go on from the point where the training was interrupted. This includes loading and saving of the model weights, skipping all of the training data the model was already trained on as well as loading all the metric already collected in the first run.
+	\item \textbf{Evaluatable}: The trained models should be easily evaluatable, which means that we should have a way of doing inference without the hassle to load the stored configurations and models by hand. The most comfortable way of doing this is through a small frontend which provides the possiblity to ''speak'' to a trained model.
 \end{itemize}
-\section{Requirements}
-\begin{itemize}
-	\item Parameterized system
-	\item Easy evaluation of trained models
-	\item Allow us to analyze the results
-\end{itemize}
+
+The properties listed above should be fulfilled by the newly developed system in order to enable us to safely conduct experiments without the fear of loosing out on any of the results.
+
 \section{Development of the System}
 \begin{itemize}
 	\item Why we've switch from Keras to Tensorflow
@@ -20,20 +23,29 @@ We had to develop a software system which allows us to conduct experiments for t
 	\item Settled with legacy API as we know this one is working
 \end{itemize}
 \section{Model Validation Checks}
-\begin{itemize}
-	\item Link to previous paragraph and explain why we had to introduce model validation checks.
-	\item Explain the overfitting test
-	\item Explain the copy test
-\end{itemize}
+\label{software_sytem:model_validation_checks}
+As described in the section before, we were struggling with the development of the software system, especially with the construction of the TensorFlow graph itself. We have had a lot of setbacks and hence were not sure how to validate that our latest model is working without spending several days to weeks on training before noticing that the graph is still broken. For this reason, we have developed two so-called model validation checks, which should ensure that the model is not broken before starting the large, long-running experiments.
+
+The first validation we introduced was a simple copy-page task: The model was trained to copy sequences of integers of different lengths. For this purpose, we have generated a dataset of $10'000$ sequences of random length and random content. We have used the integers from $0$ to $19$ as the vocabulary and the generated sequences were between $1$ and $40$ symbols long. We then used the implemented model and trained it to output the exact input sequence, for which we used the aforementioned random integer sequences. 
+
+The second validation was a simple overfitting test: The model was fed with tweets as input sequences and the respective response as output sequences. For this purpose we have used a dataset of english tweets borrowed from the user ''Marsan-Ma'' on GitHub\footnote{https://github.com/Marsan-Ma/chat\_corpus/}. We conditioned the model to output the expected output sequence each time we have used a specific input sequence.
+
+Through using these two validation checks, we were able to gain confidence that the implemented model works as expected without using as much time as a full training on any of the conversational datasets would have required.
 
 \section{Scripts}
 \begin{itemize}
 	\item Explain what we've used scripts for
 \end{itemize}
 \section{Web-UI}
-\begin{itemize}
-	\item Small description of "talk to model" GUI with screenshots
-\end{itemize}
+We have also developed an elementary GUI for doing inference through a web frontend. This allowed us to interact with the models after they have been trained in a quick and easy way. We have used the python web framework \texttt{flask}\footnote{http://flask.pocoo.org/} for implementing the backend system and a combination of \texttt{jQuery}\footnote{https://jquery.com/} JavaScript library and the \texttt{boostrap}\footnote{http://getbootstrap.com/} frontend framework.
+
+\begin{figure}[h]
+	\label{fundamentals:lstm:internal_structure}
+	\centering
+	\includegraphics[width=10cm]{img/web_frontend_inference}
+	\caption{Frontend showing the output when sending the sequence ''1 2 3 4 5'' to a model trained on the copy task (see chapter \ref{software_sytem:model_validation_checks}).}
+\end{figure}
+
 \section{Operating System \& Software Packages}
 \begin{itemize}
 	\item Declare all dependencies and how the system has to be setup in order to use the software

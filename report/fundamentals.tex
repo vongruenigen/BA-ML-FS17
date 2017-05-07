@@ -68,15 +68,11 @@ The problem of vanishing gradients was first analyzed by Sepp Hochreiter in his 
 
 It does this by introducing the so-called \emph{gates} into the cell, which are nothing else than small NNs which are responsible for deciding which informations from the previous time step we are going to keep in the old hidden state $h_{t-1}$, add to the new hidden state $h_t$ and use for the computation of the output $o_t$. There are three different gates in an LSTM cell (as depicted in figure \ref{fundamentals:lstm:internal_structure}):
 
-\begin{center}
-	\begin{minipage}{10cm}
-		\begin{itemize}
-			\item[\emph{Input gate}] Is responsible to decide which part of the input is interesting and should be used to update the hidden state $h_{t-1}$ to become the new one $h_t$.
-			\item[\emph{Forget gate}] Is responsible to decide which part of the hidden state $h_{t-1}$ the cell is going to forget.
-			\item[\emph{Output gate}] Decides which part of the hidden state $h_t$ is used to compute the output $o_t$.
-		\end{itemize}
-	\end{minipage}
-\end{center}
+\begin{itemize}
+	\item \textbf{Input gate}: Is responsible to decide which part of the input is interesting and should be used to update the hidden state $h_{t-1}$ to become the new one $h_t$.
+	\item \textbf{Forget gate}: Is responsible to decide which part of the hidden state $h_{t-1}$ the cell is going to forget.
+	\item \textbf{Output gate}: Decides which part of the hidden state $h_t$ is used to compute the output $o_t$.
+\end{itemize}
 
 \begin{figure}[h]
 	\label{fundamentals:lstm:internal_structure}
@@ -90,13 +86,23 @@ In theory, these gates do nothing more good than a plain RNN cell. However in pr
 
 First, let us look into the vanishing/exploding gradient problem: The problem occured due to the fact, that the derivation of the activation function for the recurrence is used when calculating the updates of the weight parameters by performing backpropagation with gradient-descent. This can lead to vanishing (if the derivate is below 1) or exploding (if the derivate is above 1) gradients. The LSTM cell solves this problem by not applying an activation function on the recurrence, but rather using the identity function $f(x) = x$ whose derivation is always $1$. This practically solves this problem because the gradients can neither explode nor vanish.
 
-The second problem is that an RNN cell has no easy way of forgetting information stored in the hidden state. This is obviously solved by the introduced gates which allow the cell to decide at each time step $t$, which information to keep, forget and store based on the last hidden state $h_{t-1}$ and the current input $x_t$. With this structures in place, the LSTM cell is able to track long-term dependencies without much problems.
+The second problem is that an RNN cell has no easy way of forgetting information stored in the hidden state. This is obviously solved by the introduced gates which allow the cell to decide at each time step $t$, which information to keep, forget and store based on the last hidden state $h_{t-1}$ and the current input $x_t$. With this structures in place, the LSTM cell is able to track long-term dependencies much better than a vanilla RNN cell.
+
+There are more details regarding the LSTM cell, like the forget bias and peephole connections, which can be looked up in a empirical study by Greff et al. \cite{Greff:2016}. There are even more architectures for RNN cells like \emph{Gated Recurrent Unit} \cite{Chung:2014} and \emph{Convolutional LSTM} \cite{Xingjian:2015}, which we will not go in depth on in this thesis.
 
 \section{Sequence-To-Sequence Learning}
+The RNN and LSTM cells described in the preceeding chapter can now be used to build so-called \emph{Sequence-To-Sequence} (seq2seq) models. They were first introduced by Sutskever et al. \cite{Sutskever:2014} as a generic model for learning to map arbitrary input to output sequences. They have shown, that such models can be successfully adapted to machine translation tasks and exhibit almost state-of-the-art performance. For more general informations on where and how seq2seq models can be leveraged we refer to chapter \ref{related_work}.
+
 \paragraph{Model}
 \begin{itemize}
 	\item Explain basic idea behind model.
 	\item Show different tasks which can be solved by using such models..
+\end{itemize}
+
+\paragraph{Soft-Attention Mechanism}
+\begin{itemize}
+\item Draw link to "human" attention mechanism
+\item Show how this works on a more formal level.
 \end{itemize}
 
 \paragraph{Decoding Approaches}
@@ -104,8 +110,6 @@ The second problem is that an RNN cell has no easy way of forgetting information
 	\item Explain two approaches: Greedy and Beam-Search.
 	\item Explain why greedy might not give satisfactory results.
 \end{itemize}
-\paragraph{Soft-Attention Mechanism}
-\begin{itemize}
-	\item Draw link to "human" attention mechanism
-	\item Show how this works on a more formal level.
-\end{itemize}
+
+\paragraph{Performance Metrics}
+Tell why we've used perplexity and which others could have been used but don't make any sense for our use case.
