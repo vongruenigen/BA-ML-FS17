@@ -68,6 +68,9 @@ print('(Simply enter a message and press enter, enter "exit" for quitting)')
 ask = lambda: input('(Input)  > ')
 msg = None
 
+# Run inference one time to load the model
+runner.inference('abc')
+
 try:
     while True:
         msg = ask()
