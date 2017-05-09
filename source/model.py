@@ -326,7 +326,7 @@ class TSeq2SeqModel(object):
         if use_beam_search:
             outputs_list = [self.beam_path[bucket_id],
                             self.beam_symbol[bucket_id],
-                            self.log_beam_probs[bucket_id]] + outputs_list
+                            self.log_beam_probs[-2]] + outputs_list
 
         return outputs_list
 

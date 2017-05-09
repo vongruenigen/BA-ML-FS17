@@ -165,12 +165,12 @@ class Runner(object):
                         beam_paths[j].append(beam_symbol[i][curr[j]])
                         curr[j] = beam_path[i][curr[j]]
 
-                replies = set()
+                replies = []
 
                 for i in range(beam_size):
                     answer_idxs = [int(l) for l in beam_paths[i][::-1]]
                     reply = self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
-                    replies.add(reply)
+                    replies.append(reply)
 
                 return 'Replies:\n%s' % ''.join(map(lambda x: '- %s\n' % x, replies))
             else:
