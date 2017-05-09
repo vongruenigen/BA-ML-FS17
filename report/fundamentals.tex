@@ -91,13 +91,41 @@ The second problem is that an RNN cell has no easy way of forgetting information
 There are more details regarding the LSTM cell, like the forget bias and peephole connections, which can be looked up in a empirical study by Greff et al. \cite{Greff:2016}. There are even more architectures for RNN cells like \emph{Gated Recurrent Unit} \cite{Chung:2014} and \emph{Convolutional LSTM} \cite{Xingjian:2015}, which we will not go in depth on in this thesis.
 
 \section{Sequence-To-Sequence Learning}
-The RNN and LSTM cells described in the preceeding chapter can now be used to build so-called \emph{Sequence-To-Sequence} (seq2seq) models. They were first introduced by Sutskever et al. \cite{Sutskever:2014} as a generic model for learning to map arbitrary input to output sequences. They have shown, that such models can be successfully adapted to machine translation tasks and exhibit almost state-of-the-art performance. For more general informations on where and how seq2seq models can be leveraged we refer to chapter \ref{related_work}.
+The RNN and LSTM cells described in the preceeding chapter can now be used to build so-called \emph{Sequence-To-Sequence} (seq2seq) models. They were first introduced by Sutskever et al. \cite{Sutskever:2014} as a generic model for learning to map arbitrary input to output sequences. They have shown, that such models can be successfully adapted to machine translation tasks and exhibit almost state-of-the-art performance. For more general informations on where and how seq2seq models can be leveraged we refer to chapter \ref{related_work}. In the following paragraphs, we are going to explain the basic idea behind the model and how each of its parts, called encoder and decoder, work when applied to conversational modeling.
 
 \paragraph{Model}
-\begin{itemize}
-	\item Explain basic idea behind model.
-	\item Show different tasks which can be solved by using such models..
-\end{itemize}
+The basic idea behind the model is to separate the parts necessary to understand and parse the input sequence, called the \emph{encoder}, from the part that is responsible for generating the output sequence, called the \emph{decoder} (see figure \ref{fundamentals:seq2seq:internal_structure}). Both the encoder and decoder can be any kind of RNN cell, be it GRU, LSTM or any other kind. The encoder is fed with the input sequence through multiple time steps, as an example one could say that for example each word of an input sentence is fed to the encoder one at a time. Through this process, the encoder starts to build its internal hidden state and updates it every time a new word is fed. After the input sequence is fully processed by the encoder, it then passes the information collected in the hidden state, in the context of seq2seq models also called \emph{thought vector}, to the decoder cell. The decoder cell then uses this hidden state as its own, internal, initial state and starts to produce the output sequence, one token per time step, after its fed with a dedicated \texttt{GO} token (also depicted in figure \ref{fundamentals:seq2seq:internal_structure}). The details on how the decoding exactly works are described in the paragraph \emph{Decoding Approaches} below. In general, the decoder tries to construct a sensible answer given the thought vector it received from the encoder.
+
+\begin{figure}[h]
+	\label{fundamentals:seq2seq:internal_structure}
+	\centering
+	\includegraphics[width=12cm]{img/seq2seq_internal}
+	\caption{Internal structure of a Sequence-To-Sequence Model.\protect\footnotemark}
+\end{figure}
+\footnotetext{http://suriyadeepan.github.io/2016-12-31-practical-seq2seq/}
+
+Such a model is also called an \emph{end-to-end} model because it, beeing fully differentiable, can be trained by using backpropagation with gradient-descent with ease. The training works by having pairs of input-output samples which are then used to train the network and condition it to generate the expected output given the input sequence. Formally, if we're talking about language modeling, the model is conditioned to optimize the conditional probability $p(y_1,\dots,y_{t_1}|x_1,\dots,x_{t_2})$, where $t_1$ is the length of the input sequence and $t_2$ the length of the corresponding output sequence. As said before, the encoder cell produces a thought vector $t$, which is nothing more than its hidden state after it has processed the input sequence $x_1,\dots,x_{t_2}$, and passes this to the decoder for generating the output sequence. Hence, the following equation is a formal way of expressing the conditional probability such a model is trained to maximize:
+
+\begin{equation}
+p(y_1,\dots,y_{t_1}|x_1,\dots,x_{t_2}) = \prod_{t=1}^{t_1} p(y_t|t,y_1,\dots,y_{t-1})
+\end{equation}
+
+If we look at the example depicted in figure \ref{fundamentals:seq2seq:internal_structure}, the generation of the output sequence is done as follows:
+
+\begin{enumerate}
+	\item Feed the encoder with the current input word $x_t$ and update its hidden state accordingly. The output of the cell can be ignored.
+	\item Repeat step 1 until the inputs $x_1,\dots,x_{t_1}$ are exhausted when $t_1$ is the length of the input sequence.
+	\item Pass the hidden state of the encoder cell to the decoder cell after the first has processed the last word of the input sequence $x_{t_1}$.
+	\item Initialize the decoder with the given hidden state and feed it the dedicated \texttt{GO} token.
+	\item Store the output $y_t$ of the decoder cell. After this, it depends on which decoding approach is used to generate the output sequence:
+	\begin{enumerate}
+		\item In case of a greedy decoder, simply feed the output $y_t$ back in to the decoder cell to produce the next output token $y_{t+1}$.
+		\item If case of a beam-search decoder, select the $N$ outputs $y_1,\dots,y_{N}$ with the highest probability and store them. Feed each of this outputs back in to the decoder cell.
+	\end{enumerate}
+	\item Repeat step 5 until the decoder either outputs an \texttt{EOS} token or the maximum length $y_{t_2}$ for the output is reached.
+\end{enumerate}
+
+The concatenated outputs $y_1,...,y_{t_2}$ are the output of the model. The exact decoding approaches are described in more detail in the \emph{Decoding Approaches} paragraph below. Generally speaking, such models can be used for \emph{any} sequence-to-sequence problem, not just language modeling, as long as it is possible to define a probability distribution over the output tokens $y_t$ given the context $y_1,\dots,y_{t-1}$ and the thought vector $t$. The generality of this model has been shown several times !!REFERENZEN!!.
 
 \paragraph{Soft-Attention Mechanism}
 \begin{itemize}
@@ -111,5 +139,5 @@ The RNN and LSTM cells described in the preceeding chapter can now be used to bu
 	\item Explain why greedy might not give satisfactory results.
 \end{itemize}
 
-\paragraph{Performance Metrics}
+\section{Performance Metrics}
 Tell why we've used perplexity and which others could have been used but don't make any sense for our use case.

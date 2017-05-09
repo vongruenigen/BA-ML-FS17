@@ -32,28 +32,29 @@ The second validation was a simple overfitting test: The model was fed with twee
 
 Through using these two validation checks, we were able to gain confidence that the implemented model works as expected without using as much time as a full training on any of the conversational datasets would have required.
 
-\section{Scripts}
-\begin{itemize}
-	\item Explain what we've used scripts for
-\end{itemize}
 \section{Web-UI}
 We have also developed an elementary GUI for doing inference through a web frontend. This allowed us to interact with the models after they have been trained in a quick and easy way. We have used the python web framework \texttt{flask}\footnote{http://flask.pocoo.org/} for implementing the backend system and a combination of \texttt{jQuery}\footnote{https://jquery.com/} JavaScript library and the \texttt{boostrap}\footnote{http://getbootstrap.com/} frontend framework.
 
-\begin{figure}[h]
-	\label{fundamentals:lstm:internal_structure}
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=10cm]{img/web_frontend_inference}
 	\caption{Frontend showing the output when sending the sequence ''1 2 3 4 5'' to a model trained on the copy task (see chapter \ref{software_sytem:model_validation_checks}).}
 \end{figure}
 
+\section{Scripts}
+\begin{itemize}
+	\item Explain what we've used scripts for
+\end{itemize}
+
 \section{Operating System \& Software Packages}
 \begin{itemize}
 	\item Declare all dependencies and how the system has to be setup in order to use the software
 \end{itemize}
+
+Alle Experimente werden mit dem oben beschriebenen Software-System durchgeführt. Auf den beiden verwendeten Computer-Systemen wird als Betriebssystem Ubuntu 16.04 installiert. Dazu werden \texttt{python} in der Version 3.5.2, Nvidia GPU Treiber und \texttt{cuda}\footnote{https://developer.nvidia.com/cuda-toolkit} in der Version 8.0 als Abhängigkeiten von \texttt{theano} und \texttt{keras} installiert.
+
 \section{Hardware}
-\begin{itemize}
-	\item Explain the hardware on the GPU-Cluster, as all experiments were run there
-\end{itemize}
+All experiments have been conducted on the GPU-cluster ZHAW has provided us for running the experiments related to our thesis. On this server, there are 8 Nvidia Titan X (Pascal) GPUs are installed and a total of 24 CPUs with 501GB of RAM stood at our disposal. The experiments themselves were run in a virtualized manner by using \texttt{docker}\footnote{https://www.docker.com/} with the specialized \texttt{nvidia-docker}\footnote{https://github.com/NVIDIA/nvidia-docker} appliance to ease the integration of the physical hardware into the virtual machine.
 
 \iffalse
 \section{Technischer Aufbau}
