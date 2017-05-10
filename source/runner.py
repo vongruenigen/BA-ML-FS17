@@ -137,7 +137,7 @@ class Runner(object):
             # Store the final metrics
             self.__store_metrics(loss_track, perplexity_track, val_loss_track, val_perplexity_track)
 
-    def inference(self, text):
+    def inference(self, text, trim_eos_pad=True, additional_tensor_names=[]):
         '''This method is responsible for doing inference on
            a list of texts. It returns a single answer from the
            machine.'''
@@ -148,7 +148,23 @@ class Runner(object):
             text_idxs = self.data_loader.convert_text_to_indices(text, vocabulary)
             feed_dict, bucket_id = model.make_inference_inputs([text_idxs])
             inference_op = model.get_inference_op(bucket_id)
-            output_list = session.run(inference_op, feed_dict)
+            additional_tensors = []
+
+            if additional_tensor_names is not None and len(additional_tensor_names) > 0:
+                default_graph = tf.get_default_graph()
+
+                for name in additional_tensor_names:
+                    curr_tensor = default_graph.get_tensor_by_name(name)
+                    additional_tensors.append(curr_tensor)
+
+            output_list = session.run(inference_op + additional_tensors, feed_dict)
+
+            additional_tensors_results = None
+
+            if len(additional_tensors) > 0:
+                additional_tensors_results = output_list[-len(additional_tensors):]
+
+            output_list = output_list[0:len(output_list)-len(additional_tensors)]
 
             if use_beam_search:
                 beam_path = output_list[0][0]
@@ -169,14 +185,18 @@ class Runner(object):
 
                 for i in range(beam_size):
                     answer_idxs = [int(l) for l in beam_paths[i][::-1]]
-                    reply = self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
+                    reply = self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary,
+                                                                     trim_eos_pad=trim_eos_pad)
                     replies.append(reply)
 
-                return 'Replies:\n%s' % ''.join(map(lambda x: '- %s\n' % x, replies))
+                answer = 'Replies:\n%s' % ''.join(map(lambda x: '- %s\n' % x, replies))
             else:
                 answer_idxs = np.array(output_list).transpose([1, 0, 2])
                 answer_idxs = np.argmax(answer_idxs, axis=2)[0]
-                return self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary)
+                answer = self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary,
+                                                                  trim_eos_pad=trim_on_eos)
+
+            return (answer, additional_tensors_results)
 
     def __update_global_step(self, session, model):
         '''Updates the global_step value in the config.'''
@@ -338,7 +358,8 @@ class Runner(object):
             self.__graph = tf.Graph().as_default()
             self.__session = tf.Session(config=tf.ConfigProto(allow_soft_placement=True))
 
-        yield self.__session
+        with self.__session.as_default():
+            yield self.__session
 
     @contextlib.contextmanager
     def __with_tf_saver(self, session):

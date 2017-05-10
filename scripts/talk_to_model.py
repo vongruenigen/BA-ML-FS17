@@ -78,7 +78,7 @@ try:
         if msg.lower() == 'exit':
             break
 
-        ans = runner.inference(msg)
+        ans, _ = runner.inference(msg)
         print('(Answer) > %s' % ans)
 except Exception as e:
     print('(Exiting conversation due to an error: %s)' % e)

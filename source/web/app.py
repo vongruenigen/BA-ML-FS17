@@ -83,7 +83,8 @@ def run_inference():
         return 'No session started yet!', 403
     else:
         text = request.get_data().decode('utf-8')
-        return current_runner.inference(text), 200
+        answ, _ = current_runner.inference(text)
+        return answ, 200
 
 @app.route('/stop_session', methods=['POST'])
 def stop_session():

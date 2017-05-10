@@ -123,7 +123,7 @@ class DataLoader(object):
 
         return list(line_parts)
 
-    def convert_indices_to_text(self, text_idxs, rev_vocabulary):
+    def convert_indices_to_text(self, text_idxs, rev_vocabulary, trim_eos_pad=True):
         '''Converts a list of indices to the respective texts
            by using the vocabulary dictionary. Note that this
            function expects a reversed version of the vocabulary
@@ -133,19 +133,22 @@ class DataLoader(object):
         text_idxs = list(text_idxs)
 
         # Remove anything after the first EOS token
-        if Config.EOS_WORD_IDX in text_idxs:
+        if Config.EOS_WORD_IDX in text_idxs and trim_eos_pad:
             text_idxs = text_idxs[:text_idxs.index(Config.EOS_WORD_IDX)]
 
         rev_text_idxs = list(reversed(text_idxs))
         shortened_idxs = []
 
-        # Let's remove the padded <unknown> words before converting
-        # the indices into text again.
-        for idx in rev_text_idxs:
-            if idx in skip_idxs and len(shortened_idxs) == 0:
-                continue
-            else:
-                shortened_idxs.append(idx)
+        if trim_eos_pad:
+            # Let's remove the padded <unknown> words before converting
+            # the indices into text again.
+            for idx in rev_text_idxs:
+                if idx in skip_idxs and len(shortened_idxs) == 0:
+                    continue
+                else:
+                    shortened_idxs.append(idx)
+        else:
+            shortened_idxs = rev_text_idxs
 
         if len(shortened_idxs) == 0:
             shortened_idxs = rev_text_idxs

@@ -133,7 +133,7 @@ def _extract_beam_search(embedding, beam_size, num_symbols, embedding_size,  out
 
       prev = nn_ops.xw_plus_b(prev, output_projection[0], output_projection[1])
 
-    probs  = tf.log(tf.nn.softmax(prev))
+    probs = tf.log(tf.nn.softmax(prev))
 
     if i > 1:
         probs = tf.reshape(probs + log_beam_probs[-1], [-1, beam_size * num_symbols])
@@ -152,7 +152,7 @@ def _extract_beam_search(embedding, beam_size, num_symbols, embedding_size,  out
     # Note that gradients will not propagate through the second parameter of
     # embedding_lookup.
     emb_prev = embedding_ops.embedding_lookup(embedding, symbols)
-    emb_prev  = tf.reshape(emb_prev,[beam_size,embedding_size])
+    emb_prev = tf.reshape(emb_prev, [beam_size, embedding_size])
 
     if not update_embedding:
       emb_prev = array_ops.stop_gradient(emb_prev)
