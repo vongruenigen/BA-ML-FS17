@@ -68,7 +68,8 @@ for i, input_seq in enumerate(input_seqs):
 reverse_input = config.get('reverse_input')
 
 if out_type == 'overlay':
-    pass
+    print('ERROR: Not implemented yet')
+    sys.exit(2)
 elif out_type == 'heatmap':
     out_file_name = path.join(output_dir, 'attention_visualization_%d.png')
 
@@ -82,10 +83,12 @@ elif out_type == 'heatmap':
             heatmap_val = np.flip(heatmap_val, 1)
 
         fig, ax = plt.subplots()
+        ax.yaxis.labelpad = 20
         ax.xaxis.tick_top()
         ax.invert_yaxis()
 
-        ax.imshow(heatmap_val, interpolation='nearest', cmap=plt.cm.Blues)
+        heatmap_obj = ax.imshow(heatmap_val, interpolation='nearest', cmap=plt.cm.Blues)
+        fig.colorbar(heatmap_obj)
 
         x_ticks = np.arange(0, len(input_seq))
         x_ticks_txt = input_seq
@@ -96,17 +99,11 @@ elif out_type == 'heatmap':
         ax.set_xticklabels('')
         ax.set_yticklabels('')
 
-        ax.set_xticks(x_ticks, minor=False)
-        ax.set_xticklabels(x_ticks_txt, minor=False)
+        ax.set_xticks(x_ticks)
+        ax.set_xticklabels(x_ticks_txt)
 
-        ax.set_yticks(y_ticks, minor=False)
-        ax.set_yticklabels(y_ticks_txt, minor=False)
-
-        for tick in ax.xaxis.get_major_ticks():
-            tick.label1.set_horizontalalignment('center')
-
-        for tick in ax.yaxis.get_major_ticks():
-            tick.label1.set_horizontalalignment('center')
+        ax.set_yticks(y_ticks)
+        ax.set_yticklabels(y_ticks_txt, ha='left')
 
         if 'SHOW' in os.environ:
             plt.show()
