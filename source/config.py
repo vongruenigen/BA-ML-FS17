@@ -255,6 +255,17 @@ class Config(object):
         else:
             raise Exception('there is no value for the name %s in the config' % name)
 
+    def for_inference(self):
+        '''Adapts the current object so that it can be used for inference. This
+           includes for example setting the batch size to 1 and disabling the
+           train flag.'''
+        new_cfg = copy.deepcopy(self)
+
+        new_cfg.set('train', False)
+        new_cfg.set('batch_size', 1)
+
+        return new_cfg
+
     def get_dict(self):
         '''Returns a copy of the internal config dictionary.
            Numpy matrices and other unserializable variables
