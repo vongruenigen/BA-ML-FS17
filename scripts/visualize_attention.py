@@ -5,6 +5,8 @@
 import sys
 import os
 import helpers
+import numpy as np
+import matplotlib.pyplot as plt
 
 helpers.expand_import_path_to_source()
 
@@ -23,7 +25,7 @@ model_path = argv[0]
 input_txt = argv[1]
 output_dir = argv[2]
 possible_out_types =  ['overlay', 'heatmap']
-out_type = 'overlay'
+out_type = 'heatmap'
 
 if len(argv) > 3:
     out_type = argv[4]
@@ -51,20 +53,62 @@ config.set('model_path', model_path)
 config.set('use_beam_search', False)
 
 runner = Runner(config)
+tokenize = runner.data_loader.get_tokenizer()
 results = []
 
 for i, input_seq in enumerate(input_seqs):
     prediction, attn_weights = runner.inference(input_seq,
                                                 additional_tensor_names=attn_weights_names)
-    results.append({'input': input_seq,
-                    'output': prediction,
-                    'attn_weights': attn_weights})
+    results.append((tokenize(input_seq),
+                    tokenize(prediction),
+                    attn_weights))
 
     print('Finished prediction #%d...' % (i+1))
 
-import pdb; pdb.set_trace()
+reverse_input = config.get('reverse_input')
 
 if out_type == 'overlay':
     pass
 elif out_type == 'heatmap':
-    pass
+    out_file_name = path.join(output_dir, 'attention_visualization_%d.png')
+
+    for i, (input_seq, output_seq, attn_weights) in enumerate(results):
+        heatmap_val = np.zeros((len(output_seq), len(input_seq)))
+
+        for j in range(1, heatmap_val.shape[0]):
+            heatmap_val[j,:] = attn_weights[j][0,:len(input_seq)]
+
+        if reverse_input:
+            heatmap_val = np.flip(heatmap_val, 1)
+
+        fig, ax = plt.subplots()
+        ax.xaxis.tick_top()
+        ax.invert_yaxis()
+
+        ax.imshow(heatmap_val, interpolation='nearest', cmap=plt.cm.Blues)
+
+        x_ticks = np.arange(0, len(input_seq))
+        x_ticks_txt = input_seq
+
+        y_ticks = np.arange(0, len(output_seq))
+        y_ticks_txt = output_seq
+
+        ax.set_xticklabels('')
+        ax.set_yticklabels('')
+
+        ax.set_xticks(x_ticks, minor=False)
+        ax.set_xticklabels(x_ticks_txt, minor=False)
+
+        ax.set_yticks(y_ticks, minor=False)
+        ax.set_yticklabels(y_ticks_txt, minor=False)
+
+        for tick in ax.xaxis.get_major_ticks():
+            tick.label1.set_horizontalalignment('center')
+
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label1.set_horizontalalignment('center')
+
+        if 'SHOW' in os.environ:
+            plt.show()
+        else:
+            plt.savefig(out_file_name % i)
