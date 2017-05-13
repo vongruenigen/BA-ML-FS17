@@ -93,7 +93,7 @@ class DataLoader(object):
 
             logger.warn('WARNING: Went through all the data, starting from the beginning again!')
 
-    def __get_tokenizer(self):
+    def get_tokenizer(self):
         '''Creates a tokenizer based on the configuration
            in the config object supplied in the constructor.
            The actual object is not returned but rather the
@@ -161,7 +161,7 @@ class DataLoader(object):
     def __preprocess_and_tokenize_line(self, line, vocabulary):
         '''Preprocesses a given line (e.g. removes unwanted chars),
            tokenizes it and returns it.'''
-        tknz = self.__get_tokenizer()
+        tknz = self.get_tokenizer()
         line = re.sub(self.WHITELIST_REGEX, '', line)
 
         line_parts = tknz(line)
