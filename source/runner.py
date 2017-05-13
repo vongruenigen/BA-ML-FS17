@@ -194,7 +194,7 @@ class Runner(object):
                 answer_idxs = np.array(output_list).transpose([1, 0, 2])
                 answer_idxs = np.argmax(answer_idxs, axis=2)[0]
                 answer = self.data_loader.convert_indices_to_text(answer_idxs, self.rev_vocabulary,
-                                                                  trim_eos_pad=trim_on_eos)
+                                                                  trim_eos_pad=trim_eos_pad)
 
             return (answer, additional_tensors_results)
 
