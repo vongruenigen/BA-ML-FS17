@@ -58,9 +58,10 @@ class Runner(object):
             self.__graph = None
             self.__model = None
 
-    def test(self, test_data_path):
+    def test(self, test_data_path, max_samples=None):
         '''This method can be used to evaluate the model on a given dataset.'''
         feed_dict = {}
+        batch_size = self.config.get('batch_size')
 
         test_batch_data_x = None
         test_batch_data_y = None
@@ -78,8 +79,18 @@ class Runner(object):
                                                            self.config.get('vocabulary_dict'),
                                                            disable_forwarding=True)
 
+        logger.info('Counting number of conversations in test corpus...')
+        test_len = self.data_loader.count_conversations(test_data_path)
+        logger.info('Found %i distinct conversations in the corpus' % test_len)
+
+        if max_samples is not None and test_len > max_samples:
+            test_len = max_samples
+            logger.info('Setting maximum to %i since its configured to do so' % max_samples)
+
+        iter_len = int(test_len / batch_size)
+
         with self.__with_model() as (session, model):
-            while True:
+            for _ in tqdm.tqdm(range(1, iter_len+1)):
                 try:
                     test_batch_data_x, test_batch_data_y = self.__prepare_data_batch(test_batches)
                     feed_dict, bucket_id = model.make_train_inputs(test_batch_data_x, test_batch_data_y)

@@ -96,6 +96,25 @@ class DataLoader(object):
             else:
                 raise StopIteration('finished the validation/test data')
 
+    def count_conversations(self, corpus_path):
+        '''Counts the number of conversations in the given corpus.'''
+        has_end_conv = False
+        conv_count = 0
+
+        for i, line in enumerate(open(corpus_path, 'r')):
+            if line.strip() == self.SPLIT_CONV_SYM:
+                has_end_conv = True
+                conv_count += 1
+                continue
+
+            if (i+1) % 2 == 0 and not has_end_conv:
+                conv_count += 1
+
+        if self.cfg.get('use_last_output_as_input'):
+            conv_count = (2 * conv_count) - 1
+
+        return conv_count
+
     def get_tokenizer(self):
         '''Creates a tokenizer based on the configuration
            in the config object supplied in the constructor.
