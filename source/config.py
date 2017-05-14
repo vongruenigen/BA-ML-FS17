@@ -69,6 +69,10 @@ class Config(object):
         # Note that this value is automatically set to false in case "train" is true.
         'use_beam_search': False,
 
+        # Signifies if all replies from the beam search should be returned or
+        # only the best as signified by the log probabilities.
+        'beam_search_only_best': True,
+
         # Defines the width of the beam used when doing beam-search.
         'beam_size': 10,
 

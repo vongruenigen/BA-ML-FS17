@@ -58,6 +58,50 @@ class Runner(object):
             self.__graph = None
             self.__model = None
 
+    def test(self, test_data_path):
+        '''This method can be used to evaluate the model on a given dataset.'''
+        feed_dict = {}
+
+        test_batch_data_x = None
+        test_batch_data_y = None
+
+        test_sum_losses = 0.0
+        test_sum_iters = 0
+
+        if self.config.get('train'):
+            logger.error('The "train" flag is still set to true, this might'
+                         ' not work as expected!')
+
+        logger.info('[Starting testing]')
+
+        test_batches = self.data_loader.load_conversations(test_data_path,
+                                                           self.config.get('vocabulary_dict'),
+                                                           disable_forwarding=True)
+
+        with self.__with_model() as (session, model):
+            while True:
+                try:
+                    test_batch_data_x, test_batch_data_y = self.__prepare_data_batch(test_batches)
+                    feed_dict, bucket_id = model.make_train_inputs(test_batch_data_x, test_batch_data_y)
+
+                    loss_op = model.get_loss_op(bucket_id)
+                    test_loss = session.run(loss_op, feed_dict)
+
+                    test_sum_losses += test_loss
+                    test_sum_iters += 1
+                except StopIteration:
+                    logger.info('Finished the test corpus, stopping')
+                    break
+
+            test_avg_loss = test_sum_losses / test_sum_iters
+            test_perplexity = self.__calculate_perplexity(test_avg_loss)
+
+            logger.info('[Finished testing]')
+            logger.info('    Test Loss       > %f' % test_loss)
+            logger.info('    Test Perplexity > %f' % test_perplexity)
+
+        return test_avg_loss, test_perplexity
+
     def train(self):
         '''This method is responsible for training a model
            with the settings defined in the config.'''
@@ -189,7 +233,10 @@ class Runner(object):
                                                                      trim_eos_pad=trim_eos_pad)
                     replies.append(reply)
 
-                answer = 'Replies:\n%s' % ''.join(map(lambda x: '- %s\n' % x, replies))
+                if self.config.get('beam_search_only_best'):
+                    answer = replies[log_beam_probs.index(max(log_beam_probs))]
+                else:
+                    answer = 'Replies:\n%s' % ''.join(map(lambda x: '- %s\n' % x, replies))
             else:
                 answer_idxs = np.array(output_list).transpose([1, 0, 2])
                 answer_idxs = np.argmax(answer_idxs, axis=2)[0]

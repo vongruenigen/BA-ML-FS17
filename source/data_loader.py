@@ -91,7 +91,10 @@ class DataLoader(object):
                 curr_conv.append(text_indices)
                 last_sentence = text_indices
 
-            logger.warn('WARNING: Went through all the data, starting from the beginning again!')
+            if self.cfg.get('train'):
+                logger.warn('WARNING: Went through all the data, starting from the beginning again!')
+            else:
+                raise StopIteration('finished the validation/test data')
 
     def get_tokenizer(self):
         '''Creates a tokenizer based on the configuration
