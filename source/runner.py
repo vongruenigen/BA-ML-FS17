@@ -222,10 +222,20 @@ class Runner(object):
             output_list = output_list[0:len(output_list)-len(additional_tensors)]
 
             if use_beam_search:
-                beam_path = output_list[0][0]
+                beam_path = output_list[0]
                 beam_symbol = output_list[1]
                 log_beam_probs = output_list[2]
                 output_logits = output_list[2:]
+
+                # We need to do some reshaping here outside the graph since
+                # tensorflow doesn't support reshaping a 1-dimensional tensor
+                # (e.g. with shape=(,X)) to a 2-dimensional tensor with the
+                # same number of elements, but an additional dimension of 1.
+                if beam_size == 1:
+                    beam_path = np.reshape(beam_path, (-1, beam_size))
+                    beam_symbol = np.reshape(beam_symbol, (-1, beam_size))
+                else:
+                    beam_path = beam_path[0]
 
                 beam_paths = [[] for _ in range(beam_size)]
                 curr = list(range(beam_size))
@@ -245,7 +255,8 @@ class Runner(object):
                     replies.append(reply)
 
                 if self.config.get('beam_search_only_best'):
-                    answer = replies[log_beam_probs.index(max(log_beam_probs))]
+                    answer_idx = log_beam_probs.reshape(-1).tolist().index(max(log_beam_probs))
+                    answer = replies[answer_idx]
                 else:
                     answer = 'Replies:\n%s' % ''.join(map(lambda x: '- %s\n' % x, replies))
             else:

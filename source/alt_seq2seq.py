@@ -936,12 +936,8 @@ def beam_attention_decoder(decoder_inputs,
       output_symbol = nn_ops.xw_plus_b(output, output_projection[0], output_projection[1])
       outputs.append(output_symbol)
 
-  if beam_size > 1:
-      beam_path = tf.reshape(tf.concat(beam_path, 0),[-1, beam_size]),
-      beam_symbols = tf.reshape(tf.concat(beam_symbols, 0),[-1, beam_size])
-  else:
-      beam_path = tf.stack(beam_path, 0)
-      beam_symbols = tf.stack(beam_symbols, 0)
+  beam_path = tf.reshape(tf.concat(beam_path, 0),[-1, beam_size]),
+  beam_symbols = tf.reshape(tf.concat(beam_symbols, 0),[-1, beam_size])
 
   return outputs, state, beam_path, beam_symbols, log_beam_probs
 
