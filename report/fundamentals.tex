@@ -94,7 +94,7 @@ There are more details regarding the LSTM cell, like the forget bias and peephol
 The RNN and LSTM cells described in the preceeding chapter can now be used to build so-called \emph{Sequence-To-Sequence} (seq2seq) models. They were first introduced by Sutskever et al. \cite{Sutskever:2014} as a generic model for learning to map arbitrary input to output sequences. They have shown, that such models can be successfully adapted to machine translation tasks and exhibit almost state-of-the-art performance. For more general informations on where and how seq2seq models can be leveraged we refer to chapter \ref{related_work}. In the following paragraphs, we are going to explain the basic idea behind the model and how each of its parts, called encoder and decoder, work when applied to conversational modeling.
 
 \paragraph{Model}
-The basic idea behind the model is to separate the parts necessary to understand and parse the input sequence, called the \emph{encoder}, from the part that is responsible for generating the output sequence, called the \emph{decoder} (see figure \ref{fundamentals:seq2seq:internal_structure}). Both the encoder and decoder can be any kind of RNN cell, be it GRU, LSTM or any other kind. The encoder is fed with the input sequence through multiple time steps, as an example one could say that for example each word of an input sentence is fed to the encoder one at a time. Through this process, the encoder starts to build its internal hidden state and updates it every time a new word is fed. After the input sequence is fully processed by the encoder, it then passes the information collected in the hidden state, in the context of seq2seq models also called \emph{thought vector}, to the decoder cell. The decoder cell then uses this hidden state as its own, internal, initial state and starts to produce the output sequence, one token per time step, after its fed with a dedicated \texttt{GO} token (also depicted in figure \ref{fundamentals:seq2seq:internal_structure}). The details on how the decoding exactly works are described in the paragraph \emph{Decoding Approaches} below. In general, the decoder tries to construct a sensible answer given the thought vector it received from the encoder.
+The basic idea behind the model is to separate the parts necessary to understand and parse the input sequence, called the \emph{encoder}, from the part that is responsible for generating the output sequence, called the \emph{decoder} (see figure \ref{fundamentals:seq2seq:internal_structure}). Both the encoder and decoder can be any kind of RNN cell, be it GRU, LSTM or any other kind. The encoder is fed with the input sequence through multiple time steps, as an example one could say that for example each word of an input sentence is fed to the encoder one at a time. Through this process, the encoder starts to build its internal hidden state and updates it every time a new word is fed. After the input sequence is fully processed by the encoder, it then passes the information collected in the hidden state, in the context of seq2seq models also called \emph{thought vector}, to the decoder cell. The decoder cell then uses this hidden state as its own, internal, initial state and starts to produce the output sequence, one token per time step, after its fed with a dedicated \texttt{GO} token (also depicted in figure \ref{fundamentals:seq2seq:internal_structure}). The tokens are produced by feeding the final state of the decoder cell to a softmax classification layer which outputs probabilities over the words in the vocabulary. It then usually chooses (when using a greedy decoding approach, see paragrahp ''Decoding Approaches'') the ''best'' token to output in a greedy fashion by simply selecting the token with the highest probability after the softmax layer has been applied. The details on how the decoding exactly works are described in the paragraph \emph{Decoding Approaches} below. In general, the decoder tries to construct a sensible answer given the thought vector it received from the encoder.
 
 \begin{figure}[h]
 	\label{fundamentals:seq2seq:internal_structure}
@@ -104,7 +104,7 @@ The basic idea behind the model is to separate the parts necessary to understand
 \end{figure}
 \footnotetext{http://suriyadeepan.github.io/2016-12-31-practical-seq2seq/}
 
-Such a model is also called an \emph{end-to-end} model because it, beeing fully differentiable, can be trained by using backpropagation with gradient-descent with ease. The training works by having pairs of input-output samples which are then used to train the network and condition it to generate the expected output given the input sequence. Formally, if we're talking about language modeling, the model is conditioned to optimize the conditional probability $p(y_1,\dots,y_{t_1}|x_1,\dots,x_{t_2})$, where $t_1$ is the length of the input sequence and $t_2$ the length of the corresponding output sequence. As said before, the encoder cell produces a thought vector $t$, which is nothing more than its hidden state after it has processed the input sequence $x_1,\dots,x_{t_2}$, and passes this to the decoder for generating the output sequence. Hence, the following equation is a formal way of expressing the conditional probability such a model is trained to maximize:
+Such a model is also called an \emph{end-to-end} model because it, beeing fully differentiable, can be trained by using backpropagation with gradient-descent with ease. The training works by having pairs of input-output samples which are then used to train the network and condition it to generate the expected output given the input sequence. This is done by feeding the network the expected words as inputs at each time step which allows for gradient-descent to be applied. Formally, if we're talking about language modeling, the model is conditioned to optimize the conditional probability $p(y_1,\dots,y_{t_1}|x_1,\dots,x_{t_2})$, where $t_1$ is the length of the input sequence and $t_2$ the length of the corresponding output sequence. As said before, the encoder cell produces a thought vector $t$, which is nothing more than its hidden state after it has processed the input sequence $x_1,\dots,x_2$, and passes this to the decoder for generating the output sequence. Hence, the following equation is a formal way of expressing the conditional probability such a model is trained to maximize:
 
 \begin{equation}
 p(y_1,\dots,y_{t_1}|x_1,\dots,x_{t_2}) = \prod_{t=1}^{t_1} p(y_t|t,y_1,\dots,y_{t-1})
@@ -117,27 +117,51 @@ If we look at the example depicted in figure \ref{fundamentals:seq2seq:internal_
 	\item Repeat step 1 until the inputs $x_1,\dots,x_{t_1}$ are exhausted when $t_1$ is the length of the input sequence.
 	\item Pass the hidden state of the encoder cell to the decoder cell after the first has processed the last word of the input sequence $x_{t_1}$.
 	\item Initialize the decoder with the given hidden state and feed it the dedicated \texttt{GO} token.
-	\item Store the output $y_t$ of the decoder cell. After this, it depends on which decoding approach is used to generate the output sequence:
+	\item Store the output token $y_t$ of the decoder cell. After this, it depends on which decoding approach is used to generate the output sequence:
 	\begin{enumerate}
 		\item In case of a greedy decoder, simply feed the output $y_t$ back in to the decoder cell to produce the next output token $y_{t+1}$.
 		\item If case of a beam-search decoder, select the $N$ outputs $y_1,\dots,y_{N}$ with the highest probability and store them. Feed each of this outputs back in to the decoder cell.
 	\end{enumerate}
-	\item Repeat step 5 until the decoder either outputs an \texttt{EOS} token or the maximum length $y_{t_2}$ for the output is reached.
+	\item Repeat step 5 until the decoder either outputs an \texttt{EOS} token or the maximum length $t_2$ for the output is reached.
 \end{enumerate}
 
 The concatenated outputs $y_1,...,y_{t_2}$ are the output of the model. The exact decoding approaches are described in more detail in the \emph{Decoding Approaches} paragraph below. Generally speaking, such models can be used for \emph{any} sequence-to-sequence problem, not just language modeling, as long as it is possible to define a probability distribution over the output tokens $y_t$ given the context $y_1,\dots,y_{t-1}$ and the thought vector $t$. The generality of this model has been shown several times !!REFERENZEN!!.
 
 \paragraph{Soft-Attention Mechanism}
-\begin{itemize}
-\item Draw link to "human" attention mechanism
-\item Show how this works on a more formal level.
-\end{itemize}
+Imagine you have been asked to solve the following, simple task: Read a longer text about a certain topic. At the end of the text, there are several questions regarding this text and you have to answer them. How does a human approach such a task? Usually, most of the people start by reading the text through one time and then start to answer the questions. A normal human cannot remember the whole content of the text (since it is a long one), so what it does is to focus on a single question and try to find the answer by revisiting the text. This essentially means that the participant in this task \emph{focuses} their \emph{attention} on single parts of the text instead of the text as a whole. This is basically what the \emph{soft-attention} mechanism is all about. Let us adapt the introductory example on how this behaviour could be adapted to seq2seq models and how it helps to solve tasks.
 
-\paragraph{Decoding Approaches}
+As mentioned before, the main bottleneck of seq2seq models is that the encoder has to compress all the information it has processed into its thought vector. The thought vector is then passed to the decoder which tries to come up with a meaningful answer to the information stored in the thought vector. If a long text is compressed into the thought vector, this might not be an easy task to solve. The attention mechanism helps by solving this issue by allowing the decoder to ''look'' at all thought vectors of the encoder at all timesteps via a weighted sum.
+
+More formally, the attention mechanism works as follows: At each timestep $t$ when decoding, we allow the model to predict a weight-vector $\mathbf{A} = (a_{t,1},a_{t,2},\dots,a_{t,l})$ where $l$ stands for the number of timesteps the encoder has taken to embed the input sentence into the thought vector. This set of weights is generated by the model itself using a simple feed-forward NN internally to compute it. This vector $\mathbf{A}$ represents a probability distribution over all hidden states of the encoder at all timesteps $\mathbf{H} = \{h_1, h_2, \dots, h_l\}$ and is used to allow the model to ''attend'' to certain input states more than on others. This is done by using the computed weights in $\mathbf{A}$ to compute a weighted-sum $c_t$ over all hidden states $h_{,t1},h_{t,2},\dots,h_{t,l}$. This vector $c_t$, also called the context vector, is then used by the model to gain access to information through all hidden states of the encoder it would otherwise not be able to. Formally speaking, the context vector $c_t$ is simply the weighted sum all hidden states $h_t$ from $\mathbf{H}$ multiplied with their respective weight $a_{t,l}$ in $\mathbf{A}$:
+
+\begin{equation}
+c_t = \sum_{i=1}^{l} a_{t,i} h_t
+\end{equation}
+
+The weights in $\mathbf{A}$ are learned while training the model. This means, that ability to be ''attentive'' is something the model has to learn and hence cannot be added after the training. This also means that choice on what the model attends is not only dependent on the current sample, but also on the task in general.
+
+\begin{figure}[h]
+	\subfigure[Heatmap visualizing the attention weights.]{\includegraphics[width = 3in]{img/attention_heatmap_example}}
+	\subfigure[Attention weights visualized via a weights overlay]{\includegraphics[width = 3in]{img/attention_overlay_example}}
+	\caption{Examples of how attention weights can be visualized using heatmaps and overlays.}
+	\label{fundamentals:seq2seq:attention_weights_visualization}
+\end{figure}
+
+The name \emph{soft}-attention comes from the fact, that this kind of attention mechanism is fully differentiable and hence can be simply plugged into any existing NN architecture. The other kind of of attention is the so-called \emph{hard}-attention mechanism which in contrast selects a random XYZ and because of that, it is not fully differentiable and hence cannot simply be added to an existing system running with back-propagation and gradient-descent.
+
+We have only explained on how soft-attention can be used in a context where we process language. However, the attention mechanism itself originated from the computer vision area !!REFERENZ!!. The mechanism can be adapted to any kind of problem and model, not just computer vision or NLP, as long as the model has any way of accessing the input data.
+
+\paragraph{Decoding Approaches} In the following paragraph, we are going to elaborate on two decoding approaches that we are going to use in our experiments: \emph{greedy} decoding and \emph{beam-search} decoding.
+
+Greedy decoding is the simpler of the two variants. When using it, the output $y_t$ of the model using it is simply the token with the highest probability after the softmax layer has been applied on the last hidden state $h_t$ of the decoder at time $t$. It then goes on by feeding in the hidden state $h_t$ to produce the output token $y_{t+1}$ for the next time step $t+1$. This variant is really simple to implement, but also has its flaws: Since the decoder is working in a local and greedy fashion, it has to take 
+
+Beam-Search tries to fix or at least minimize this problematic by not only considering a single candidate sequence but instead focuses on the $m$ different sequences, which are most promising. The variable $m$ is called the \emph{beam width} and signifies how much possible candidate sequences are under consideration. The approach itself works by doing the usual computation and process the input sequence with the encoder cell at the beginning. The last hidden state is then passed to the decoder which starts to do the beam search. It begins by using the last hidden state (and the fed ''GO'' token) to predict the first word of the output in the same way as the greedy decoder does. It then feeds back in the hidden state of the decoder after the first output token has been generated and generates the next probability distribution over the vocabulary (by the softmax). But now, instead of simply choosing the next token to be the one with the highest probability, the decoder stores  
+
 \begin{itemize}
 	\item Explain two approaches: Greedy and Beam-Search.
 	\item Explain why greedy might not give satisfactory results.
 \end{itemize}
 
 \section{Performance Metrics}
-Tell why we've used perplexity and which others could have been used but don't make any sense for our use case.
+\paragraph{Cross-Entropy Loss} \blindtext
+\paragraph{Perplexity} \blindtext
