@@ -10,7 +10,7 @@ The following introduction only covers a small part of the spectrum of possibili
 \paragraph{Conversation} \blindtext
 
 \section{Recurrent Neural Networks}
-\emph{Recurrent neural networks} (RNN) are a special variation of the NNs described in appendix \ref{fundamentals:neural_networks}. The main difference between them is, that RNNs have a recurrence built into it, which allows them to adapt to problems which also have a temporal dimension and are dependent on data from differente timesteps to solve. We're also going into the problems such RNNs have due to their recurrence and how this problem can be solved by exploiting another form of RNN, called \emph{Long Short-Term Memory Networks} (LSMT).
+\emph{Recurrent neural networks} (RNN) are a special variation of the NNs described in appendix \ref{fundamentals:neural_network}. The main difference between them is, that RNNs have a recurrence built into it, which allows them to adapt to problems which also have a temporal dimension and are dependent on data from differente timesteps to solve. We're also going into the problems such RNNs have due to their recurrence and how this problem can be solved by exploiting another form of RNN, called \emph{Long Short-Term Memory Networks} (LSMT).
 
 \paragraph{RNNs in principle}
 One of the main restrictions of vanilla NNs is the following: Assume a task, where the NN is conditioned to output a prediction on tomorrows weather given yesterdays. Now, if one would use a vanilla NN as described in the appendix, the main restriction would be that the NN has to make its prediction solely based on the weather information of the day before. Such a model does not take into account, that weather is not only dependent on the weather of the previous day, but also on the days before. This could be solved by feeding, say, the weather of the last week to the network instead of just the weather of the previous day. But if new scientific evident now shows, that weather is not only dependent on last week, but also on the last month, probably the last year, we quickly get into problems due to the sheer size of a NN performing such tasks, because the input size grows rapidly. Also, such a NN would still be static in the way, that one cannot simply change the time-window used to feed to the network. If one settles with one month, it will always be able predict the weather based on the last month, but not any different time-window, otherwise the NN has to be retrained using another time-window in order to work again as before. RNNs (see figure \ref{fundamentals:rnn:rolled_vanilla}) try to solve this problem by introducing a recurrence into the network, which allows it to exploit informations not only from the current input, but also from inputs of the past. In a more formal way, one could say that this recurrence allows RNNs to ''exhibit dynamic behaviour across the temporal dimension of the input data''.
@@ -170,6 +170,37 @@ Beam-Search tries to fix or at least minimize this problematic by not only consi
 \end{itemize}
 
 \section{Performance Metrics}
-\paragraph{Cross-Entropy Loss} \blindtext
-\paragraph{Perplexity} \blindtext
-\paragraph{Other metrics} \blindtext
+In this section, we are going to introduce the main performance metrics used in this thesis to asses the performance of the trained models.
+
+\paragraph{Cross-Entropy Loss} For our model, we are primarily using the \emph{Cross-Entropy} loss function while training. It can be used to measure how well an expected probability distribution $p$ is predicted by a trained model, where the prediction is denoted as $q$. In our case, the probability distribution $p(x)$ is the distribution of the words predicted by the decoder at the time step $t$ and $q(x)$ is the expected distribution for the given sample $x$. The loss function is defined via the following equation where $X$ stands for the whole training dataset:
+
+\begin{equation}
+H(p, q) = - \sum_{X} p(x) log_2(q(x))
+\end{equation}
+
+In the case of sequence-to-sequence learning, the expected probability is effectively a one-hot encoded vector with a $1$ at the entry of the expected word at time step $t$. This loss function can be used for training a seq2seq model (or any model which predicts probability distributions in a broader sense) and it can then also be used to calculate the perplexity of the model, which we are going to elaborate on below.
+
+\paragraph{Perplexity} The perplexity is another metric for measuring how good a language model will predict the sentences in the test dataset and is closely tied to the cross-entropy loss function. The value of the perplexity can be computed by raising the value of the cross-entropy loss function to the power of $2$. The perplexity can be computed by the following equation:
+
+\begin{equation}
+\operatorname{perplexity}(X) = 2^{H(X)} = 2^{- \sum_{X} p(x) log_2(q(x)}
+\end{equation}
+
+!!MORE!!
+
+\paragraph{Sent2Vec Similarity} We were seeking for a third performance metric, since the perplexity is simply the result of the loss function raised to the power of $2$. This means, we effectively have one performance metric to use. To fix this problem, we also investigated into using \texttt{Sent2Vec}\footnote{https://github.com/epfml/sent2vec} \cite{Pgj:2017} for measuring the semantic similarity of the sentences generated by the model when testing it after it has been trained. We propose the following way to test the model:
+
+\begin{enumerate}[noitemsep]
+	\item Allocate a variable for storing the sum of distances.
+	\item Repeat the following steps until all samples in the test set are exhausted:
+	\begin{enumerate}[noitemsep]
+		\item Create prediction for the given input sentence.
+		\item Embed the generated and expected sentences via \texttt{Sent2Vec} to obtain n-dimensional embedding vectors for both of them.
+		\item Measure the distance by using the euclidean distance between the embeddings in the n-dimensional vector space.
+		\item Add this distance to the sum of distances.
+	\end{enumerate}
+	\item Divide the sum of distances by the number of samples. This is the final result which can be used as a metric.
+\end{enumerate}
+
+This procedure allows us to further analyze the performance of the model by comparing the semantic similarities between the expected and the generated answers. For example, when the expected output sentence is ''I feel good, how about you?'' and the answer generated by the model is ''I'm fine, you?'', the similarity measurement should return a small value since we would expect that this sentences are embedded closely to each other due to the semantic similarity of the content. In contrast, when the output of the model is ''I really love cupcakes'' and the expected is still the same, the similarity measure should become big to signify that there is a large mismatch between the meaning of the expected and generated sentence.
+
