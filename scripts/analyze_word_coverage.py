@@ -10,6 +10,8 @@ import json
 import pickle
 import helpers
 
+from collections import defaultdict
+
 helpers.expand_import_path_to_source()
 
 from data_loader import DataLoader
@@ -40,7 +42,7 @@ for voc_path in vocabulary_paths:
         vocabularies[vocabulary_filename] = pickle.load(voc_f)
 
 total_word_count = 0
-seen_words = set()
+seen_words = defaultdict(set)
 
 max_unknown_words_per_sentence = 10
 unknown_words_perc_keys = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
@@ -59,7 +61,7 @@ for voc_name in vocabularies.keys():
         'sentences_with_perc_unknown_words': sentences_with_perc_unknown_words
     }
 
-may_consider_word = lambda w: not unique or (unique and w not in seen_words)
+may_consider_word = lambda w, v: not unique or (unique and w not in seen_words[v])
 
 with open(corpus_path, 'r') as corpus_f:
     print('Starting to analyze the corpus in regard to the supplied vocabularies...')
@@ -76,13 +78,13 @@ with open(corpus_path, 'r') as corpus_f:
             unknown_words_count = 0
 
             for w in words:
-                if w in voc_dict:
-                    if may_consider_word(w):
-                        vocabulary_stats[voc_name]['total_known_words'] += 1
-                else:
-                    unknown_words_count += 1
+                if may_consider_word(w, voc_name):
+                    seen_words[voc_name].add(w)
 
-                    if may_consider_word(w):
+                    if w in voc_dict:
+                        vocabulary_stats[voc_name]['total_known_words'] += 1
+                    else:
+                        unknown_words_count += 1
                         vocabulary_stats[voc_name]['total_unknown_words'] += 1
 
             sentences_with_n_unknown_words = vocabulary_stats[voc_name]['sentences_with_n_unknown_words']
@@ -105,9 +107,6 @@ with open(corpus_path, 'r') as corpus_f:
 
             sentences_with_n_unknown_words[unknown_words_count] += 1
             vocabulary_stats[voc_name]['sentences_with_n_unknown_words'] = sentences_with_n_unknown_words
-
-        for w in words:
-            seen_words.add(w)
 
         total_word_count += len(words)
 
