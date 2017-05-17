@@ -1,2 +1,55 @@
-\chapter{Data}
-\blindtext
+\chapter{Data}\label{chapter_data}
+Dieses Kapitel beinhaltet Informationen über die Datensets. Auch erklären wir hier unsere Vorgehensweise, wie wir von den Rohdaten zu unseren "Trainingsdaten"(todo Begriffe abstimmen) kommen. For the following experiments we used two datasets: The OpenSubtitle dataset includes move subtitles, so this dataset represents spoken language. On the other hand we have the Reddit Submission Corpus dataset which contains written language. We choose those movie related datasets because we focus all subject about movies and films.
+
+\section{Original datasets}
+In diesem Abschnitt befinden sich Informationen zu den rohen Datensets. In the table \ref{table_data-origin} you can see some general information about the datasets.
+\paragraph{OpenSubtitle} For each movie there exists a file which contains the movies subtitles in chronologically order. You can see en example in the picture \ref{?}. 
+\begin{table}[H]
+	\centering
+	\begin{tabular}{l||llll}
+		name & size [GB] & \# lines [million] & data format & source \\
+		\hline
+		OpenSubtitle 9999 & 750? & 5800? & XML &  \\
+		Reddit Submission Corpus 2006-2015 & 500? & 8700? & JSON & $https://www.reddit.com/r/datasets/comments/3mg812/full_reddit_submission_corpus_now_available_2006$ \\
+	\end{tabular}
+	\caption{Origing and some other information about the Datasets.}
+	\label{table_data-origin}
+\end{table}
+todo: Besprechen, einheitliches Tabellendesign
+\section{Preprocessing}
+In diesem Abschnitt wird erklärt, wie wir die Daten für das Training entsprechend extrahieren, filtern und anschliessend die Dialoge zusammengebaut werden.
+\subsection{Extraction}
+Für beide Datensets gelten die gleichen Regex Regeln. Erlaubt sind Buchstaben a-z,A-Z Zahlen 0-9 und Satzzeichen. Entfernt werden Tags, welche mit einem Slash oder Backslash beginnen, wie auch Links. Zwischen jedem Wort (Zahlen und Satzzeichen gelten ebenfalls als Wörter) wird zusätzlich ein Leerschlag eingefügt.
+\paragraph{OpenSubtitle} Die Daten liegen sortiert nach Film Genre und Jahr vor. In diesen Unterordner befindet sich pro Film eine Datei welche im XML Format den Untertitel beinhaltet.
+In einem ersten Schritt werden die gezippten Files in den Unterordner gesucht. Anschliessend wird jedes File entzippt und mit Hilfe der XML Library eingelesen. In der Abbildung \ref{?} ist ersichtlich, dass die einzelne Kinder des XML Objekts die Wörter enthalten. Die Wörter werden ausgelesen und entsprechend zu einem Satz kombiniert. Im der Abbildung \ref{?} sehen Sie den oben gezeigten Beispielsatz nach dem Preprocessing. Ein Dialog wiederum wir aus zwei nacheinander folgenden Sätzen erstellt.
+\paragraph{Reddit Submission Corpus 2006-2015} Die Reddit Daten sind nach Jahr und Monat sortiert. Pro Monat gibt es eine Datei mit chronologisch aufsteigend sortierten JSON Objekte.
+Als erstes werden, abhängig von den Programmierter, die Dateien pro gewünschtes Jahr zusammengesucht. Anschliessend werden diese Dateien aufsteigend mit Hilfe der JSON Library ausgelesen und nach entsprechenden Subreddits gefiltert. Ein Beispieleintrag finden Sie in der Abbildung \ref{?}. Da wir ein Dialog System mit Fokus auf Filme erstellen möchten, filterten wir die Daten entsprechend nach den Subreddit Tags, Movies, Films und Television. Nach dem Filtern der Daten, muss die Ursprüngliche Struktur der Kommentare wiederhergestellt werden. Für diesen Vorgang sind die Tags, $Parent_id$, $Link_id$ und Name relevant. Auf der obersten Kommentarebene ist die $Parent_id$ gleich der $Link_id$. Wobei beim ersten Vorkommnis pro ID ein neuer Beitrag beginnt. Für die Kinder eines Kommentars verhält es sich so, dass deren $Parent_id$ gleich dem Name Tag des Elternkommentar ist. Mit Hilfe der Shelve Library werden so die Urpsrünglichen Kommentarstrukturen erstellt. Dialoge werden generiert, indem der Elternknoten jeweils mit allen direkten Kindern kombiniert wird. In der Abbildung \ref{?} sind 2 Beispielkonversationen ersichtlich. Zwischen den Konversationen wird ein Trennzeichen ('<<<<<END-CONV>>>>>') eingefügt, welches in den Experimenten dem Modell entsprechend das Ende eines Dialogs anzeigt.
+
+Pro Datensatz erhalten wir nach dem Preprocessing eine Datei, welche pro Zeile eine Aussage enthält.
+todo: Clique Bildung in text einbauen? entscheid für subreddit tags Visualisierung der CLique gemäss BigQuery
+todo: visualisierung bildung der dialoge reddit?
+\section{Generate Vocabulary and a train, valid and text Dataset}
+Da wir die Wörter nicht normalisieren können, müssen wir die zur Verfügung stehenden Wörter begrenzen. Ansonsten würde bei der Softmax Berechnung zu wenig Speicher zur Verfügung stehen(Genauer erklären, referenz auf Kapitel wo erklärt wird). Dementsprechend wird das Vokabular spezifisch für jeden Datensatz generiert.
+Dabei werden zuerst alle vorkommenden Wörter gezählt und nach der Häufigkeit absteigend ausgegeben. Wir extrahierten daraus 3 Vokabulare, mit den jeweils 25k, 50k und 100k häufigsten Wörter. Die anschliessende Analyse zeigt die Abdeckung des Datensatzes pro Vokabular. Die Ergebnisse sind in der Tabelle \ref{?} ersichtlich.
+
+Wir sehen also, das trotz der grossen Anzahl Wörter (Angabe Wörter insgesamt pro Dataset), können bereits mit 50k Wörter \% der Wörter abgedeckt werden.
+
+Beim Durchsichten der Daten, empfanden wir die Qualität des OpenSubtitles Datensatz als eher schlecht. Wir vermuten die Ursache in der gesprochenen Sprache, somit fehlt ein wichtiger Informationsträger, das Bild. Eine zusätzliche mögliche Begründung wäre es, dass die Bildszene endet und mit einigem zeitlichen Abstand erst wieder gesprochen wird. Deshalb haben wir die zeitlichen Abstände zwischen den Sätzen analysiert. Die Ergebnisse sind in der Grafik \ref{?} ersichtlich. Aufgrund der Ergebnisse verwerfen wir die These mit den Zeitabständen. 80\% sind >
+todo:zahlen in Text einfliessen lassen einfügen und pickl generierung?
+todo: Einfügen Tabelle Abdeckung Vocab => Korpus
+Wir untersuchten die Daten zusätzliche nach Häufigkeiten von Bi- und Trigrammen. Diese Vorgang war sehr rechenintensiv und dauerte entsprechend lange. Die Resultate sind pro Datensatz in den Abbildungen \ref{?} und \ref{?} ersichtlich. Das Ziel dieser Analyse ist es, die später generierten Sätze ebenfalls auf Bi- und Trigramme zu untersuchen um eine mögliche Korrelation auf der Ebene Phrase zu finden.
+Todo: Wolkenbildung...
+
+Schlussendlich teilten wir die Datensätze auf wobei 97\% als Trainingsdaten, 2\% als Validierungsdaten und 1\% als Testdaten verwendet werden. Die genauen Zahlen befinden sich in der Tabelle \ref{?}.
+
+Kennzahlen
+(Tabelle Korpus, wieviele lines pro Korpus, Link von wo kommen diese Datasets)
+
+Preprocessing
+Regex, Filter bei Reddit 2 Varianten, nach Subrreddit, 30 Wordcount
+
+Aufbau der 3 sets (training, valid, test) und verteilung %
+
+Generiereung Vokabular und Abdeckung pro Vokabular und corpus
+
+Bi-Gram Tri-Gram Analyse
