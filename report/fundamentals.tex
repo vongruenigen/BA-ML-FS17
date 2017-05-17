@@ -160,7 +160,7 @@ We have only explained on how soft-attention can be used in a context where we p
 
 \paragraph{Decoding Approaches} In the following paragraph, we are going to elaborate on two decoding approaches that we are going to use in our experiments: \emph{greedy} decoding and \emph{beam-search} decoding.
 
-Greedy decoding is the simpler of the two variants. When using it, the output $y_t$ of the model using it is simply the token with the highest probability after the softmax layer has been applied on the last hidden state $h_t$ of the decoder at time $t$. It then goes on by feeding in the hidden state $h_t$ to produce the output token $y_{t+1}$ for the next time step $t+1$. This variant is really simple to implement, but also has its flaws: Since the decoder is working in a local and greedy fashion, it has to take ...
+Greedy decoding is the simpler of the two variants. When using it, the output $y_t$ of the model using it is simply the token with the highest probability after the softmax layer has been applied on the last hidden state $h_t$ of the decoder at time $t$. It then goes on by feeding in the hidden state $h_t$ and the last output word $y_t$ to produce the output token $y_{t+1}$ for the next time step $t+1$. This variant is really simple to implement, but also has its flaws: Since the decoder is working in a local and greedy fashion, it does not know beforehand what kind of sentence it would predict best, and hence has to stick with local optimas on each time step $t$ by returning the word with the highest probability after applying the softmax.
 
 Beam-Search tries to fix or at least minimize this problematic by not only considering a single candidate sequence but instead focuses on the $m$ different sequences, which are most promising. The variable $m$ is called the \emph{beam width} and signifies how much possible candidate sequences are under consideration. The approach itself works by doing the usual computation and process the input sequence with the encoder cell at the beginning. The last hidden state is then passed to the decoder which starts to do the beam search. It begins by using the last hidden state to predict the first word of the output in the same way as the greedy decoder does. It then feeds back in the hidden state of the decoder after the first output token has been generated and generates the next probability distribution over the vocabulary (by using the softmax layer at the end). But now, instead of simply choosing the next token to be the one with the highest probability, the decoder stores the $m$ tokens with the highest probability.
 
@@ -172,13 +172,13 @@ Beam-Search tries to fix or at least minimize this problematic by not only consi
 \section{Performance Metrics}
 In this section, we are going to introduce the main performance metrics used in this thesis to asses the performance of the trained models.
 
-\paragraph{Cross-Entropy Loss} For our model, we are primarily using the \emph{Cross-Entropy} loss function while training. It can be used to measure how well an expected probability distribution $p$ is predicted by a trained model, where the prediction is denoted as $q$. In our case, the probability distribution $p(x)$ is the distribution of the words predicted by the decoder at the time step $t$ and $q(x)$ is the expected distribution for the given sample $x$. The loss function is defined via the following equation where $X$ stands for the whole training dataset:
+\paragraph{Cross-Entropy Loss} For our model, we are primarily using the \emph{Cross-Entropy} loss function while training. It can be used to measure how well an expected probability distribution $p$ is predicted by a trained model, where the predicted distribution is denoted as $q$. In our case, the probability distribution $p(x)$ is the distribution of the words predicted by the decoder at the time step $t$ and $q(x)$ is the expected distribution for the given sample $x$. The loss function is defined via the following equation where $X$ stands for the whole training dataset:
 
 \begin{equation}
 H(p, q) = - \sum_{X} p(x) log_2(q(x))
 \end{equation}
 
-In the case of sequence-to-sequence learning, the expected probability is effectively a one-hot encoded vector with a $1$ at the entry of the expected word at time step $t$. This loss function can be used for training a seq2seq model (or any model which predicts probability distributions in a broader sense) and it can then also be used to calculate the perplexity of the model, which we are going to elaborate on below.
+In the case of sequence-to-sequence learning, the expected probability is effectively a one-hot encoded vector with a $1$ at the entry of the expected word at time step $t$ and $0$ everywhere else. This loss function can be used for training a seq2seq model (or any model which predicts probability distributions in a broader sense) and it can then also be used to calculate the perplexity of the model, which we are going to elaborate on below.
 
 \paragraph{Perplexity} The perplexity is another metric for measuring how good a language model will predict the sentences in the test dataset and is closely tied to the cross-entropy loss function. The value of the perplexity can be computed by raising the value of the cross-entropy loss function to the power of $2$. The perplexity can be computed by the following equation:
 
@@ -186,7 +186,7 @@ In the case of sequence-to-sequence learning, the expected probability is effect
 \operatorname{perplexity}(X) = 2^{H(X)} = 2^{- \sum_{X} p(x) log_2(q(x)}
 \end{equation}
 
-!!MORE!!
+The perplexity tells ''how good'' a language model is. More formally, it tells us how good the model reproduces the data seen in the test set. For example, a ''dumb'' model would predict each word with equal probability, which would be $\frac{1}{N}$, where $N$ is the vocabulary size. This does not reflect the reality, as certain words are much more likely to occur often in language.
 
 \paragraph{Sent2Vec Similarity} We were seeking for a third performance metric, since the perplexity is simply the result of the loss function raised to the power of $2$. This means, we effectively have one performance metric to use. To fix this problem, we also investigated into using \texttt{Sent2Vec}\footnote{https://github.com/epfml/sent2vec} \cite{Pgj:2017} for measuring the semantic similarity of the sentences generated by the model when testing it after it has been trained. We propose the following way to test the model:
 
