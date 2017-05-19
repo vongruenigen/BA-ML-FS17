@@ -11,6 +11,7 @@ import pickle
 import helpers
 
 from collections import defaultdict
+from tqdm import tqdm
 
 helpers.expand_import_path_to_source()
 
@@ -63,10 +64,12 @@ for voc_name in vocabularies.keys():
 
 may_consider_word = lambda w, v: not unique or (unique and w not in seen_words[v])
 
+num_lines = sum(1 for _ in open(corpus_path, 'r'))
+
 with open(corpus_path, 'r') as corpus_f:
     print('Starting to analyze the corpus in regard to the supplied vocabularies...')
 
-    for i, line in enumerate(corpus_f):
+    for i, line in tqdm(enumerate(corpus_f), total=num_lines):
         line = line.strip('\n')
 
         if line == end_conv_token:
@@ -110,15 +113,12 @@ with open(corpus_path, 'r') as corpus_f:
 
         total_word_count += len(words)
 
-        if (i+1) % (10**6) == 0:
-            print('(Analyzed %i lines...)' % (i+1))
-
     print('Finished analyzing the corpus!')
 
-if unique:
-    total_word_count = len(seen_words)
-
 for voc_name, stats in vocabulary_stats.items():
+    if unique:
+        total_word_count = len(seen_words[voc_name])
+
     for attr_name in ('total_unknown_words', 'total_known_words'):
         value = stats[attr_name]
         perc_value = value / total_word_count

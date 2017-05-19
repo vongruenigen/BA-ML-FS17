@@ -88,15 +88,24 @@ class Runner(object):
             logger.info('Setting maximum to %i since its configured to do so' % max_samples)
 
         iter_len = int(test_len / batch_size)
+        all_predictions = []
 
         with self.__with_model() as (session, model):
-            for _ in tqdm.tqdm(range(1, iter_len+1)):
+            for i in tqdm.tqdm(range(1, iter_len+1)):
                 try:
                     test_batch_data_x, test_batch_data_y = self.__prepare_data_batch(test_batches)
                     feed_dict, bucket_id = model.make_train_inputs(test_batch_data_x, test_batch_data_y)
 
+                    inference_op = model.get_inference_op(bucket_id)
                     loss_op = model.get_loss_op(bucket_id)
-                    test_loss = session.run(loss_op, feed_dict)
+                    test_loss, test_preds = session.run([loss_op, inference_op], feed_dict)
+
+                    batch_predictions = self.__show_predictions(
+                        session, model, (test_batch_data_x, test_batch_data_y),
+                        (i+1), print_predictions=False, predicted_idxs=test_preds
+                    )
+
+                    all_predictions += batch_predictions
 
                     test_sum_losses += test_loss
                     test_sum_iters += 1
@@ -111,7 +120,7 @@ class Runner(object):
             logger.info('    Test Loss       > %f' % test_loss)
             logger.info('    Test Perplexity > %f' % test_perplexity)
 
-        return test_avg_loss, test_perplexity
+        return test_avg_loss, test_perplexity, all_predictions
 
     def train(self):
         '''This method is responsible for training a model
@@ -346,7 +355,8 @@ class Runner(object):
 
         return loss, perplexity, (batch_data_x, batch_data_y)
 
-    def __show_predictions(self, session, model, last_batch, epoch_nr):
+    def __show_predictions(self, session, model, last_batch, epoch_nr,
+                           print_predictions=True, predicted_idxs=None):
         if self.config.get('show_predictions_while_training'):
             num_show_samples    = self.config.get('batch_size')
             max_input_length    = self.config.get('max_input_length')
@@ -377,17 +387,22 @@ class Runner(object):
             num_show_samples = self.config.get('show_predictions_while_training_num')
             prediction_batch = last_batch[0]
 
-            if num_show_samples > 0 and num_show_samples < self.config.get('batch_size'):
-                prediction_batch = prediction_batch[:num_show_samples]
+            if print_predictions:
+                if num_show_samples > 0 and num_show_samples < self.config.get('batch_size'):
+                    prediction_batch = prediction_batch[:num_show_samples]
 
             feed_dict, bucket_id = model.make_inference_inputs(prediction_batch)
             inference_op = model.get_inference_op(bucket_id)
 
-            predicted_idxs = session.run(inference_op, feed_dict)
+            if predicted_idxs is None or len(predicted_idxs) == 0:
+                predicted_idxs = session.run(inference_op, feed_dict)
+
             predicted_idxs = np.array(predicted_idxs).transpose([1, 0, 2])
             predicted_idxs = np.argmax(predicted_idxs, axis=2)
 
             inp_out_pred = zip(input_samples_idxs, output_samples_idxs, predicted_idxs)
+
+            predictions = []
 
             for i, (e_in, dt_exp, dt_pred) in enumerate(inp_out_pred):
                 if self.config.get('reverse_input'): e_in = reversed(e_in)
@@ -396,10 +411,16 @@ class Runner(object):
                 text_exp = self.data_loader.convert_indices_to_text(dt_exp, self.rev_vocabulary)
                 text_out = self.data_loader.convert_indices_to_text(dt_pred, self.rev_vocabulary)
 
-                logger.info('[sample #%i of epoch #%i]' % (i+1, epoch_nr))
-                logger.info('    input      > %s' % text_in)
-                logger.info('    prediction > %s' % text_out)
-                logger.info('    expected   > %s' % text_exp)
+                if print_predictions:
+                    logger.info('[sample #%i of epoch #%i]' % (i+1, epoch_nr))
+                    logger.info('    input      > %s' % text_in)
+                    logger.info('    prediction > %s' % text_out)
+                    logger.info('    expected   > %s' % text_exp)
+                else:
+                    predictions.append((text_in, text_exp, text_out))
+
+            if not print_predictions:
+                return predictions
 
     @contextlib.contextmanager
     def __with_model(self):
