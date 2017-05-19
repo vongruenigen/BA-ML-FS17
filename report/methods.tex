@@ -1,11 +1,58 @@
 \chapter{Methods}
+\label{methods}
 In the following chapter, we are going to elaborate on how we performed the experiments, which hyperparameters where used and how we evaluated the results of the trained models.
 
 \section{Architecture of the Sequence-To-Sequence Model}
-\blindtext
+In the following paragraphs, we are going to describe the architecture of the model used to conduct our experiments.
+
+\paragraph{Sequence-To-Sequence} In general, we are using the architecture of seq2seq models describe in chapter \ref{fundamentals:seq2seq}. We are using LSTM cells. We restrict ourselves to only use one LSTM cell for the encoder, and another cell for the decoder. This has to do with the fact, that we wanted our cells to be as large as possible to come as close to the size of the cells used in \cite{Vinyals:2015}, as we are trying to replicate the results from there. However, this is not simply possible due to the fact, that in the referenced paper, they used two really large cells with each having a hidden state size of $4096$ hidden units and a vocabulary consisting of $100'000$ words. In the paper, they trained their models on a CPU due to this fact, because such a huge network fits does not fit in the memory of any GPU currently available. As we are seeking to train our models on a single GPU (see chapter \ref{sofware_system:development_history}), we had to shrink the size of our model to the biggest size possible so that it still fits within the 12GB of memory the GPUs we are using have (see chapter \ref{software_system:hardware}). The exact size of the model used in this thesis is described in the subsequent paragraph ``Hyperparameters'' below.
+
+\paragraph{Down-Projection of Hidden State} Because of the problematic with such large RNN cells as described in the preceding paragraph, we implemented a so-called \emph{down-projection} at the end of the decoder cell. This is done similar to the down-projection used in \cite{Vinyals:2015}, with the main difference lying in the motivation why we implemented it. In the paper, they state, that they used it to speed up the training due to the large weights-matrix in the softmax layer at the end. In our case, the down-projection was not just for speeding up the training, but mainly to allow us to use bigger cells than we would be able to without the projection. The implementation of this feature allowed us to grow our model in size by a factor of $2$, from a hidden state size of $1024$ to $2048$, without the need to sacrifice the size of the vocabulary used (see chapter \ref{methods:hyperparameters} for more informations on the used hyperparameters).
+
+\paragraph{Sampled Softmax} To speed up the training of the large softmax layer at the end (consisting of $50'000$ entries), we implemented a \emph{sampled softmax} as described in \cite{Sebastien:2014} which is only applied while training the models. Basically, the idea behind it is, that instead of using the full softmax at each time step in the decoder, we only use a subset of the words from the vocabulary to approximate the softmax layer. This speeds up training dramatically.\todo{Descirbe more!}. On inference time, we then have to use the full softmax layer again to generate the predictions.
+
+\paragraph{Static Unrolling of RNN} Due to the fact, that we are working with a deprecated \texttt{TensorFlow} API (see chapter \ref{sofware_system:development_history}), we have to use static unrolling for our model. Static unrolling works, by defining a fixed size of time steps for the encoder and decoder, and then unrolling the encoder and decoder cell for this number of time steps \emph{before} we are actually computing anything using it. This actually ``removes'' the recurrence from our model and transforms it into kind-of ``feed forward'' model with the major difference being, that the weights are shared between the layers of the unrolled model (as each layer basically represents the same cell).
+
+\begin{figure}
+	\label{methods:static_unrolling:unrolled_rnn}
+	\centering
+	\includegraphics[width=10cm]{img/rnn_unrolled}
+	\caption{Image for illustrating the process of unrolling an RNN over a fixed size of time steps.\protect\footnotemark}
+\end{figure}
+\footnotetext{http://colah.github.io/posts/2015-08-Understanding-LSTMs/}
+
+This implementation forced us to define a maximum number of time steps used for the encoder and decoder beforehand.
 
 \section{Hyperparameters}
-\blindtext
+\label{methods:hyperparameters}
+
+\paragraph{Model} In summary, for our model we are using the following hyperparameters:
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Name & Value\\ \midrule
+			Number of encoder cells & $1$\\
+			Number of decoder cells & $1$\\
+			Max. number of time steps in encoder & $30$\\
+			Max. number of time steps in decoder & $30$\\
+			Hidden state size & $2048$\\
+			Projected hidden state size & $1024$\\
+			Number of sampled words for softmax & $512$\\
+			Size of the softmax layer & $50'000$\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Hyperparameter, which were used for our seq2seq model.}
+	\label{methods:hyperparameters:table}
+\end{table}
+
+\paragraph{Optimizer} As the optimizer, we used \emph{AdaGrad} \cite{Duchi:2011} as in \cite{Vinyals:2015} with the learning rate set to $0.01$. We also implemented gradient clipping and set the maximum allowed gradient value to be $10$, as described in \cite{Pascanu:2013}.
+
+\paragraph{Training} We trained our models on the hardware described in chapter \ref{software_system:hardware} with the software packages from \ref{software_system:softwar_packages}.
 
 \section{Evaluation}
 \blindtext
