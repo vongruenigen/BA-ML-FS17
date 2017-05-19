@@ -16,7 +16,7 @@ In diesem Abschnitt befinden sich Informationen zu den rohen Datensets. In the t
 		&  \specialcell{\emph{data format}}
 		&  \specialcell{\emph{source}} \\
 		\midrule
-		\emph{OpenSubtitle 2016}						&Opus	& 93	& 338	& XML	& \cite{lison2016opensubtitles2016}	\\
+		\emph{OpenSubtitle 2016}						&OpenSubtitle	& 93	& 338	& XML	& \cite{lison2016opensubtitles2016}	\\
 		\emph{Reddit Submission Corpus 2006-2015} 		&Reddit	&885	& 1'650	& JSON	&  Reddit Comments Corpus \protect\footnotemark \\
 		\bottomrule
 	
@@ -66,6 +66,30 @@ Todo: Wolkenbildung...
 Schlussendlich teilten wir die Datensätze auf wobei 97\% als Trainingsdaten, 2\% als Validierungsdaten und 1\% als Testdaten verwendet werden. Die genauen Zahlen befinden sich in der Tabelle \ref{tbl:data:split:corpus}.
 \begin{table}[H]
 	\begin{adjustbox}{max width=\textwidth}
+		\centering
+		\small
+		\begin{tabular}{lllll}
+			\toprule
+			&  \specialcell{\emph{set}}
+			&  \specialcell{\emph{Percent from total} \\\textit{[\%]}}
+			&  \specialcell{\emph{size} \\\textit{[MB]}}
+			&  \specialcell{\emph{lines} \\\textit{[thousend]}}\\
+			\midrule
+			\emph{OpenSubtitle}		&train	&97	&9'393	&321'643	\\
+							&valid	&1	&97		&3'315	\\
+							&test	&2	&194	&6'631	\\
+			\emph{Reddit}	&train	&97	&8'455	&75'297	\\
+							&valid	&2	&185	&1'552	\\
+							&test	&1	&92		&776	\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{In this table you can see the resulting 3 sets per Dataset....}
+	\label{tbl:data:split:corpus}
+\end{table}
+
+\begin{table}[H]
+	\begin{adjustbox}{max width=\textwidth}
 	\centering
 	\small
 	\begin{tabular}{llllllll}
@@ -78,7 +102,7 @@ Schlussendlich teilten wir die Datensätze auf wobei 97\% als Trainingsdaten, 2\
 		&  \specialcell{\emph{2 missing words}\\\emph{per utterance} \\\textit{[\%]}}
 		&  \specialcell{\emph{total coverage} \\\textit{[\%]}}\\
 		\midrule
-		\emph{Opus}			&25		&-	&-	&-	&-	&-	&-\\
+		\emph{OpenSubtitle}			&25		&-	&-	&-	&-	&-	&-\\
 							&50		&-	&-	&-	&-	&-	&-\\
 							&100	&-	&-	&-	&-	&-	&-\\
 		\emph{Reddit}		&25		&-	&-	&-	&-	&-	&-\\
@@ -88,10 +112,10 @@ Schlussendlich teilten wir die Datensätze auf wobei 97\% als Trainingsdaten, 2\
 	\end{tabular}
 	\end{adjustbox}
 	\caption{single coverage abdeckung einzelner wörter. sollte prfübar sein, total words amount mit covab grösse kombiniert.}
-	\label{tbl:data:split:corpus}
+	\label{tbl:data:split:corpus:analyze}
 \end{table}
 
-Beim Durchsichten der Daten, empfanden wir die Qualität des Opus Datensatz als eher schlecht. Wir vermuteten die Ursache in der gesprochenen Sprache, da das Bild als wichtiger Informationsträger fehlt. Eine zusätzliche mögliche Begründung wäre es, dass die Bildszene endet und mit einigem zeitlichen Abstand erst wieder gesprochen wird. Somit würden Sätze kombiniert werden, welche nicht den gleichen Kontext besitzen. Deshalb haben wir die zeitlichen Abstände zwischen den Sätzen analysiert. Die Ergebnisse sind in der Grafik \ref{fig:data:analyse:timediff:opus} ersichtlich. Aufgrund der Ergebnisse, dass über 80\% der Aussagen in einem Zeitabstand kleiner gleich 5 Sekunden aufeinander folgen, verwerfen wir vorerst diese These als Ursache. In der Abbildung \ref{fig:data:analyse:timediff:opus} sind die Werte grösser 30\% auffällig hoch. Dies liegt einerseits an den Übergängen zwischen 2 Datensets und weil alle restlichen Werte in dieser Klasse landen. Dies sehen wir aber nicht als Problem an, weil über 80\% der Daten diese Problematik nicht betrifft.
+Beim Durchsichten der Daten, empfanden wir die Qualität des OpenSubtitle Datensatzes als eher schlecht. Wir vermuteten die Ursache in der gesprochenen Sprache, da das Bild als wichtiger Informationsträger fehlt. Eine zusätzliche mögliche Begründung wäre es, dass die Bildszene endet und mit einigem zeitlichen Abstand erst wieder gesprochen wird. Somit würden Sätze kombiniert werden, welche nicht den gleichen Kontext besitzen. Deshalb haben wir die zeitlichen Abstände zwischen den Sätzen analysiert. Die Ergebnisse sind in der Grafik \ref{fig:data:analyse:timediff:opus} ersichtlich. Aufgrund der Ergebnisse, dass über 80\% der Aussagen in einem Zeitabstand kleiner gleich 5 Sekunden aufeinander folgen, verwerfen wir vorerst diese These als Ursache. In der Abbildung \ref{fig:data:analyse:timediff:opus} sind die Werte grösser 30\% auffällig hoch. Dies liegt einerseits an den Übergängen zwischen 2 Datensets und weil alle restlichen Werte in dieser Klasse landen. Dies sehen wir aber nicht als Problem an, weil über 80\% der Daten diese Problematik nicht betrifft.
 Wir unternehmen vorerst keine weiteren 
 
 \begin{figure}[h]
@@ -101,36 +125,7 @@ Wir unternehmen vorerst keine weiteren
 	\caption{Relative Verteilung der berechneten Zeiten (Diskret) in ganzen Sekunden zwischen zwei Äusserungen. Wobei die grössten Anteile die folgende 5 Zeitabstände haben: 13.0\% 1 Sekunde, 26.4\% 2 Sekunden, 22.8\% 3 Sekunden, 13.4\% 4 Sekunden und 7\% 5 Sekunden. Die resultierende Abdeckung dieser 5 häufigsten Zeitabstände beträgt 82.6\%. \protect\footnotemark}
 \end{figure}
 
-
-Wir untersuchten die Daten zusätzliche nach Häufigkeiten von Bi- und Trigrammen. Diese Vorgang war sehr rechenintensiv und dauerte entsprechend lange. Die Resultate sind pro Datensatz in den Abbildungen \ref{?} und \ref{?} ersichtlich. Das Ziel dieser Analyse ist es, die später generierten Sätze ebenfalls auf Bi- und Trigramme zu untersuchen um eine mögliche Korrelation auf der Ebene Phrase zu finden.
-Todo: Wolkenbildung...
-
-Schlussendlich teilten wir die Datensätze auf wobei 97\% als Trainingsdaten, 2\% als Validierungsdaten und 1\% als Testdaten verwendet werden. Die genauen Zahlen befinden sich in der Tabelle \ref{tbl:data:split:corpus}.
-\begin{table}[H]
-	\begin{adjustbox}{max width=\textwidth}
-	\centering
-	\small
-	\begin{tabular}{llllll}
-		\toprule
-		&  \specialcell{\emph{set}}
-		&  \specialcell{\emph{Percent from total} \\\textit{[\%]}}
-		&  \specialcell{\emph{size} \\\textit{[GB]}}
-		&  \specialcell{\emph{lines} \\\textit{[million]}}
-		&  \specialcell{\emph{Dialogue Examples} \\\textit{[million]}}\\
-		\midrule
-		\emph{Opus}			&train	&-	&-	&-	&-	\\
-							&valid	&-	&-	&-	&-	\\
-							&test	&-	&-	&-	&-	\\
-		\emph{Reddit}		&train	&-	&-	&-	&-	\\
-							&valid	&-	&-	&-	&-	\\
-							&test	&-	&-	&-	&-	\\
-		\bottomrule
-	\end{tabular}
-	\end{adjustbox}
-	\caption{In this table you can see the resulting 3 sets per Dataset....}
-	\label{tbl:data:split:corpus}
-\end{table}
-todo: split erklären, 
+todo: split erklären, dass trainingsbeispiele zusammenbleiben
 
 
 Preprocessing
@@ -147,7 +142,3 @@ $https://www.quora.com/What-are-alternatives-to-tag-clouds-for-information-visua
 Begriffe: Utterance (eine Aussage)
 			Sample (in- utterance, und out utterance)
 			
-Beispiel Opus: Vor und nach preprocessing:
-Tae Gong Sil was the 'big sun' , and you're 'little sun'. => tae gong sil was the big sun, and you re little sun .
-♫ I'm picturing you with my tears ... ♫ You are engraved on my heart ... => i m picturing you with my tears , you are engraved on my heart
-'JACKIE - - YOU KNOW , I HAVE BEEN AT EVERY FIGHT , MEGAN - - ==> jackie you know , i have been at every fight , megan'
