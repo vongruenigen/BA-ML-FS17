@@ -37,5 +37,5 @@ ngrams_pos = np.arange(len(ngrams)) + 0.5
 
 plt.yticks(ngrams_pos, ngram_txts)
 plt.xlabel('Frequency')
-plt.barh(ngrams_pos, ngram_vals)
+plt.barh(ngrams_pos, ngram_vals, color='lightblue')
 plt.show()
