@@ -1,4 +1,5 @@
 \documentclass[12pt,
+	english,
 	a4paper,
 	listof=totoc,
 	bibliography=totoc,
@@ -6,8 +7,6 @@
 	]{scrreprt}
 
 \usepackage[utf8]{inputenc}
-\usepackage[ngerman]{babel}
-\usepackage[babel,german=quotes]{csquotes}
 \usepackage[hidelinks]{hyperref}
 \usepackage{amsmath}
 \usepackage{paralist}
@@ -44,10 +43,11 @@
 \usepackage{multirow}
 \usepackage{mathtools}
 \usepackage{blindtext}
+\usepackage[multiple]{footmisc}
 
-\renewcaptionname{ngerman}{\bibname}{References}
 \renewcommand\appendixtocname{Appendix}
 \renewcommand\appendixpagename{Appendix}
+\renewcommand\figurename{Figure}
 \setcounter{secnumdepth}{3}
 
 \newcommand{\mytitle}{Building Conversational Dialog-Systems using Sequence-To-Sequence Learning}
