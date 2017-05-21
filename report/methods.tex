@@ -23,14 +23,16 @@ In the following paragraphs, we are going to describe the architecture of the mo
 
 This implementation forced us to define a maximum number of time steps used for the encoder and decoder beforehand, which we have set to $30$ for both the encoder and decoder.
 
-\paragraph{Reversing the Input Sequence} As \cite{Sutskever:2014} have noticed in their paper, it was beneficial to reverse the input sequence before feeding it to the model. They assume, that this helps because the minimal time lag \cite{Hochreiter:1997} is greatly reduced due to the fact that the first few words in the source language are much closer to the first few words in the target language. This explanation makes sense in the context of machine translations, but not necessarily in the context of a conversational dialog-system. Nevertheless, we want to try to use it and see if it makes any difference our models. We decided that the Reddit model should be with reversed input sequences.
+\paragraph{Reversing the Input Sequence} As \cite{Sutskever:2014} have noticed in their paper, it was beneficial to reverse the input sequence before feeding it to the model. They assume, that this helps because the minimal time lag \cite{Hochreiter:1997} is greatly reduced due to the fact that the first few words in the source language are much closer to the first few words in the target language. This explanation makes sense in the context of machine translations, but not necessarily in the context of a conversational dialog-system. Nevertheless, we want to try to use it and see if it makes any difference our models. We decided that the Reddit model should be the one that is trained with reversed input sequences.
 
-\section{OpenSubtitles and Reddit Models} \blindtext
+\section{OpenSubtitles and Reddit Models}
+\label{methods:both_models}
+As already described in chapter \ref{chapter:data}, we are going to train two distinct models that each use a separate training, validation and test corpus. The first is trained on the OpenSubtitles corpus and the second on the Reddit corpus. Both of them are going to be trained in the same way, except for some differences regarding how the input sequences are fed to the model.
 
 \section{Hyperparameters}
 \label{methods:hyperparameters}
 
-\paragraph{Model} In summary, for our models we are using the following hyperparameters:
+\paragraph{Model} The hyperparameters used for training the models can be seen in table \ref{methods:hyperparameters:table}. Both of our models use the same set of hyperparameters, the only difference being that the Reddit model is fed with reversed input sequences whereas the OpenSubtitles model is not.
 
 \begin{table}[H]
 	\centering
@@ -47,6 +49,7 @@ This implementation forced us to define a maximum number of time steps used for 
 			Projected hidden state size & $1024$\\
 			Number of sampled words for softmax & $512$\\
 			Size of the softmax layer & $50'000$\\
+			Batch size & $64$\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
@@ -56,7 +59,7 @@ This implementation forced us to define a maximum number of time steps used for 
 
 \paragraph{Optimizer} As the optimizer, we use \emph{AdaGrad} \cite{Duchi:2011} as in \cite{Vinyals:2015} with the learning rate set to $0.01$. We also use gradient clipping and set the maximum allowed gradient value to be $10$, as described in \cite{Pascanu:2013}.
 
-\paragraph{Training} We train our models on the hardware described in chapter \ref{software_system:hardware} with the software packages from chapter \ref{software_system:softwar_packages}. As this models take a really long time to converge (in \cite{Vinyals:2015} the authors trained their model for several weeks), we also have to train ours for a long time. To show the development of the model throughout this time, we took several snapshots, approximately every second day or about after every 500'000 batches. We set the batch size to 64 samples.
+\paragraph{Training} We train our models on the hardware described in chapter \ref{software_system:hardware} with the software packages from chapter \ref{software_system:softwar_packages}. As this models take a really long time to converge (in \cite{Vinyals:2015} the authors trained their model for several weeks), we also have to train ours for a long time. To show the development of the model throughout this time, we took several snapshots, approximately every second day or about after every 500'000 batches. The taken snapshots are going to be used in the analysis we are going to do in the next chapter. They enable us to not only do an analysis of the final results, but rather show the evolution of the models throughout the training process.
 
 \section{Evaluation}
 \blindtext

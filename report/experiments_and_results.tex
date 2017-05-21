@@ -1,4 +1,11 @@
 \chapter{Experiments}
+In this chapter, we are going to analyze the evolution and final results of the two models (see chapter \ref{methods:both_models}), trained on the OpenSubtitles and Reddit corpus, under several different aspects:
+
+\begin{enumerate}[noitemsep]
+	\item \textbf{Quantitive}: This part focuses on evaluating metrics and other measurements. We are going to look into the metrics at train time, a similarity analysis using Sent2Vec and an analysis of the produced language models by using n-gram collocations.\todo{Not correct: What are we going to do with ngrams?}
+	\item \textbf{Qualitative}: This part focuses on the quality of the language produced by the models. This includes a comparison between our models and \emph{CleverBot}\footnote{http://www.cleverbot.com/} and the development of the language model of the models throughout the training time.
+	\item \textbf{Miscellaneous}: This part focuses on theoretical analysis, such as analyzing the internal embeddings for the input sequence or if and how the models are using the soft-attention mechanism in their favor.
+\end{enumerate}
 \blindtext
 
 * Attention
@@ -16,7 +23,7 @@
 \section{Generated outputs over time}
 \blindtext
 
-\section{Comparison with CleverBot}
+\section{Comparison with CleverBot and ``Neural Conversational Model''}
 \blindtext
 
 \section{N-Gram Analysis}
