@@ -239,13 +239,18 @@ The generated datasets have to be split in order to obtain a train, validation a
 
 \section{Time-Lag Analysis OpenSubtitles}
 \label{data:opensubtitles:time_lag_analysis}
-Beim Durchsichten der Daten, empfanden wir die Qualität des OpenSubtitles Datensatzes als eher schlecht. Wir vermuteten die Ursache in der gesprochenen Sprache, da das Bild als wichtiger Informationsträger fehlt. Eine zusätzliche mögliche Begründung wäre es, dass die Bildszene endet und mit einigem zeitlichen Abstand erst wieder gesprochen wird. Somit würden Sätze kombiniert werden, welche nicht den gleichen Kontext besitzen. Deshalb haben wir die zeitlichen Abstände zwischen den Sätzen analysiert. Die Ergebnisse sind in der Grafik \ref{fig:data:analyse:timediff:opus} ersichtlich. Aufgrund der Ergebnisse, dass über 80\% der Aussagen in einem Zeitabstand kleiner gleich 5 Sekunden aufeinander folgen, verwerfen wir vorerst diese These als Ursache. In der Abbildung \ref{fig:data:analyse:timediff:opus} sind die Werte grösser 30\% auffällig hoch. Dies liegt einerseits an den Übergängen zwischen 2 Datensets und weil alle restlichen Werte in dieser Klasse landen. Dies sehen wir aber nicht als Problem an, weil über 80\% der Daten diese Problematik nicht betrifft.
-\begin{figure}[h]
+While searching through the OpenSubtitles dataset we discovered that there are several pairs of utterances which don't make a lot of sense (e.g. (``I love cupcaked'', ``Hello, how are you?'')) under the viewpoint of conversational modeling. We quickly realized that this useless pairs of utterances occur because of the way we preprocess the raw corpus: In order to get a sample, we take the first utterance and combine it with the utterance on the next line in the preprocessed corpus. The problem occurs there, where the timestamps signify a large time difference between the first and second utterance. This is comprehensible, as all utterances are just saved in the corpus on after each other without taking the timestamps (see OpenSubtitles paragraph in Chapter~\ref{data:structure_of_corpora}) into account. In order to investigate if this problem is urgent, we did an analysis to see if a large portion of the utterances have a time-lag higher than a certain timespan. The results of this investigation are summarized in the figure~\ref{fig:data:analyse:timediff:opus}.
+
+\begin{figure}[H]
 	\centering
 	\includegraphics[width=15cm]{img/opus_time_analyze.PNG}
-	\caption{Relative Verteilung der berechneten Zeiten (Diskret) in ganzen Sekunden zwischen zwei Äusserungen. Wobei die grössten Anteile die folgende 5 Zeitabstände haben: 13.0\% 1 Sekunde, 26.4\% 2 Sekunden, 22.8\% 3 Sekunden, 13.4\% 4 Sekunden und 7\% 5 Sekunden. Die resultierende Abdeckung dieser 5 häufigsten Zeitabstände beträgt 82.6\%.}
+	\caption{Relative distribution (discrete) of the time-lag between two utterances in the raw OpenSubtitles corpus. Most of the utterances lie in the range from $1$ to $5$ seconds: $13.0\%$ within 1 second, $26.4\%$ within 2 seconds, $22.8\%$ within 3 seconds, $13.4\%$ within 4 seconds and  $7.0\%$ within 5 seconds.}
 	\label{fig:data:analyse:timediff:opus}
 \end{figure}
+
+As one can see, most of the utterances, actually over 80\%, occur between $1$ and $5$ seconds after each other. The big spike at the end of the graph contains a much large portion than all the other between $5$ and $30$ seconds. This has to do with the fact, that there might be changes in the scenes of the movies, which can lead to two consecutive utterances in the corpus being uttered with a larger time gap. The other reason is, that each movie is stored in a single file and hence, there might be utterances which are combined, but actually belong to two different movies.
+
+As this analysis has shown, most of the utterances lie so close to each other, that this will most probably not be a problem when training our model with it.
 
 \section{N-Gram Analysis}
 \blindtext
@@ -279,46 +284,10 @@ Beim Durchsichten der Daten, empfanden wir die Qualität des OpenSubtitles Daten
 	\small
 	\text{Reddit}
 	\endminipage\hfill
-	\caption{N-Gram graphs for the 50 most used bigrams in the OpenSubtitles (upper) and Reddit (lower) datasets. Each node in the graphs represents a bigram, the edges between them show that either the first word of the first bigram matches the second word of the other bigram or the last word of the first bigram equals the last word of the second bigram.}
+	\caption{N-Gram graphs for the 50 most used bigrams in the OpenSubtitles (upper) and Reddit (lower) datasets. Each node in the graphs represents a bigram, the edges between them show that either the first word of the first bigram matches the second word of the other bigram or the last word of the first bigram equals the last word of the second bigram. The size of each node is relative to its occurrence frequency, which means, that larger nodes occur more frequent than smaller ones.}
 	\label{data:ngram:graph_top_50}
 \end{figure}
 \todo{Improve comment!}
-
-\section{N-Gram Analysis}
-\blindtext
-\begin{figure}[htb]
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/opensubtitles_bigram_top_30_freq}
-	\centering
-	\small
-	\text{OpenSubtitles}
-	\endminipage\hfill
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/reddit_bigram_top_30_freq}
-	\centering
-	\small
-	\text{Reddit}
-	\endminipage\hfill
-	\caption{Occurrence frequencies of the 30 most used bigrams in the OpenSubtitles~(left) and Reddit (right) datasets.}
-	\label{data:ngram:freq_top_30}
-\end{figure}
-
-\begin{figure}[htb]
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/opensubtitles_bigram_top_1000_dist}
-	\centering
-	\small
-	\text{OpenSubtitles}
-	\endminipage\hfill
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/reddit_bigram_top_1000_dist}
-	\centering
-	\small
-	\text{Reddit}
-	\endminipage\hfill
-	\caption{Distribution of the 1000 most used bigrams for the OpenSubtitles (left) and the Reddit (right) datasets.}
-	\label{data:ngram:freq_dist_top_1000}
-\end{figure}
 
 \subsection{N Gram analyze}
 Wir untersuchten die Daten zusätzliche nach Häufigkeiten von Bi- und Trigrammen. Diese Vorgang war sehr rechenintensiv und dauerte entsprechend lange. Die Resultate sind pro Datensatz in den Abbildungen \ref{?} und \ref{?} ersichtlich. Das Ziel dieser Analyse ist es, die später generierten Sätze ebenfalls auf Bi- und Trigramme zu untersuchen um eine mögliche Korrelation auf der Ebene Phrase zu finden.
