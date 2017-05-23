@@ -26,19 +26,19 @@ We are using two different datasets for the experiments. The first is the curren
 \end{table}
 \footnotetext{https://archive.org/details/2015\_reddit\_comments\_corpus}
 
-The two datasets in several aspects: Since the OpenSubtitles corpus is extracted from subtitles of a large number of movies, it represents a corpora of \emph{spoken} language. In contrast, the Reddit dataset only consists of comments posted on the website and hence represents written, partially colloquial, language. This two types of language usually have a a big discrepancy in how XYZ.
+The two datasets in several aspects: Since the OpenSubtitles corpus is extracted from subtitles of a large number of movies, it represents a corpora of \emph{spoken} language. In contrast, the Reddit dataset only consists of comments posted on the website and hence represents written, partially colloquial, language. This two types of language usually have a a big discrepancy in how they are used\footnote{A good comparison can be found on the website of the University of Westminister: http://www2.wmin.ac.uk/eic/learning-skills/literacy/sp\_vs\_writ\_dif.shtml}.
 
 \section{Structure of the Raw Corpora}
 \label{data:structure_of_corpora}
-The following two paragraphs explain how the raw datasets are structured and how we have extract the raw utterances from them.
+The following two paragraphs explain how the raw datasets are structured and how the raw utterances are extracted from them.
 
-\paragraph{OpenSubtitles} The OpenSubtitles corpus is structured via XML files, each one containing all utterances from a single movie (see listing~\ref{data:opensubtitles:xml_example}). Each XML is structured the same way: It starts with the declaration of the \texttt{<document>} tag and an ID signifying which movie the subtitles are from. However, as our research has shown, the value of the \texttt{id} attribute cannot be used whether subtitles of a certain movie has already been processed, because there are files with the same \texttt{id} but different content. After the \texttt{<document>} the actual utterances are listed in \texttt{<s>} tags. Each of these \texttt{<s>} contains multiple \texttt{<w>} tags that contain the actual words uttered in this utterance. Furthermore, one can see that there are also \texttt{<time>} tags that contains the a timestamp when the utterance started and one when the utterance ended. These timestamps are later used to for the time-lag analysis in the chapter~\ref{data:opensubtitles:time_lag_analysis}. There is absolutely no indication on turn-taking, which forces us handle each utterance as an utterance by a different person, even though it could certainly be uttered by the same.\\
+\paragraph{OpenSubtitles} The OpenSubtitles corpus is structured via XML files, each one containing all utterances from a single movie (see figure~\ref{data:opensubtitles:xml_example}). Each XML is structured the same way: It starts with the declaration of the \texttt{<document>} tag and an \texttt{id} attribute signifying which movie the subtitles are from. However, as our research has shown, the value of the \texttt{id} attribute cannot be used to decide whether subtitles of a certain movie have already been processed, because there are files with the same \texttt{id} but different content. After the \texttt{<document>} the actual utterances are listed in \texttt{<s>} tags. Each of these \texttt{<s>} contains multiple \texttt{<w>} tags that contain the actual words uttered in this utterance. Furthermore, one can see that there are also \texttt{<time>} tags that contains the a timestamp when the utterance started and one when the utterance ended. These timestamps are later used to for the time-lag analysis in the chapter~\ref{data:opensubtitles:time_lag_analysis}. There is absolutely no indication on turn-taking, which forces us handle each utterance as an utterance by a different person, even though it could certainly be uttered by the same.\\
 
 
 \begin{figure}[thp]
 	\centering
 	\begin{tabular}{c}  % the tabular makes the listing as small as possible and centers it
-		\begin{lstlisting}[language=XML,label=data:opensubtitles:xml_example]
+		\begin{lstlisting}[language=XML]
 		<?xml version="1.0" encoding="utf-8"?>
 		<document id="4955664">
 			<s id="1">
@@ -60,9 +60,10 @@ The following two paragraphs explain how the raw datasets are structured and how
 		\end{lstlisting}
 	\end{tabular}
 	\caption{Example XML entry from the OpenSubtitles corpus.}
+	\label{data:opensubtitles:xml_example}
 \end{figure}
 
-\paragraph{Reddit} The Reddit corpus is structured in huge plain text files for each year where comments are available. In our case, the comments available are from ranging from 2006 up to the year 2015. For each year, there is a separate plain text file containing one JSON object per line. Each of these JSON objects (see listing~\ref{data:reddit:json_example}) contains a single comment posted on the Reddit website. There are several different values in each of the JSON objects, however, we only need four of them for our purposes: 
+\paragraph{Reddit} The Reddit corpus is structured in huge plain text files for each year, where comments are available. In our case, the comments available are from ranging from 2006 up to the year 2015. For each year, there is a separate plain text file containing one JSON object per line. Each of these JSON objects (see figure~\ref{data:reddit:json_example}) contains a single comment posted on the Reddit website. There are several different values in each of the JSON objects, however, we only need four of them for our purposes: 
 
 \begin{itemize}[noitemsep]
 	\item \textbf{\texttt{body}}: This attribute contains the actual comment posted on Reddit.
@@ -71,12 +72,12 @@ The following two paragraphs explain how the raw datasets are structured and how
 	\item \textbf{\texttt{parent\_id}}: This attribute contains the \texttt{name} id of the comment that this comment answered to.
 \end{itemize}
 
-The shown attributes can be used to create a tree structure per thread, where the \texttt{link\_id} is used as the root node. The childs of this root node are the comments where the \texttt{parent\_id} is equal to the \texttt{link\_id}. Each of these comments may have several comments answering the original comment; these are matched by comparing the \texttt{name} of the original comment and the \texttt{parent\_id} of all other comments. The same procedure applied to the comments on the topmost level of the tree is then also applied to their child comments in a recursive manner until a comment does not have any child comments anymore. This process leads to a tree like structure for the comments, stored in a \texttt{shelve}\footnote{https://docs.python.org/3.4/library/shelve.html} file, which we then use in the Chapter~\ref{data:preprocessing:reddit} for building the final dataset.
+The shown attributes can be used to create a tree structure per thread, where the \texttt{link\_id} is used as the root node. The childs of this root node are the comments where the \texttt{parent\_id} is equal to the \texttt{link\_id}. Each of these comments may have several comments answering the original comment; these are matched by comparing the \texttt{name} of the original comment and the \texttt{parent\_id} of all other comments. The same procedure applied to the comments on the topmost level of the tree is then also applied to their child comments in a recursive manner until a comment does not have any child comments anymore. This process leads to a tree like structure for the comments, which we store in a \texttt{shelve}\footnote{https://docs.python.org/3.4/library/shelve.html} file, which we then use for building the final dataset (see Chapter~\ref{data:preprocessing}).
 \\
 \begin{figure}[thp]
 	\centering
 	\begin{tabular}{c}  % the tabular makes the listing as small as possible and centers it
-		\begin{lstlisting}[style=json,label=data:reddit:json_example]
+		\begin{lstlisting}[style=json]
 			{
 				"retrieved_on": 1425820157,
 				"parent_id": "t1_c02s9rv",
@@ -102,13 +103,15 @@ The shown attributes can be used to create a tree structure per thread, where th
 			}
 		\end{lstlisting}
 	\end{tabular}
+	\label{data:reddit:json_example}
 	\caption{Example JSON entry from the Reddit corpus.}
 \end{figure}
 
 \section{Preprocessing}
+\label{data:preprocessing}
 The preprocessing process is explained in the following paragraphs. Steps that are applied to both corpora are mentioned in the ``general'' paragraph, the rest in the corpora-specific paragraphs.
 
-\paragraph{General} The first step is to extract all utterances from both corpora and tokenize them. For this purpose, we use the \texttt{nltk} \texttt{word\_tokenizer}. After extracting all the texts, we run them through a set of regular expression which ensure that no unwanted characters are present: All characters which are not either alphanumerical (i.e. \texttt{A-Z}, \texttt{a-z}, \texttt{0-9}) or punctuation (i.e. \texttt{,}, \texttt{.}, \texttt{?} or \texttt{!}) are removed from the text. The last general step is to convert all characters to lowercase and join the words again with a space in between them (punctuation also counts as words). In table~\ref{data:preprocessing:table_after_preprocessing} you can find an example on how a text is transformed from its raw form to the preprocessed form.
+\paragraph{General} The first step is to extract all utterances from both corpora and tokenize them. For this purpose, we use the \texttt{word\_tokenizer} from the \texttt{nltk} library. After extracting all the utterances, we run them through a set of regular expression which ensure that no unwanted characters are present: All characters which are neither alphanumeric (i.e. \texttt{A-Z}, \texttt{a-z}, \texttt{0-9}) or punctuation (i.e. \texttt{,}, \texttt{.}, \texttt{?}, \texttt{!}) are removed from the text. The last general step is to convert all characters to lowercase and join the words again with a space in between them (punctuation also counts as words). In table~\ref{data:preprocessing:table_after_preprocessing} you can find an example on how a text is transformed from its raw form to the preprocessed form.
 \\
 \begin{figure}[h]
 	\centering
@@ -127,7 +130,7 @@ The preprocessing process is explained in the following paragraphs. Steps that a
 
 \paragraph{OpenSubtitles} After the general preprocessing has been applied, we start by building the final dataset from the OpenSubtitles corpus. As we do not have any information about turn-taking or speakers, we have to assume that each utterance is uttered by a different person, even though it might be possible that the same person said both of them. We then write out the preprocessed utterance to a file, one per line. This serves as our dataset and does not need any further processing. As said, we do not have any information about speakers or turn-taking and hence cannot decide wether a conversation has ended or not, this is the reason we do not need a dedicated token for showing that a conversation has ended (as opposed to the Reddit, see next paragraph).
 
-\paragraph{Reddit} After the general preprocessing has been applied, we start by building the final dataset from the Reddit corpus and the tree structure explained in Chapter~\ref{data:structure_of_corpora} (see figure~\ref{fig:data:reddit:utterance:construction}). We first filter all comments by subreddit and only include those which were posted in either \emph{movies}, \emph{television} and \emph{films}. Then, we start by reading the tree of the first thread from the stored tree structure. We then go on to read the comments on the first level, in the case of figure~\ref{fig:data:reddit:utterance:construction} this is only A. This comment might have several comments as childs; in the tree these are A, B and C for the comment A. The comments are then combined so that each root comment is combined with all their child comments to form samples. In the case of the exemplary tree, these yields the samples (A, B), (A, C), (A, D), (D, E) and (D, F) for the root comment A. This is done for all comments and all levels to obtain all samples for the Reddit dataset. These samples are then written into a plain text corpus, where each line contains one utterance. To separate the conversations, we put a dedicated token (\texttt{<<<<<END-CONV>>>>>}) between them to signify when a conversation has ended.
+\paragraph{Reddit} After the general preprocessing has been applied, we start by building the final dataset from the Reddit corpus and the tree structure explained in Chapter~\ref{data:structure_of_corpora} (see figure~\ref{fig:data:reddit:utterance:construction}). We first filter all comments by subreddit and only include those which were posted in either \emph{movies}, \emph{television} and \emph{films}. Then, we start by reading the tree of the first thread from the stored tree structure. We then go on to read the comments on the first level, in the case of figure~\ref{fig:data:reddit:utterance:construction} this is only A. This comment might have several comments as childs; in the tree these are A, B and C for the comment A. The comments are then combined so that each root comment is combined with all their child comments to form samples. In the case of the exemplary tree, this yields the samples (A, B), (A, C), (A, D), (D, E) and (D, F) for the root comment A. This is done for all comments and all levels to obtain all samples for the Reddit dataset. These samples are then written into a plain text corpus, where each line contains one utterance. To separate the conversations, we put a dedicated token (\texttt{<<<<<END-CONV>>>>>}) between them to signify when a conversation has ended.
 \\
 \begin{figure}[H]
 	\centering
@@ -137,7 +140,7 @@ The preprocessing process is explained in the following paragraphs. Steps that a
 \end{figure}
 
 \section{Vocabulary and Coverage}
-After the datasets for both corpora has been generated, we go on with generating corpus specific vocabularies. We do this by iterating the generated dataset and extracting all words which occur there. These collected words are then ranked by their frequency of occurence and converted into vocabularies containing the $n$ most used words, where $n$ stands for the number of words chosen. We decied that we would use three different vocabulary sizes: $25'000$, $50'000$ and $100'000$. As expected, the larger the vocabularies get, the better is the coverage.
+After the datasets for both corpora have been generated, we go on with generating corpus specific vocabularies. We do this by iterating the generated dataset and extracting all words which occur there. These collected words are then ranked by their frequency of occurence and converted into vocabularies containing the $n$ most used words, where $n$ stands for the number of words chosen. We decied that we would use three different vocabulary sizes: $25'000$, $50'000$ and $100'000$. As expected, the larger the vocabularies get, the better is the coverage.
 \\
 \begin{table}[H]
 	\begin{adjustbox}{max width=\textwidth}
@@ -161,7 +164,7 @@ After the datasets for both corpora has been generated, we go on with generating
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Absolute coverage of dataset per vocabulary size.}
+	\caption{Word coverage of differently sized vocabularies extracted from the generated datasets.}
 	\label{tbl:data:split:corpus:analyze}
 \end{table}
 
@@ -210,7 +213,7 @@ Below, in figure~\ref{fig:data:reddit:vocab:analyze}, you can find plot where it
 \todo{Other blue color and replace "missing words" with "Missing Words"}
 
 \section{Splitting the Datasets}
-The generated datasets have to be split in order to obtain a train, validation and test set. The table \ref{tbl:data:split:corpus} shows how proportions in which the datasets were split. We split in a way, that we always process two utterances at once to ensure that no utterance is present in the training and the other datasets.
+The generated datasets have to be split in order to obtain a train, validation and test set. The table \ref{tbl:data:split:corpus} shows how proportions in which the datasets were split. We split in a way, that we always process two utterances at one to ensure that there is no overlap between the training and the other datasets. The splitting is also done randomly, to ensure that we do not run into problems due to the fact that the utterances may be sorted in any unknown way.
 \\
 \begin{table}[H]
 	\centering
@@ -220,16 +223,16 @@ The generated datasets have to be split in order to obtain a train, validation a
 		\begin{tabular}{llccc}
 			\toprule
 			&  \specialcell{Set}
-			&  \specialcell{Percent of Dataset \\ {[\%]}}
+			&  \specialcell{Share of Dataset \\ {[\%]}}
 			&  \specialcell{Size \\{[MB]}}
 			&  \specialcell{No. of Lines \\{[Thousand]}}\\
 			\midrule
-			OpenSubtitles	& Train	&97	&9'393	&321'643	\\
-			&valid	&1	&97		&3'315	\\
-			&test	&2	&194	&6'631	\\\\
-			Reddit			&train	&97	&8'455	&75'297	\\
-			&valid	&2	&185	&1'552	\\
-			&test	&1	&92		&776	\\
+			OpenSubtitles	& Train	&97\%	&9'393	&321'643	\\
+			&Valid	&1\%	&97		&3'315	\\
+			&Test	&2\%	&194	&6'631	\\\\
+			Reddit			&Train	&97\%	&8'455	&75'297	\\
+			&Valid	&2\%	&185	&1'552	\\
+			&Test	&1\%	&92		&776	\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
@@ -239,7 +242,7 @@ The generated datasets have to be split in order to obtain a train, validation a
 
 \section{Time-Lag Analysis OpenSubtitles}
 \label{data:opensubtitles:time_lag_analysis}
-While searching through the OpenSubtitles dataset we discovered that there are several pairs of utterances which don't make a lot of sense (e.g. (``I love cupcake'', ``Hello, how are you?'')) under the viewpoint of conversational modeling. We quickly realized that this useless pairs of utterances occur because of the way we preprocess the raw corpus: In order to get a sample, we take the first utterance and combine it with the utterance on the next line in the preprocessed corpus. The problem occurs there, where the timestamps signify a large time difference between the first and second utterance. This is comprehensible, as all utterances are just saved in the corpus on after each other without taking the timestamps (see OpenSubtitles paragraph in Chapter~\ref{data:structure_of_corpora}) into account. In order to investigate if this problem is urgent, we did an analysis to see if a large portion of the utterances have a time-lag higher than a certain timespan. The results of this investigation are summarized in the figure~\ref{fig:data:analyse:timediff:opus}.
+While searching through the OpenSubtitles dataset, we discovered that there are several pairs of utterances which don't make a lot of sense (e.g. (``I love cupcake'', ``Hello, how are you?'')) under the viewpoint of conversational modeling. We quickly realized that this useless pairs of utterances occur because of the way we preprocess the raw corpus: In order to get a sample, we take the first utterance and combine it with the utterance on the next line in the preprocessed corpus. The problem occurs there, where the timestamps signify a large time difference between the first and second utterance. This is comprehensible, as all utterances are just saved in the corpus on after each other without taking the timestamps (see OpenSubtitles paragraph in Chapter~\ref{data:structure_of_corpora}) into account. In order to investigate if this problem is urgent, we did an analysis to see if a large portion of the utterances have a time-lag higher than a certain timespan. The results of this investigation are summarized in the figure~\ref{fig:data:analyse:timediff:opus}.
 
 \begin{figure}[H]
 	\centering
@@ -248,12 +251,13 @@ While searching through the OpenSubtitles dataset we discovered that there are s
 	\label{fig:data:analyse:timediff:opus}
 \end{figure}
 
-As one can see, most of the utterances, actually over 80\%, occur between $1$ and $5$ seconds after each other. The big spike at the end of the graph contains a much large portion than all the other between $5$ and $30$ seconds. This has to do with the fact, that there might be changes in the scenes of the movies, which can lead to two consecutive utterances in the corpus being uttered with a larger time gap. The other reason is, that each movie is stored in a single file and hence, there might be utterances which are combined, but actually belong to two different movies.
+As one can see, most of the utterances, actually over 80\%, occur between $1$ and $5$ seconds after each other. The big spike at the end of the graph contains a much large portion than all the other between $10$ and $30$ seconds. This has to do with the fact, that there might be changes in the scenes of the movies, which can lead to two consecutive utterances in the corpus being uttered with a larger time gap. The other reason is, that each movie is stored in a single file and hence, there might be utterances which are combined, but actually belong to two different movies.
 
 As this analysis has shown, most of the utterances lie so close to each other, that this will most probably not be a problem when training our model with it.
 
 \section{N-Gram Analysis}
-We also do a n-gram analysis of the used corpora. For this purpose, we generated bi- and trigrams for both the OpenSubtitles and Reddit corpora. We do this, to be able to compare the n-grams of the outputs produced by our models after they have been trained with the n-grams obtained when analyzing the preprocessed corpora. This enable us to find correlations between the n-grams produced by this analysis and n-grams produced by the trained models. The results of analyzing the preprocessed datasets are visualized in the figures~\ref{data:ngram:freq_top_30} and \ref{data:ngram:graph_top_50}. For the second visualizations, we use a custom graph visualization which we call ``N-Gram Graph''. This allows us to visualize how n-grams can be connected to each other (through edges) and at the same time visualize their relative occurrence frequencies to all other n-grams in the graph.
+\label{chapter:data:ngram}
+We also do an n-gram analysis of the used corpora. For this purpose, we generated uni- and bigrams for both the OpenSubtitles and Reddit corpora. We do this, to be able to compare the n-grams of the outputs produced by our models after they have been trained with the n-grams obtained when analyzing the preprocessed corpora. This enables us to find correlations between the n-grams produced by this analysis and n-grams extracted from the outputs of the trained models. The results of analyzing the preprocessed datasets are visualized in the figures~\ref{data:ngram:freq_top_30} and \ref{data:ngram:graph_top_50}. For the second visualizations, we use a custom graph visualization which we call ``N-Gram Graph''. This allows us to visualize how n-grams can be connected to each other (through edges) and at the same time visualize their relative occurrence frequencies to all other n-grams in the graph.
  
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
