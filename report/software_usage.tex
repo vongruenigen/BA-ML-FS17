@@ -1,3 +1,211 @@
-\chapter{Using The Software System}
+\chapter{Using the Software System}
 \label{appendix:software_usage}
-\blindtext
+The following chapter gives a tutorial on how to use the software system (see Chapter~\ref{software_system}) implemented to conduct the experiments in this thesis.
+
+\section{Download}
+The code of the software system can be downloaded by using \texttt{git}\footnote{https://git-scm.com/}. The repository is located in the publicly accessible GitHub server of the ZHAW\footnote{https://github.ch/vongrdir/BA-ML-17}.
+
+\section{Requirements}
+To use the software and all the related scripts, the following software packages must be installed:
+
+\begin{itemize}[noitemsep]
+	\item \texttt{python} in the version 3.4.3\footnote{https://www.python.org/}
+	\item If a GPU is used:
+	\begin{itemize}[noitemsep]
+		\item Nvidia GPU driver\footnote{http://www.nvidia.de/Download/index.aspx} for the respective GPU.
+		\item Nvidia \texttt{cuda} 8 toolkit\footnote{https://developer.nvidia.com/cuda-toolkit}.
+	\end{itemize}
+\end{itemize}
+
+The experiments and script can also be conducted without a GPU and solely on the CPU. However, this leads to higher runtime in several parts of the system, mainly when training models. In addition to the mentioned software packages the following \texttt{python} libraries must be installed:
+
+\begin{itemize}[noitemsep]
+	\item \texttt{numpy} Version 1.11.1
+	\item \texttt{theano} Version 0.8.2
+	\item \texttt{keras} Version 1.1.0
+	\item \texttt{nltk} Version 3.2.1
+	\item \texttt{scikit{\_}learn} Version 0.18
+	\item \texttt{matplotlib} Version 1.5.3
+	\item \texttt{gensim} Version 0.12.4
+	\item \texttt{h5py} Version 2.6.0
+	\item \texttt{flask} Version 0.11.1
+\end{itemize}
+\todo{update}
+
+The libraries can be installed via the \texttt{python} package manager \texttt{pip}\footnote{https://packaging.python.org/installing/}. It is recommended to us the exact version of the mentioned software packages and \texttt{python} libraries to avoid any compatibility issues. However, it might certainly be possible that the software system runs find with newer version without any problems.
+
+\clearpage
+\section{Structure of the Repository}
+In the following table, we explain the structure of the repository and the contents of the main directories.
+
+\begin{table}[H]
+	\centering
+	\begin{tabularx}{\textwidth}{lX}
+		\toprule
+		Name of Directory & Description\\ \midrule
+		\texttt{configs/} & Im Ordner \texttt{configs/} werden die JSON Konfigurationen aller Experimente abgelegt. Diese sind nach \texttt{group{\_}id} in einzelnen Unterordner gruppiert.\\
+		\texttt{report/} & Ist der Ordner, in welchem alle Dokumente, welche für das Erstellen des Berichts benötigt werden, liegen.\\
+		\texttt{results/} & Hier werden die Resultate aller durchgeführten Experimente abgespeichert. Wie bereits bei den Konfigurationen werden die Resultate hier nach \texttt{group{\_}id} gruppiert. Jedes Experiment erhält einen Ordner in welchem das finale CNN, die gesammelten Evaluierungs-Metriken sowie die Konfiguration des Experiments abgespeichert werden.\\
+		\texttt{scripts/} & Im Ordner \texttt{scripts/} liegen alle Skripts, welche nachfolgend erläutert werden.\\
+		\texttt{source/} & Hier liegt der eigentliche Source-Code des Systems. Darin befinden sich alle Teile, welche im Kapitel \ref{technical_setup} erläutert wurden. Ausserdem befinden sich dort diverse \texttt{python} Module (z.B. \texttt{data{\_}utils}), welche ebenfalls im Rahmen der Skripts benötigt werden.\\
+		\texttt{web/} & Im Ordner \texttt{web/} liegt der Source-Code der Weboberfläche.\\
+		\bottomrule
+	\end{tabularx}
+	\caption{Erläuterungen zum Aufbau des Repository.}
+\end{table}
+\todo{update}
+
+\clearpage
+\section{Using the Scripts}
+Im Folgenden werden die wichtigsten Skripte des Systems, welche zur Durchführung der Experimente notwendig sind, erläutert. Die Skripte selber liegen im Ordner \texttt{scripts/} des Repositories.
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{lp{8cm}p{8cm}}
+			\toprule
+			Name & Beschreibung\\ \midrule
+			\texttt{aggregate{\_}results{\_}metrics.py} & Mithilfe dieses Skripts können die Resultate eines oder mehrerer Experimente aggregiert werden. Diese werden dann in eine CSV Datei im aktuellen Arbeitsverzeichnis abgelegt.\\
+			\texttt{extract{\_}embeddings.py} & Word-Embeddings, welche mit \texttt{word2vec} erstellt wurden, müssen ausgepackt werden bevor diese in den Experimenten verwendet werden können. Dieses Skript ist dafür zuständig.\\
+			\texttt{extract{\_}embeddings{\_}glove.py} & Word-Embeddings, welche mit \texttt{glove} erstellt wurden, müssen ausgepackt werden bevor diese in den Experimenten verwendet werden können. Dieses Skript ist dafür zuständig.\\
+			\texttt{extract{\_}embeddings{\_}vocabulary.py} & Das Vokabular von Word-Embeddings können mithilfe dieses Skripts extrahiert werden.\\
+			\texttt{generate{\_}data{\_}statistics.py} & Mithilfe dieses Skripts können Statistiken ein oder mehrerer TSV Dateien erstellt werden. Dabei werden die darin enthaltenen Texte und Sentiments analysiert.\\
+			\texttt{preprocess{\_}tsv{\_}data.py} & Mithilfe dieses Skripts können Daten aus einer TSV-Datei vorverarbeitet und im HDF5 Format abgespeichert werden. Dies ist nötig um z.B. die Daten für die Distant-Phasen vorzubereiten.\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Beschreibungen der wichtigsten Skripte zur Verwendung Software-Systems.}
+\end{table}
+
+Es sind noch einige zusätzliche Skripte im Ordner \texttt{scripts/} vorhanden (z.B. für Erstellung von Plots, Verwaltung von Experimenten, etc.). Allerdings werden nicht alle benötigt um die Experimente durchzuführen und deswegen werden hier nur die wichtigsten erläutert.
+
+In der folgenden Tabelle sind Beispielaufrufe für jedes Skript aufgelistet:
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{lp{20cm}}
+			\toprule
+			Name & Bespielaufruf\\ \midrule
+			\texttt{aggregate{\_}results{\_}metrics.py} & python scripts/aggregate{\_}results{\_}metrics.py results/my-experiment-group/my-experiment\\
+			\texttt{extract{\_}embeddings.py} & python scripts/extract{\_}embeddings.py -e embeddings/my-embeddings -v vocabularies/vocabulary.pickle -o embeddings/my-extracted-embeddings\\
+			\texttt{extract{\_}embeddings{\_}glove.py} & python scripts/extract{\_}embeddings{\_}glove.py -e embeddings/my-glove-embeddings -v vocabularies/vocabulary.pickle -o embeddings/my-extracted-embeddings\\
+			\texttt{extract{\_}embeddings{\_}vocabulary.py} & python scripts/extract{\_}embeddings{\_}vocabulary.py.py -e embeddings/my-glove-embeddings -v vocabularies/vocabulary.pickle -o embeddings/my-extracted-embeddings\\
+			\texttt{generate{\_}data{\_}statistics.py} & python scripts/generate{\_}data{\_}statistics.py testdata/my-data.tsv\\
+			\texttt{preprocess{\_}tsv{\_}data.py} & python scripts/preprocess{\_}tsv{\_}data.py -t my-data.tsv -o preprocessed.h5 -s 140 -v vocabularies/my-vocabulary.pickle -m 1000000\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Beispielaufrufe der wichtigsten Skripte zur Verwendung Software-Systems.}
+\end{table}
+
+\clearpage
+
+\section{Durchführung von Experimenten}
+Um ein Experiment durchzuführen wird eine Konfiguration im JSON Format benötigt. Diese liegen alle im Ordner \texttt{configs/}. Im Folgenden werden die einzelnen Konfigurationsparameter erläutert:
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth, max height=\textheight}
+		\begin{tabular}{llp{10cm}}
+			\toprule
+			Parametername & Standartwert & Beschreibung\\ \midrule
+			\texttt{batch{\_}size} & \texttt{500} & Mithilfe dieses Parameters kann konfiguriert werden mit welcher Batch-Size das Training des CNN durchgeführt wird.\\
+			\texttt{early{\_}stopping{\_}monitor{\_}metric} & \texttt{val{\_}f1{\_}score{\_}pos{\_}neg} & Damit wird konfiguriert, welche Metrik durch das Early-Stopping überwacht werden soll.\\
+			\texttt{early{\_}stopping{\_}patience} & \texttt{75} & Über diesen Parameter kann konfiguriert werden wieviel Epochen ohne Fortschritt bezüglich der \texttt{early{\_}stopping{\_}monitor{\_}metric} Metrik trainiert wird, bevor das Training abgebrochen wird.\\
+			\texttt{max{\_}sent{\_}length} & \texttt{140} & Mithilfe dieses Parameters kann angegeben werden, wieviele Wörter pro Satz maximal erlaubt sind. Längere Sätze werden demnach gekürzt.\\
+			\texttt{nb{\_}epoch} & \texttt{1000} & Dieser Parameter ist dafür zuständig, über wieviel Epochen hinweg das Training durchgeführt wird.\\
+			\texttt{nb{\_}kfold{\_}cv} & \texttt{4} & Wenn dieser Parameter vorhanden ist, wird während des Trainings k-fold Cross-Validation verwendet. Bei einem Parameterwerte kleiner als $2$ wird keine k-fold Cross-Validation durchgeführt.\\
+			\texttt{early{\_}stopping{\_}patience} & \texttt{75} & Über diesen Parameter kann konfiguriert werden wieviel Epochen ohne Fortschritt bezüglich der \texttt{early{\_}stopping{\_}monitor{\_}stopping} trainiert wird, bevor das Training abgebrochen wird.\\
+			\texttt{name} & \texttt{null} & Muss gesetz werden, da das Experiment dem Namen entsprechend im \texttt{results/} Verzeichnis abgelegt wird.\\
+			\texttt{group{\_}id} & \texttt{null} & Muss gesetzt werden, da Experimente nach diesem Namen im \texttt{results/} Verzeichnis gruppiert werden.\\
+			\texttt{model{\_}json{\_}path} & \texttt{null} & Gibt den Pfad zur JSON Datei mit dem zu ladenden \texttt{keras} Modell an. Darf nur angegeben werden sofern auch ein Wert für \texttt{model{\_}weights{\_}path} gesetzt ist, sonst tritt beim Start ein Fehler auf.\\
+			\texttt{model{\_}id} & \texttt{1} & Damit können verschiedene Versionen des verwendeten CNN geladen werden (z.B. unterschiedliche Anzahl Convolutional Schichten). Welche ID für welches Modell steht ist in der Datei \texttt{source/model.py} ersichtlich.\\
+			\texttt{model{\_}weights{\_}path} & \texttt{null} & Gibt den Pfad zur HDF5 Datei mit den zu ladenden Gewichten an. Darf nur angegeben werden sofern auch ein Wert für \texttt{model{\_}json{\_}path} gesetzt ist.\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Erklärungen der einzelnen Konfigurationsparameter des Software-Systems. (Teil 1)}
+\end{table}
+
+\clearpage
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth, max height=\textheight}
+		\begin{tabular}{llp{10cm}}
+			\toprule
+			Parametername & Standartwert & Beschreibung\\ \midrule
+			\texttt{monitor{\_}metric} & \texttt{val{\_}f1{\_}score{\_}pos{\_}neg} & Mithilfe dieses Parameters kann konfiguriert werden, welche Metrik ausschlaggebend ist um am Ende des Trainings zu entscheiden, welcher der beste Fold war. Wird nur beachtet wenn k-fold Cross-Validation aktiviert ist.\\
+			\texttt{monitor{\_}metric{\_}mode} & \texttt{max} & Mithilfe dieses Parameter wird konfiguriert ob die \texttt{monitor{\_}metric} nach dem maximalen oder minimalen Wert überwacht werden soll.\\
+			\texttt{preprocessed{\_}data} & \texttt{null} & Hier kann die HDF5 Datei, aus welcher die Trainingsdaten stammen, referenziert werden. Dann werden die Parameter \texttt{validation{\_}data{\_}path} sowie \texttt{test{\_}data} ignoriert. Ausserdem muss der Parameter \texttt{samples{\_}per{\_}epoch} gesetzt werden.\\
+			\texttt{randomize{\_}test{\_}data} & \texttt{true} & Wenn diser Parameter auf \texttt{true} gesetzt wird, werden die geladenen Trainingsdaten zufällig durchmischt.\\
+			\texttt{use{\_}random{\_}embeddings} & \texttt{false} & Falls dieser Parameter auf \texttt{true} gesetzt wird werden die Word-Embeddings zufällig initialisiert.\\
+			\texttt{set{\_}class{\_}weights} & \texttt{false} & Entscheidet ob während des Trainings Klassengewichte verwendet werden sollen.\\
+			\texttt{samples{\_}per{\_}epoch} & \texttt{0} & Falls die Parameter t\texttt{use{\_}preprocessed{\_}data} und \texttt{preprocessed{\_}data} gesetzt sind, muss hier angegeben werden wieviel Datensätze aus den vorverarbeiteten Daten verwendet werden sollen.\\
+			\texttt{test{\_}data} & \texttt{null} & Über diesen Parameter kann konfiguriert werden, welche Trainingsdaten verwendet werden sollen. Dabei muss entweder der Pfad zu einer TSV Datei angegeben werden, oder ein Objekt welches als Schlüssel die Pfade zu den zu ladenden TSV Dateien und als Werte die zu ladenden Anzahl Datensätze enthält. Wird ignoriert wenn vorverarbeitete Daten verwendet werden.\\
+			\texttt{use{\_}preprocessed{\_}data} & \texttt{false} & Muss auf \texttt{true} gesetzt werden falls der Parameter \texttt{preprocessed{\_}data} gesetzt wurde.\\
+			\texttt{validation{\_}data{\_}path} & \texttt{null} & Über diesen Parameter wird konfiguriert, welche Daten für die Validierung während und am Ende des Trainings verwendet werden sollen. Der Aufbau ist dabei derselbe wie beim Parameter \texttt{test{\_}data}. Wird ignoriert wenn vorverarbeitete Daten verwendet werden.\\
+			\texttt{validation{\_}split} & \texttt{0.0} & Dieser Parameter gibt an, welcher Bruchteil der Trainingsdaten als Validierungsdaten verwendet werden sollen. Falls der Parameter \texttt{validation{\_}data{\_}path} gesetzt ist wird dieser Parameter ignoriert.\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Erklärungen der einzelnen Konfigurationsparameter des Software-Systems. (Teil 2)}
+\end{table}
+
+Die obigen Erläuterungen sind nicht abschliessend oder vollständig. Für die genaue Funktionsweise der weiteren Parameter wird empfohlen den Source-Code hinzu zu konsultieren.
+
+\clearpage
+
+Eine Beispiel-Konfiguration für ein einfaches Experiment sieht wie folgt aus:
+
+\begin{lstlisting}[frame=none]
+{
+"test_data": {
+"testdata/MPQ_reviews_full.tsv": 3000,
+"testdata/DIL_Reviews.tsv": 3000
+},
+"name": "my-fancy-experiment",
+"group_id": "really-cool-group",
+"nb_epoch": 1000,
+"nb_kfold_cv": 4,
+"vocabulary_embeddings": "embeddings/emb_smiley_tweets_embedding_english_590M.npy",
+"validation_data_path": "testdata/MPQ_News.tsv",
+"vocabulary_path": "vocabularies/vocab_en300M_reduced.pickle"
+}
+\end{lstlisting}
+
+Eine Beispiel-Konfiguration um eine Distant-Phase mit vorverarbeiteten Daten durchzuführen kann wie folgt aussehen:
+
+\begin{lstlisting}[frame=none]
+{
+"group_id": "amazon_distant_model",
+"use_preprocessed_data": true,
+"preprocessed_data": "preprocessed/amazon_distant_train_preprocessed.hdf5",
+"samples_per_epoch": 82400000,
+"test_data": "testdata/amazon_distant_train.tsv",
+"name": "amazon_distant_model_82M_dedup_v2",
+"nb_epoch": 1,
+"max_sent_length": 140,
+"batch_size": 1000,
+"vocabulary_embeddings": "embeddings/word2vec_embeddings_en_news_emb.npy",
+"vocabulary_path": "vocabularies/vocab_news_emb.pickle"
+}
+\end{lstlisting}
+
+Um ein Experiment zu starten sollte das \texttt{run.sh} Skript im Repository verwendet werden. Dabei können als Parameter alle JSON Konfigurationen jener Experimente mitgegeben werden, welche durchgeführt werden sollen. Wenn im \texttt{configs/} Verzeichnis die beiden Konfigurationen \texttt{config-1.json} und \texttt{config-2.json} liegen würden, könnten diese mit folgendem Befehl gestartet werden:
+
+\begin{lstlisting}[frame=none]
+$ ./run.sh configs/config-1.json configs/config-2.json
+\end{lstlisting}
+
+Die Resultate werden dann in einem der \texttt{group{\_}id} entsprechenden Verzeichnis innerhalb des \texttt{results/} Verzeichnisses abgelegt.
+
+\section{Weboberfläche}
+Mithilfe der bereitgestellten Weboberfläche können durchgeführte Experimente analysiert werden. Um dies zu ermöglichen sind drei Kernfunktionalitäten implementiert: Es wird eine Übersicht über alle JSON Dateien im entsprechenden Resultat-Ordner angezeigt, Metriken können mittels \texttt{math.js}\footnote{http://mathjs.org/} ausgewertet und es ist möglich Plots über Metriken mittels \texttt{matplotlib}\footnote{http://matplotlib.org/} zu erstellen.
+
+Die Weboberfläche selbst kann über den Befehl \texttt{python web/app.py} gestartet werden. Diese ist dann über den Browser mittels der URL \texttt{http://localhost:5000} erreichbar.
