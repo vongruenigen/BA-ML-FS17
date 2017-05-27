@@ -140,6 +140,7 @@ The preprocessing process is explained in the following paragraphs. Steps that a
 \end{figure}
 
 \section{Vocabulary and Coverage}
+\label{data:word_coverage}
 After the datasets for both corpora have been generated, we go on with generating corpus specific vocabularies. We do this by iterating the generated dataset and extracting all words which occur there. These collected words are then ranked by their frequency of occurence and converted into vocabularies containing the $n$ most used words, where $n$ stands for the number of words chosen. We decied that we would use three different vocabulary sizes: $25'000$, $50'000$ and $100'000$. As expected, the larger the vocabularies get, the better is the coverage.
 \\
 \begin{table}[H]
@@ -213,6 +214,7 @@ Below, in figure~\ref{fig:data:reddit:vocab:analyze}, you can find plot where it
 \todo{Other blue color and replace "missing words" with "Missing Words"}
 
 \section{Splitting the Datasets}
+\label{data:split_corpus}
 The generated datasets have to be split in order to obtain a train, validation and test set. The table \ref{tbl:data:split:corpus} shows how proportions in which the datasets were split. We split in a way, that we always process two utterances at one to ensure that there is no overlap between the training and the other datasets. The splitting is also done randomly, to ensure that we do not run into problems due to the fact that the utterances may be sorted in any unknown way.
 \\
 \begin{table}[H]

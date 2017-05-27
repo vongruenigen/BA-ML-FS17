@@ -43,7 +43,7 @@ In the following table, we explain the structure of the repository and the conte
 	\begin{tabularx}{\textwidth}{lX}
 		\toprule
 		Name of Directory & Description\\ \midrule
-		\texttt{configs/} & In this directory, all the JSONconfigurations for all experiments are stored.\\
+		\texttt{configs/} & In this directory, all the JSON configurations for all experiments are stored.\\
 		\texttt{report/} & All documents related to the thesis itself are stored in this directory.\\
 		\texttt{results/} & The results of all the run experiments are stored in this directory. The results themselves are stored in a directory named after the \texttt{WHAT} of the experiment. In total, the model, all collected metrics and the configuration of experiments are stored in this directories.\\
 		\texttt{scripts/} & The scripts used in this thesis are stored in this directory (see Chapter~\ref{sofware_usage:scripts}).\\
@@ -65,12 +65,16 @@ In the following section, we are going to introduce the most important scripts n
 		\begin{tabular}{lp{8cm}p{8cm}}
 			\toprule
 			Name & Description\\ \midrule
-			\texttt{aggregate{\_}results{\_}metrics.py} & Mithilfe dieses Skripts können die Resultate eines oder mehrerer Experimente aggregiert werden. Diese werden dann in eine CSV Datei im aktuellen Arbeitsverzeichnis abgelegt.\\
-			\texttt{extract{\_}embeddings.py} & Word-Embeddings, welche mit \texttt{word2vec} erstellt wurden, müssen ausgepackt werden bevor diese in den Experimenten verwendet werden können. Dieses Skript ist dafür zuständig.\\
-			\texttt{extract{\_}embeddings{\_}glove.py} & Word-Embeddings, welche mit \texttt{glove} erstellt wurden, müssen ausgepackt werden bevor diese in den Experimenten verwendet werden können. Dieses Skript ist dafür zuständig.\\
-			\texttt{extract{\_}embeddings{\_}vocabulary.py} & Das Vokabular von Word-Embeddings können mithilfe dieses Skripts extrahiert werden.\\
-			\texttt{generate{\_}data{\_}statistics.py} & Mithilfe dieses Skripts können Statistiken ein oder mehrerer TSV Dateien erstellt werden. Dabei werden die darin enthaltenen Texte und Sentiments analysiert.\\
-			\texttt{preprocess{\_}tsv{\_}data.py} & Mithilfe dieses Skripts können Daten aus einer TSV-Datei vorverarbeitet und im HDF5 Format abgespeichert werden. Dies ist nötig um z.B. die Daten für die Distant-Phasen vorzubereiten.\\
+			\texttt{analyse{\_}ngram.py{\_}from{\_}corpus.py} & With this script, it is possible to analyse a corpus regarding its bigrams. This script was used to generate the n-grams in Chapter~\ref{chapter:data:ngram} and~!!REFERENZ RESULTATE!!.\\
+			\texttt{analyze{\_}timestamp{\_}problematic{\_}opensubtitles.py} & With this script, the time-lag analysis between utterances in the OpenSubtitles corpus can be done (see Chapter~\ref{data:opensubtitles:time_lag_analysis}).\\
+			\texttt{analyze{\_}word{\_}coverage.py} & This script allows to analyse the word coverage of a corpus with regard to a given vocabulary (see Chapter~\ref{data:word_coverage}).\\
+			\texttt{split{\_}corpus.py} & This script allows to split a given corpus into a training, test and validation set by proportions. The split itself is done randomly (see Chapter~\ref{data:split_corpus}).\\
+			\texttt{evaluate{\_}trained{\_}model.py} & This script allows to evaluate a trained model on a certain dataset and stores the resulting metrics of this evaluation.\\
+			\texttt{generate{\_}s2v{\_}sequence{\_}embeddings.py} & This script allows for generating Sent2Vec embeddings for the given list of sequence samples. These are then used in Chapter~!!!RFERENZ RESULTATE!! for the similarity analysis.\\
+			\texttt{get{\_}internal{\_}embeddings{\_}from{\_}samples.py} & This script allows to generate ``thought vectors'' for list of given samples. They are used in the analysis in Chapter~!!REFERENZ!!.\\
+			\texttt{preprocess{\_}opensbutitles{\_}data.py} & This script is responsible for preprocessing the raw OpenSubtitles corpus as described in Chapter~\ref{data:preprocessing}.\\
+			\texttt{preprocess{\_}reddit{\_}corpus.py} & This script is responsible for preprocessing the raw Reddit corpus and building the tree which is the finally converted into the datasets as described in Chapter~\ref{data:preprocessing}.\\
+			\texttt{talk{\_}to{\_}model.py} & This script provides a possibility to talk to trained models through the terminal. The functionality is basically the same as in the web frontend (see Chapter~\ref{sofware_usage:web_frontend}).\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
@@ -88,13 +92,17 @@ In the following table there are exemplary calls for all scripts listed above:
 	\begin{adjustbox}{max width=\textwidth}
 		\begin{tabular}{lp{20cm}}
 			\toprule
-			Name & Bespielaufruf\\ \midrule
-			\texttt{aggregate{\_}results{\_}metrics.py} & python scripts/aggregate{\_}results{\_}metrics.py results/my-experiment-group/my-experiment\\
-			\texttt{extract{\_}embeddings.py} & python scripts/extract{\_}embeddings.py -e embeddings/my-embeddings -v vocabularies/vocabulary.pickle -o embeddings/my-extracted-embeddings\\
-			\texttt{extract{\_}embeddings{\_}glove.py} & python scripts/extract{\_}embeddings{\_}glove.py -e embeddings/my-glove-embeddings -v vocabularies/vocabulary.pickle -o embeddings/my-extracted-embeddings\\
-			\texttt{extract{\_}embeddings{\_}vocabulary.py} & python scripts/extract{\_}embeddings{\_}vocabulary.py.py -e embeddings/my-glove-embeddings -v vocabularies/vocabulary.pickle -o embeddings/my-extracted-embeddings\\
-			\texttt{generate{\_}data{\_}statistics.py} & python scripts/generate{\_}data{\_}statistics.py testdata/my-data.tsv\\
-			\texttt{preprocess{\_}tsv{\_}data.py} & python scripts/preprocess{\_}tsv{\_}data.py -t my-data.tsv -o preprocessed.h5 -s 140 -v vocabularies/my-vocabulary.pickle -m 1000000\\
+			Name & Exemplary Call\\ \midrule
+			\texttt{analyse{\_}ngram.py{\_}from{\_}corpus.py} & python scripts/analyse{\_}ngram.py{\_}from{\_}corpus.py data/opensubtitles/opensubtitles\_raw.txt 2 results/opensubtitles/bigram\_analysis.csv results/opensubtitles/bigram\_analysis\_words.csv\\
+			\texttt{analyze{\_}timestamp{\_}problematic{\_}opensubtitles.py} & python scripts/analyze{\_}timestamp{\_}problematic{\_}opensubtitles.py data/OpenSubtitles2016 analysis\_timestamps\_opensubtitles.json\\
+			\texttt{analyze{\_}word{\_}coverage.py} & python scripts/analyze{\_}word{\_}coverage.py data/reddit/reddit\_corpus.txt word\_coverage\_reddit\_new.json data/reddit/vocab\_100k.pickle,data/reddit/vocab\_50k.pickle\\
+			\texttt{split{\_}corpus.py} & Tpython scripts/split{\_}corpus.py data/reddit/reddit\_corpus\_preprocessed.txt 80,10,10 data/reddit/reddit\_train.txt data/reddit/reddit\_valid.txt data/reddit/reddit\_test.txt\\
+			\texttt{evaluate{\_}trained{\_}model.py} & python scripts/evaluate{\_}trained{\_}model.py results/reddit/model-100000.chkp data/reddit/reddit\_train.txt results/reddit/test\_metrics.json results/reddit/test\_predictions.csv 250000\\
+			\texttt{generate{\_}s2v{\_}sequence{\_}embeddings.py} & python scripts/generate{\_}s2v{\_}sequence{\_}embeddings.py misc/fasttext misc/sent2vec\_wiki\_bigrams 700 2 results/reddit/test\_predictions.csv results/reddit/test\_s2v\_generated\_wiki\_bigrams.h5\\
+			\texttt{get{\_}internal{\_}embeddings{\_}from{\_}samples.py} & python scripts/get{\_}internal{\_}embeddings{\_}from{\_}samples.py samples.txt results/reddit/model-100000.chkp results/reddit/samples\_embeddings.h5\\
+			\texttt{preprocess{\_}opensubtitles{\_}data.py} & python scripts/preprocess\_opensubtitles\_data.py data/opensubtitles/raw-xml-files/ data/opensubtitles/opensubtitles\_raw.txt\\
+			\texttt{preprocess{\_}reddit{\_}corpus.py} & python script/preprocess\_reddit\_corpus data/reddit/full\_corpus/ 2014,2015 movies\\
+			\texttt{talk{\_}to{\_}model.py} & python scripts/talk\_to\_model.py\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
@@ -105,6 +113,7 @@ In the following table there are exemplary calls for all scripts listed above:
 \clearpage
 
 \section{Running Experiments}
+\label{software_usage:running_experiments}
 To run experiments, one has to write a configuration file in the JSON format. All of them reside in the directory \texttt{configs/}. In the following table, all important configuration parameters are explained:
 
 \begin{table}[H]
@@ -114,18 +123,24 @@ To run experiments, one has to write a configuration file in the JSON format. Al
 		\begin{tabular}{llp{10cm}}
 			\toprule
 			Name & Default Value & Description\\ \midrule
-			\texttt{batch{\_}size} & \texttt{500} & Mithilfe dieses Parameters kann konfiguriert werden mit welcher Batch-Size das Training des CNN durchgeführt wird.\\
-			\texttt{early{\_}stopping{\_}monitor{\_}metric} & \texttt{val{\_}f1{\_}score{\_}pos{\_}neg} & Damit wird konfiguriert, welche Metrik durch das Early-Stopping überwacht werden soll.\\
-			\texttt{early{\_}stopping{\_}patience} & \texttt{75} & Über diesen Parameter kann konfiguriert werden wieviel Epochen ohne Fortschritt bezüglich der \texttt{early{\_}stopping{\_}monitor{\_}metric} Metrik trainiert wird, bevor das Training abgebrochen wird.\\
-			\texttt{max{\_}sent{\_}length} & \texttt{140} & Mithilfe dieses Parameters kann angegeben werden, wieviele Wörter pro Satz maximal erlaubt sind. Längere Sätze werden demnach gekürzt.\\
-			\texttt{nb{\_}epoch} & \texttt{1000} & Dieser Parameter ist dafür zuständig, über wieviel Epochen hinweg das Training durchgeführt wird.\\
-			\texttt{nb{\_}kfold{\_}cv} & \texttt{4} & Wenn dieser Parameter vorhanden ist, wird während des Trainings k-fold Cross-Validation verwendet. Bei einem Parameterwerte kleiner als $2$ wird keine k-fold Cross-Validation durchgeführt.\\
-			\texttt{early{\_}stopping{\_}patience} & \texttt{75} & Über diesen Parameter kann konfiguriert werden wieviel Epochen ohne Fortschritt bezüglich der \texttt{early{\_}stopping{\_}monitor{\_}stopping} trainiert wird, bevor das Training abgebrochen wird.\\
-			\texttt{name} & \texttt{null} & Muss gesetz werden, da das Experiment dem Namen entsprechend im \texttt{results/} Verzeichnis abgelegt wird.\\
-			\texttt{group{\_}id} & \texttt{null} & Muss gesetzt werden, da Experimente nach diesem Namen im \texttt{results/} Verzeichnis gruppiert werden.\\
-			\texttt{model{\_}json{\_}path} & \texttt{null} & Gibt den Pfad zur JSON Datei mit dem zu ladenden \texttt{keras} Modell an. Darf nur angegeben werden sofern auch ein Wert für \texttt{model{\_}weights{\_}path} gesetzt ist, sonst tritt beim Start ein Fehler auf.\\
-			\texttt{model{\_}id} & \texttt{1} & Damit können verschiedene Versionen des verwendeten CNN geladen werden (z.B. unterschiedliche Anzahl Convolutional Schichten). Welche ID für welches Modell steht ist in der Datei \texttt{source/model.py} ersichtlich.\\
-			\texttt{model{\_}weights{\_}path} & \texttt{null} & Gibt den Pfad zur HDF5 Datei mit den zu ladenden Gewichten an. Darf nur angegeben werden sofern auch ein Wert für \texttt{model{\_}json{\_}path} gesetzt ist.\\
+			\texttt{device} & \texttt{/gpu:0} & Defines the device on which the computations are run.\\
+			\texttt{train} & \texttt{true} & Defines whether a training should be run or not. Is set to \texttt{false} in case inference is run.\\
+			\texttt{git\_rev} & \texttt{null} & This parameter stores the SHA1 of the latest \texttt{git} revision when an experiment was started.\\
+			\texttt{model\_path} & \texttt{null} & This parameter signifies if an already trained model should be loaded before starting the training or inference.\\
+			\texttt{training\_data} & \texttt{null} & Defines which dataset should be used for training the model while training.\\
+			\texttt{validation\_data} & \texttt{null} & Defines which dataset should be used for validating the model while training.\\
+			\texttt{reverse\_input} & \texttt{false} & Defines whether the input sequence should be fed to the model in reverse if set to \texttt{true}.\\
+			\texttt{use\_last\_output\_as\_input} & \texttt{false} & Defines whether the output of the last sample should be used as the input for the next sample as described in Chapter~\ref{methods}.\\
+			\texttt{start\_training\_from\_beginning} & \texttt{false} & Defines whether the training should start from the first sample of the training dataset or not. If it is set to \texttt{true}, the training will start with the first sample the model has not already seen in previous trainings, as indicated by internal variables of the model saved when storing the model.\\
+			\texttt{show{\_}predictions\_while\_training} & \texttt{false} & Defines whether the outputs of the model should be printed to the terminal when training.\\
+			\texttt{show{\_}predictions\_while\_training\_num} & \texttt{5} & Defines how much predictions should be printed at the end of each epoch when training.\\
+			\texttt{vocabulary} & \texttt{null} & Defines which \texttt{pickle} vocabulary should be used for the current model.\\
+			\texttt{epoch} & 1 & Defines the number of epochs which should be done in case of training a model.\\
+			\texttt{save\_model\_after\_n\_epochs} & \texttt{10} & Defines the interval in which the model is stored based on the number of epochs finished.\\
+			\texttt{epochs\_per\_validation} & \texttt{10} & Defines the interval in which the model is validated while training based on the number of epochs finished.\\
+			\texttt{batches\_per\_validation} & \texttt{0} & Defines the interval in which the model is validated while training based on the number of epochs finished.\\
+			\texttt{batches\_per\_epoch} & \texttt{1000} & Defines how much batches should be processed in one epoch.\\
+			\texttt{batch{\_}size} & \texttt{1} & Defines how much samples should be put in one batch.\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
@@ -139,30 +154,33 @@ To run experiments, one has to write a configuration file in the JSON format. Al
 	\ra{1.3}
 	\begin{adjustbox}{max width=\textwidth, max height=\textheight}
 		\begin{tabular}{llp{10cm}}
-			\toprule
-			Name & Default Value & Description\\ \midrule
-			\texttt{monitor{\_}metric} & \texttt{val{\_}f1{\_}score{\_}pos{\_}neg} & Mithilfe dieses Parameters kann konfiguriert werden, welche Metrik ausschlaggebend ist um am Ende des Trainings zu entscheiden, welcher der beste Fold war. Wird nur beachtet wenn k-fold Cross-Validation aktiviert ist.\\
-			\texttt{monitor{\_}metric{\_}mode} & \texttt{max} & Mithilfe dieses Parameter wird konfiguriert ob die \texttt{monitor{\_}metric} nach dem maximalen oder minimalen Wert überwacht werden soll.\\
-			\texttt{preprocessed{\_}data} & \texttt{null} & Hier kann die HDF5 Datei, aus welcher die Trainingsdaten stammen, referenziert werden. Dann werden die Parameter \texttt{validation{\_}data{\_}path} sowie \texttt{test{\_}data} ignoriert. Ausserdem muss der Parameter \texttt{samples{\_}per{\_}epoch} gesetzt werden.\\
-			\texttt{randomize{\_}test{\_}data} & \texttt{true} & Wenn diser Parameter auf \texttt{true} gesetzt wird, werden die geladenen Trainingsdaten zufällig durchmischt.\\
-			\texttt{use{\_}random{\_}embeddings} & \texttt{false} & Falls dieser Parameter auf \texttt{true} gesetzt wird werden die Word-Embeddings zufällig initialisiert.\\
-			\texttt{set{\_}class{\_}weights} & \texttt{false} & Entscheidet ob während des Trainings Klassengewichte verwendet werden sollen.\\
-			\texttt{samples{\_}per{\_}epoch} & \texttt{0} & Falls die Parameter t\texttt{use{\_}preprocessed{\_}data} und \texttt{preprocessed{\_}data} gesetzt sind, muss hier angegeben werden wieviel Datensätze aus den vorverarbeiteten Daten verwendet werden sollen.\\
-			\texttt{test{\_}data} & \texttt{null} & Über diesen Parameter kann konfiguriert werden, welche Trainingsdaten verwendet werden sollen. Dabei muss entweder der Pfad zu einer TSV Datei angegeben werden, oder ein Objekt welches als Schlüssel die Pfade zu den zu ladenden TSV Dateien und als Werte die zu ladenden Anzahl Datensätze enthält. Wird ignoriert wenn vorverarbeitete Daten verwendet werden.\\
-			\texttt{use{\_}preprocessed{\_}data} & \texttt{false} & Muss auf \texttt{true} gesetzt werden falls der Parameter \texttt{preprocessed{\_}data} gesetzt wurde.\\
-			\texttt{validation{\_}data{\_}path} & \texttt{null} & Über diesen Parameter wird konfiguriert, welche Daten für die Validierung während und am Ende des Trainings verwendet werden sollen. Der Aufbau ist dabei derselbe wie beim Parameter \texttt{test{\_}data}. Wird ignoriert wenn vorverarbeitete Daten verwendet werden.\\
-			\texttt{validation{\_}split} & \texttt{0.0} & Dieser Parameter gibt an, welcher Bruchteil der Trainingsdaten als Validierungsdaten verwendet werden sollen. Falls der Parameter \texttt{validation{\_}data{\_}path} gesetzt ist wird dieser Parameter ignoriert.\\
-			\bottomrule
+		\toprule
+		Name & Default Value & Description\\ \midrule
+		\texttt{max{\_}input\_length} & \texttt{50} & Defines the maximum number of words to consider from the input sequence.\\
+		\texttt{max{\_}output\_length} & \texttt{50} & Defines the maximum number of words the decoder can generate before the decoding stops.\\
+		\texttt{num{\_}encoder\_layers} & \texttt{1} & Defines the number of layers used for the encoder.\\
+		\texttt{num{\_}decoder\_layers} & \texttt{1} & Defines the number of layers used for the decoder.\\
+		\texttt{num{\_}hidden\_units} & \texttt{1024} & Defines the size of the hidden state used in the encoder and decoder cell.\\
+		\texttt{cell{\_}type} & \texttt{LSTM} & Defines which kind of RNN cell is used for the model. Can be either \texttt{LSTM}, \texttt{GRU} or \texttt{RNN}.\\
+		\texttt{sampled{\_}softmax\_number\_of\_samples} & \texttt{512} & Defines the number of words sampled when using the sampled softmax loss function. Is disabled in case the number of words is smaller than the provided number or if the parameter is set to 0.\\
+		\texttt{hidden\_state\_reduction\_size} & \texttt{null} & Defines the dimensionality the hidden state of the decoder cell should be projected down to before it is fed to the softmax layer at the end.\\
+		\texttt{max\_random\_embeddings\_size} & \texttt{512} & Defines the dimensionality of the word embeddings used within the model.\\
+		\texttt{use\_beam\_search} & \texttt{false} & Defines whether the beam search decoder should be used instead of the greedy decoder.\\
+		\texttt{beam\_size} & \texttt{10} & The number of beams which should be considered when using the beam search decoder.\\
+		\texttt{beam\_search\_only\_best} & \texttt{true} & Defines that the output of the beam search decoder should only be the one resulting from the best beam if set to \texttt{true}, or the results from all beams otherwise.\\
+		\texttt{buckets} & \texttt{[[50, 50]]} & Defines the buckets which are used when using the model. We only used one bucket, but it is certainly possible to use multiple of them. The range of available buckets has to cover the \texttt{max{\_}input\_length} and \texttt{max{\_}output\_length}, otherwise an error is thrown.\\
+		\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Explanation of the important configuration parameters of the software system (part 1).}
+	\caption{Explanation of the important configuration parameters of the software system (part 2).}
 \end{table}
 
-The descriptions above are neither complete nor concluding. We recommend consult the source code for the exact behavior of the additional parameters
+
+The descriptions above are neither complete nor concluding. We recommend consult the source code for the exact behavior of the additional parameters. Also, there are more model related parameters which are only applicable to the models stored in the source code file \texttt{other\_models.py}, where implemented but now unused models reside.
 
 \clearpage
 
-An example configuration (here from the OpenSubtitles experiment) can look as follows:
+An example configuration can look as follows:
 
 \begin{figure}[thp]
 	\centering
@@ -180,9 +198,9 @@ An example configuration (here from the OpenSubtitles experiment) can look as fo
 			"hidden_state_reduction_size": 1024,
 			"num_encoder_layers": 1,
 			"num_decoder_layers": 0,
-			"training_data": "data/opensubtitles-2016-new/opensubtitles_2016.train.0.txt",
-			"validation_data": "data/opensubtitles-2016-new/opensubtitles_2016.valid.0.txt",
-			"vocabulary": "data/opensubtitles-2016-new/vocab_opensubtitles_2016_50k.pickle",
+			"training_data": "data/reddit_train.txt",
+			"validation_data": "data/reddit_valid.txt",
+			"vocabulary": "data/reddit/vocab_50k.pickle",
 			"max_random_embeddings_size": 1024,
 			"max_input_length": 30,
 			"max_output_length": 30,
@@ -197,28 +215,25 @@ An example configuration (here from the OpenSubtitles experiment) can look as fo
 		\end{lstlisting}
 	\end{tabular}
 	\label{software_usage:config_json_example}
-	\caption{Example JSON configuration for the OpenSubtitles experiment.}
+	\caption{Example JSON configuration for the Reddit experiment.}
 \end{figure}
 
 To start experiments, one has to invoke the \texttt{run.sh} script at the root of the repository with the configuration of the experiment desired to run.
 
-\begin{lstlisting}[frame=none]
-$ ./run.sh configs/config-1.json
-\end{lstlisting}
+\texttt{\$ ./run.sh configs/config-1.json}
 
 The results are then stored in a directory in \texttt{results/} within a subdirectory named after the name of the configuration file supplied to \texttt{run.sh}.
 
 \section{Web Frontend}
+\label{sofware_usage:web_frontend}
 We implemented a simple web frontend for communicating with already trained models. It is implemented by using \texttt{flask}, \texttt{jQuery} and the \texttt{bootstrap} frontend framework. To us the frontende, one has to start  it using the following command:
 
-\begin{lstlisting}[frame=none]
-$ python scripts/web/app.py
-\end{lstlisting}
+\texttt{\$ python scripts/web/app.py}
 
-This will start the web frontend running on \texttt{localhost} and using the port 9001. After it has been started, one has to select the model it would like to load from the models in the dropdown at the top. All models found in the \texttt{results/} directory are listed there. After the selection, a session has to be started by clicking on the \emph{Start} button. This might take a moment, as the loading of the model is a costly process. After the model has been loaded (as indicated by ...), one can start to communicate with it by sending text. Keep in mind, that the kind of output of the model (e.g. beam-search or greedy) directly depends on the configuration stored in the directory where the loaded model is located. This means, if one wants to see for example the output of all beams (in case of beam-search), one has to change the configuration value of the key \texttt{beam\_search\_only\_best} to \texttt{true} there. For a comprehensive list of all configuration values and their meaning, please see Chapter~\ref{sofware_usage:config}.
-
-!!IMAGE!!
-
-Mithilfe der bereitgestellten Weboberfläche können durchgeführte Experimente analysiert werden. Um dies zu ermöglichen sind drei Kernfunktionalitäten implementiert: Es wird eine Übersicht über alle JSON Dateien im entsprechenden Resultat-Ordner angezeigt, Metriken können mittels \texttt{math.js}\footnote{http://mathjs.org/} ausgewertet und es ist möglich Plots über Metriken mittels \texttt{matplotlib}\footnote{http://matplotlib.org/} zu erstellen.
-
-Die Weboberfläche selbst kann über den Befehl \texttt{python web/app.py} gestartet werden. Diese ist dann über den Browser mittels der URL \texttt{http://localhost:5000} erreichbar.
+This will start the web frontend running on \texttt{localhost} and using the port 9001. After it has been started, one has to select the model it would like to load from the models in the dropdown at the top. All models found in the \texttt{results/} directory are listed there. After the selection, a session has to be started by clicking on the \emph{Start} button. This might take a moment, as the loading of the model is a costly process. After the model has been loaded (as indicated by ...), one can start to communicate with it by sending text. Keep in mind, that the kind of output of the model (e.g. beam-search or greedy) directly depends on the configuration stored in the directory where the loaded model is located. This means, if one wants to see for example the output of all beams (in case of beam-search), one has to change the configuration value of the key \texttt{beam\_search\_only\_best} to \texttt{true} there. For a comprehensive list of all configuration values and their meaning, please see Chapter~\ref{software_usage:running_experiments} or the source code itself.
+\\
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=10cm]{img/web_frontend_inference}
+	\caption{Frontend showing the output when sending the sequence ``1 2 3 4 5'' to a model trained on the copy task (see chapter \ref{software_sytem:model_validation_checks}).}
+\end{figure}
