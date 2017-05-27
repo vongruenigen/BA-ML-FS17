@@ -11,7 +11,7 @@
 #              2. Unzip the file RC_2015-01
 #              3. Run this file with the top lvl path of your RC_2015-01 file AND as second parameter you can select which dataset year you wish. As a third parameter 
 #                 you select the subreddit corpus  you like.
-#                 Example: ./script/preprocess_reddit_corpus ../../reddit_corpus/ 2014,2015 movies
+#                 Example: ./script/preprocess_reddit_corpus ../../reddit_corpus/ 2014,2015
 
 import sys
 import os
