@@ -174,6 +174,7 @@ Beam-search tries to fix or at least minimize this problem by not only consideri
 \footnotetext{https://github.com/tensorflow/tensorflow/issues/654}
 
 \section{Performance Metrics}
+\label{fundamentals:metrics}
 In this section, we are going to introduce the main performance metrics used in this thesis to asses the performance of the trained models.
 
 \paragraph{Cross-Entropy Loss} For our model, we are using the \emph{Cross-Entropy} loss function while training. It can be used to measure how well an expected probability distribution $p$ is predicted by a trained model, where the predicted distribution is denoted as $q$. In our case, the probability distribution $p(x)$ is the distribution of the words predicted by the decoder at the time step $t$ and $q(x)$ is the expected distribution for the given sample $x$. The loss function is defined via the following equation where $X$ stands for the whole training dataset:
