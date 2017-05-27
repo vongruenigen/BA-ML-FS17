@@ -168,7 +168,9 @@ To run experiments, one has to write a configuration file in the JSON format. Al
 		\texttt{use\_beam\_search} & \texttt{false} & Defines whether the beam search decoder should be used instead of the greedy decoder.\\
 		\texttt{beam\_size} & \texttt{10} & The number of beams which should be considered when using the beam search decoder.\\
 		\texttt{beam\_search\_only\_best} & \texttt{true} & Defines that the output of the beam search decoder should only be the one resulting from the best beam if set to \texttt{true}, or the results from all beams otherwise.\\
-		\texttt{buckets} & \texttt{[[50, 50]]} & Defines the buckets which are used when using the model. We only used one bucket, but it is certainly possible to use multiple of them. The range of available buckets has to cover the \texttt{max{\_}input\_length} and \texttt{max{\_}output\_length}, otherwise an error is thrown.\\
+		\texttt{buckets} & \texttt{[[50, 50]]} & Defines the buckets which are used when using the model. We only used one bucket, but it is certainly possible to use multiple of them. The range of available buckets has to cover \texttt{max{\_}input\_length} and \texttt{max{\_}output\_length}.\\
+		\texttt{dropout\_input\_keep\_prob} & \texttt{1.0} & Defines how much percent of the input to the RNN cells should be kept when using dropout.\\
+		\texttt{dropout\_input\_keep\_prob} & \texttt{1.0} & Defines how much percent of the output of the RNN cells should be kept when using dropout.\\
 		\bottomrule
 		\end{tabular}
 	\end{adjustbox}
