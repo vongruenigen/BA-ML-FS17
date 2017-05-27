@@ -43,21 +43,20 @@ In the following table, we explain the structure of the repository and the conte
 	\begin{tabularx}{\textwidth}{lX}
 		\toprule
 		Name of Directory & Description\\ \midrule
-		\texttt{configs/} & Im Ordner \texttt{configs/} werden die JSON Konfigurationen aller Experimente abgelegt. Diese sind nach \texttt{group{\_}id} in einzelnen Unterordner gruppiert.\\
-		\texttt{report/} & Ist der Ordner, in welchem alle Dokumente, welche für das Erstellen des Berichts benötigt werden, liegen.\\
-		\texttt{results/} & Hier werden die Resultate aller durchgeführten Experimente abgespeichert. Wie bereits bei den Konfigurationen werden die Resultate hier nach \texttt{group{\_}id} gruppiert. Jedes Experiment erhält einen Ordner in welchem das finale CNN, die gesammelten Evaluierungs-Metriken sowie die Konfiguration des Experiments abgespeichert werden.\\
-		\texttt{scripts/} & Im Ordner \texttt{scripts/} liegen alle Skripts, welche nachfolgend erläutert werden.\\
-		\texttt{source/} & Hier liegt der eigentliche Source-Code des Systems. Darin befinden sich alle Teile, welche im Kapitel \ref{technical_setup} erläutert wurden. Ausserdem befinden sich dort diverse \texttt{python} Module (z.B. \texttt{data{\_}utils}), welche ebenfalls im Rahmen der Skripts benötigt werden.\\
-		\texttt{web/} & Im Ordner \texttt{web/} liegt der Source-Code der Weboberfläche.\\
+		\texttt{configs/} & In this directory, all the JSONconfigurations for all experiments are stored.\\
+		\texttt{report/} & All documents related to the thesis itself are stored in this directory.\\
+		\texttt{results/} & The results of all the run experiments are stored in this directory. The results themselves are stored in a directory named after the \texttt{WHAT} of the experiment. In total, the model, all collected metrics and the configuration of experiments are stored in this directories.\\
+		\texttt{scripts/} & The scripts used in this thesis are stored in this directory (see Chapter~\ref{sofware_usage:scripts}).\\
+		\texttt{source/} & The whole source code of the software system itself is located in this directory including all the components necessary to implement the system described in the Chapter~\ref{sofware_system}.\\
 		\bottomrule
 	\end{tabularx}
-	\caption{Erläuterungen zum Aufbau des Repository.}
+	\caption{Remarks regarding the structure of the repository.}
 \end{table}
 \todo{update}
 
 \clearpage
 \section{Using the Scripts}
-Im Folgenden werden die wichtigsten Skripte des Systems, welche zur Durchführung der Experimente notwendig sind, erläutert. Die Skripte selber liegen im Ordner \texttt{scripts/} des Repositories.
+In the following section, we are going to introduce the most important scripts necessary to use the software system for running experiments. The scripts themselves are located in the directory \texttt{scripts/}.
 
 \begin{table}[H]
 	\centering
@@ -65,7 +64,7 @@ Im Folgenden werden die wichtigsten Skripte des Systems, welche zur Durchführun
 	\begin{adjustbox}{max width=\textwidth}
 		\begin{tabular}{lp{8cm}p{8cm}}
 			\toprule
-			Name & Beschreibung\\ \midrule
+			Name & Description\\ \midrule
 			\texttt{aggregate{\_}results{\_}metrics.py} & Mithilfe dieses Skripts können die Resultate eines oder mehrerer Experimente aggregiert werden. Diese werden dann in eine CSV Datei im aktuellen Arbeitsverzeichnis abgelegt.\\
 			\texttt{extract{\_}embeddings.py} & Word-Embeddings, welche mit \texttt{word2vec} erstellt wurden, müssen ausgepackt werden bevor diese in den Experimenten verwendet werden können. Dieses Skript ist dafür zuständig.\\
 			\texttt{extract{\_}embeddings{\_}glove.py} & Word-Embeddings, welche mit \texttt{glove} erstellt wurden, müssen ausgepackt werden bevor diese in den Experimenten verwendet werden können. Dieses Skript ist dafür zuständig.\\
@@ -75,12 +74,13 @@ Im Folgenden werden die wichtigsten Skripte des Systems, welche zur Durchführun
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Beschreibungen der wichtigsten Skripte zur Verwendung Software-Systems.}
+	\caption{Descriptions of the most important scripts to use the software system.}
 \end{table}
+\todo{update}
 
-Es sind noch einige zusätzliche Skripte im Ordner \texttt{scripts/} vorhanden (z.B. für Erstellung von Plots, Verwaltung von Experimenten, etc.). Allerdings werden nicht alle benötigt um die Experimente durchzuführen und deswegen werden hier nur die wichtigsten erläutert.
+There are much more scripts than ones described above (e.g. for plotting, creation of vocabularies). Especially. Not all of them are necessary to conduct experiments, which is why only explain the most important.
 
-In der folgenden Tabelle sind Beispielaufrufe für jedes Skript aufgelistet:
+In the following table there are exemplary calls for all scripts listed above:
 
 \begin{table}[H]
 	\centering
@@ -98,13 +98,14 @@ In der folgenden Tabelle sind Beispielaufrufe für jedes Skript aufgelistet:
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Beispielaufrufe der wichtigsten Skripte zur Verwendung Software-Systems.}
+	\caption{Exemplary calls for the most important scripts to use the software system.}
 \end{table}
+\todo{update}
 
 \clearpage
 
-\section{Durchführung von Experimenten}
-Um ein Experiment durchzuführen wird eine Konfiguration im JSON Format benötigt. Diese liegen alle im Ordner \texttt{configs/}. Im Folgenden werden die einzelnen Konfigurationsparameter erläutert:
+\section{Running Experiments}
+To run experiments, one has to write a configuration file in the JSON format. All of them reside in the directory \texttt{configs/}. In the following table, all important configuration parameters are explained:
 
 \begin{table}[H]
 	\centering
@@ -112,7 +113,7 @@ Um ein Experiment durchzuführen wird eine Konfiguration im JSON Format benötig
 	\begin{adjustbox}{max width=\textwidth, max height=\textheight}
 		\begin{tabular}{llp{10cm}}
 			\toprule
-			Parametername & Standartwert & Beschreibung\\ \midrule
+			Name & Default Value & Description\\ \midrule
 			\texttt{batch{\_}size} & \texttt{500} & Mithilfe dieses Parameters kann konfiguriert werden mit welcher Batch-Size das Training des CNN durchgeführt wird.\\
 			\texttt{early{\_}stopping{\_}monitor{\_}metric} & \texttt{val{\_}f1{\_}score{\_}pos{\_}neg} & Damit wird konfiguriert, welche Metrik durch das Early-Stopping überwacht werden soll.\\
 			\texttt{early{\_}stopping{\_}patience} & \texttt{75} & Über diesen Parameter kann konfiguriert werden wieviel Epochen ohne Fortschritt bezüglich der \texttt{early{\_}stopping{\_}monitor{\_}metric} Metrik trainiert wird, bevor das Training abgebrochen wird.\\
@@ -128,7 +129,7 @@ Um ein Experiment durchzuführen wird eine Konfiguration im JSON Format benötig
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Erklärungen der einzelnen Konfigurationsparameter des Software-Systems. (Teil 1)}
+	\caption{Explanation of the important configuration parameters of the software system (part 1).}
 \end{table}
 
 \clearpage
@@ -139,7 +140,7 @@ Um ein Experiment durchzuführen wird eine Konfiguration im JSON Format benötig
 	\begin{adjustbox}{max width=\textwidth, max height=\textheight}
 		\begin{tabular}{llp{10cm}}
 			\toprule
-			Parametername & Standartwert & Beschreibung\\ \midrule
+			Name & Default Value & Description\\ \midrule
 			\texttt{monitor{\_}metric} & \texttt{val{\_}f1{\_}score{\_}pos{\_}neg} & Mithilfe dieses Parameters kann konfiguriert werden, welche Metrik ausschlaggebend ist um am Ende des Trainings zu entscheiden, welcher der beste Fold war. Wird nur beachtet wenn k-fold Cross-Validation aktiviert ist.\\
 			\texttt{monitor{\_}metric{\_}mode} & \texttt{max} & Mithilfe dieses Parameter wird konfiguriert ob die \texttt{monitor{\_}metric} nach dem maximalen oder minimalen Wert überwacht werden soll.\\
 			\texttt{preprocessed{\_}data} & \texttt{null} & Hier kann die HDF5 Datei, aus welcher die Trainingsdaten stammen, referenziert werden. Dann werden die Parameter \texttt{validation{\_}data{\_}path} sowie \texttt{test{\_}data} ignoriert. Ausserdem muss der Parameter \texttt{samples{\_}per{\_}epoch} gesetzt werden.\\
@@ -154,58 +155,70 @@ Um ein Experiment durchzuführen wird eine Konfiguration im JSON Format benötig
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Erklärungen der einzelnen Konfigurationsparameter des Software-Systems. (Teil 2)}
+	\caption{Explanation of the important configuration parameters of the software system (part 1).}
 \end{table}
 
-Die obigen Erläuterungen sind nicht abschliessend oder vollständig. Für die genaue Funktionsweise der weiteren Parameter wird empfohlen den Source-Code hinzu zu konsultieren.
+The descriptions above are neither complete nor concluding. We recommend consult the source code for the exact behavior of the additional parameters
 
 \clearpage
 
-Eine Beispiel-Konfiguration für ein einfaches Experiment sieht wie folgt aus:
+An example configuration (here from the OpenSubtitles experiment) can look as follows:
+
+\begin{figure}[thp]
+	\centering
+	\begin{tabular}{c}  % the tabular makes the listing as small as possible and centers it
+		\begin{lstlisting}[style=json]
+		{
+			"epochs": 150000,
+			"batches_per_epoch": 100,
+			"batches_per_validation": 2500,
+			"epochs_per_validation": 50,
+			"save_model_after_n_epochs": 100,
+			"batch_size": 64,
+			"cell_type": "LSTM",
+			"num_hidden_units": 2048,
+			"hidden_state_reduction_size": 1024,
+			"num_encoder_layers": 1,
+			"num_decoder_layers": 0,
+			"training_data": "data/opensubtitles-2016-new/opensubtitles_2016.train.0.txt",
+			"validation_data": "data/opensubtitles-2016-new/opensubtitles_2016.valid.0.txt",
+			"vocabulary": "data/opensubtitles-2016-new/vocab_opensubtitles_2016_50k.pickle",
+			"max_random_embeddings_size": 1024,
+			"max_input_length": 30,
+			"max_output_length": 30,
+			"reverse_input": false,
+			"show_predictions_while_training": true,
+			"buckets": [[30, 30]],
+			"sampled_softmax_number_of_samples": 512,
+			"word_tokenizer": "none",
+			"use_last_output_as_input": true,
+			"start_training_from_beginning": false
+		}
+		\end{lstlisting}
+	\end{tabular}
+	\label{software_usage:config_json_example}
+	\caption{Example JSON configuration for the OpenSubtitles experiment.}
+\end{figure}
+
+To start experiments, one has to invoke the \texttt{run.sh} script at the root of the repository with the configuration of the experiment desired to run.
 
 \begin{lstlisting}[frame=none]
-{
-"test_data": {
-"testdata/MPQ_reviews_full.tsv": 3000,
-"testdata/DIL_Reviews.tsv": 3000
-},
-"name": "my-fancy-experiment",
-"group_id": "really-cool-group",
-"nb_epoch": 1000,
-"nb_kfold_cv": 4,
-"vocabulary_embeddings": "embeddings/emb_smiley_tweets_embedding_english_590M.npy",
-"validation_data_path": "testdata/MPQ_News.tsv",
-"vocabulary_path": "vocabularies/vocab_en300M_reduced.pickle"
-}
+$ ./run.sh configs/config-1.json
 \end{lstlisting}
 
-Eine Beispiel-Konfiguration um eine Distant-Phase mit vorverarbeiteten Daten durchzuführen kann wie folgt aussehen:
+The results are then stored in a directory in \texttt{results/} within a subdirectory named after the name of the configuration file supplied to \texttt{run.sh}.
+
+\section{Web Frontend}
+We implemented a simple web frontend for communicating with already trained models. It is implemented by using \texttt{flask}, \texttt{jQuery} and the \texttt{bootstrap} frontend framework. To us the frontende, one has to start  it using the following command:
 
 \begin{lstlisting}[frame=none]
-{
-"group_id": "amazon_distant_model",
-"use_preprocessed_data": true,
-"preprocessed_data": "preprocessed/amazon_distant_train_preprocessed.hdf5",
-"samples_per_epoch": 82400000,
-"test_data": "testdata/amazon_distant_train.tsv",
-"name": "amazon_distant_model_82M_dedup_v2",
-"nb_epoch": 1,
-"max_sent_length": 140,
-"batch_size": 1000,
-"vocabulary_embeddings": "embeddings/word2vec_embeddings_en_news_emb.npy",
-"vocabulary_path": "vocabularies/vocab_news_emb.pickle"
-}
+$ python scripts/web/app.py
 \end{lstlisting}
 
-Um ein Experiment zu starten sollte das \texttt{run.sh} Skript im Repository verwendet werden. Dabei können als Parameter alle JSON Konfigurationen jener Experimente mitgegeben werden, welche durchgeführt werden sollen. Wenn im \texttt{configs/} Verzeichnis die beiden Konfigurationen \texttt{config-1.json} und \texttt{config-2.json} liegen würden, könnten diese mit folgendem Befehl gestartet werden:
+This will start the web frontend running on \texttt{localhost} and using the port 9001. After it has been started, one has to select the model it would like to load from the models in the dropdown at the top. All models found in the \texttt{results/} directory are listed there. After the selection, a session has to be started by clicking on the \emph{Start} button. This might take a moment, as the loading of the model is a costly process. After the model has been loaded (as indicated by ...), one can start to communicate with it by sending text. Keep in mind, that the kind of output of the model (e.g. beam-search or greedy) directly depends on the configuration stored in the directory where the loaded model is located. This means, if one wants to see for example the output of all beams (in case of beam-search), one has to change the configuration value of the key \texttt{beam\_search\_only\_best} to \texttt{true} there. For a comprehensive list of all configuration values and their meaning, please see Chapter~\ref{sofware_usage:config}.
 
-\begin{lstlisting}[frame=none]
-$ ./run.sh configs/config-1.json configs/config-2.json
-\end{lstlisting}
+!!IMAGE!!
 
-Die Resultate werden dann in einem der \texttt{group{\_}id} entsprechenden Verzeichnis innerhalb des \texttt{results/} Verzeichnisses abgelegt.
-
-\section{Weboberfläche}
 Mithilfe der bereitgestellten Weboberfläche können durchgeführte Experimente analysiert werden. Um dies zu ermöglichen sind drei Kernfunktionalitäten implementiert: Es wird eine Übersicht über alle JSON Dateien im entsprechenden Resultat-Ordner angezeigt, Metriken können mittels \texttt{math.js}\footnote{http://mathjs.org/} ausgewertet und es ist möglich Plots über Metriken mittels \texttt{matplotlib}\footnote{http://matplotlib.org/} zu erstellen.
 
 Die Weboberfläche selbst kann über den Befehl \texttt{python web/app.py} gestartet werden. Diese ist dann über den Browser mittels der URL \texttt{http://localhost:5000} erreichbar.
