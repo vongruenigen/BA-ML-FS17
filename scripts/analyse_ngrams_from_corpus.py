@@ -48,18 +48,31 @@ def generate_words(data_path):
             else:
                 for w in line.split(): yield w
 
+collocation_finder = None
+assoc_measures = None
+
+if ngram_size == 2:
+    collocation_finder = BigramCollocationFinder
+    assoc_measures = BigramAssocMeasures
+elif ngram_size == 3:
+    collocation_finder = TrigramCollocationFinder
+    assoc_measures = TrigramAssocMeasures
+else:
+    print('ERROR: n-gram size of %d is unsupported' % ngram_size)
+    sys.exit(2)
+
 if metric == 'likelihood':
-    metric_fn = BigramAssocMeasures.likelihood_ratio
+    metric_fn = assoc_measures.likelihood_ratio
 elif metric == 'pmi':
-    metric_fn = BigramAssocMeasures.pmi
+    metric_fn = assoc_measures.pmi
 elif metric == 'chi_sq':
-    metric_fn = BigramAssocMeasures.chi_sq
+    metric_fn = assoc_measures.chi_sq
 
 if metric_fn is None and metric != 'freq':
     print('ERROR: Invalid metric "%s"' % metric)
     sys.exit(2)
 
-bcf = BigramCollocationFinder.from_words(generate_words(corpus_path))
+bcf = collocation_finder.from_words(generate_words(corpus_path))
 bcf.apply_freq_filter(3)
 
 with open(out_words_path, 'w+') as f:
