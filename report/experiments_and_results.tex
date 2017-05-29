@@ -75,7 +75,90 @@ In this chapter, we are going to analyze the evolution and final results of the 
 \blindtext
 
 \section{N-Gram Analysis}
-\blindtext
+
+\paragraph{OpenSubtitles} \blindtext
+\begin{figure}[H]
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/bigram_distribution_comparison_step_500000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 500'000.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/bigram_distribution_comparison_step_1000000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 1'000'000.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/bigram_distribution_comparison_step_1500000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 1'500'000.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/bigram_distribution_comparison_step_2000000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 2'000'000.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/bigram_distribution_comparison_step_2500000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 2'500'000.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/bigram_distribution_comparison_step_3000000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 3'000'000.}
+	\endminipage\hfill
+	\caption{Distributions of the top 100 bigrams in the generated answers when using the test set over multiple time steps of the training.}
+	\label{results:ngram:distributions:opensubtitles}
+\end{figure}
+
+\paragraph{Reddit} \blindtext
+\begin{figure}[H]
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/bigram_distribution_comparison_step_500000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 500'000.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/bigram_distribution_comparison_step_1000000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 1'000'000.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/bigram_distribution_comparison_step_1500000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 1'500'000.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/bigram_distribution_comparison_step_2000000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 2'000'000.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/bigram_distribution_comparison_step_2500000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 2'500'000.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/bigram_distribution_comparison_step_3000000.pdf}
+	\centering
+	\small
+	\text{Distribution at training step 3'000'000.}
+	\endminipage\hfill
+	\caption{Distributions of the top 100 bigrams in the generated answers when using the test set over multiple time steps of the training.}
+	\label{results:ngram:distributions:opensubtitles}
+\end{figure}
 
 \section{Sent2Vec Analysis}
 
