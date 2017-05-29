@@ -20,6 +20,54 @@ In this chapter, we are going to analyze the evolution and final results of the 
 \section{Analysis of Learning Process}
 \blindtext
 
+\begin{figure}[H]
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/train_metrics.png}
+	\caption{Development of the loss and perplexity on the training and validation set throughout the training of the OpenSubtitles model.}
+	\label{results:learning_process:metrics:opensubtitles}
+\end{figure}
+
+\begin{figure}[H]
+	\includegraphics[width=\linewidth]{img/plots/reddit/train_metrics.png}
+	\caption{Development of the loss and perplexity on the training and validation set throughout the training of the Reddit model.}
+	\label{results:learning_process:metrics:reddit}
+\end{figure}
+
+\section{Performance on Test Sets}
+
+\begin{figure}[H]
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/test_metrics_both.png}
+	\centering
+	\small
+	\text{The loss and perplexity.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/test_metrics_loss.png}
+	\centering
+	\small
+	\text{Only the loss.}
+	\endminipage\hfill
+	\caption{The loss and perplexity by running the six different snapshots against the test dataset using the OpenSubtitles model.}
+	\label{result:test_performance:opensubtitles}
+\end{figure}
+
+\begin{figure}[H]
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/test_metrics_both.png}
+	\centering
+	\small
+	\text{The loss and perplexity.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/test_metrics_loss.png}
+	\centering
+	\small
+	\text{Only the loss.}
+	\endminipage\hfill
+	\caption{The loss and perplexity by running the six different snapshots against the test dataset using the Reddit model.}
+	\label{result:test_performance:reddit}
+\end{figure}
+
 \section{Generated outputs over time}
 \blindtext
 
@@ -30,7 +78,41 @@ In this chapter, we are going to analyze the evolution and final results of the 
 \blindtext
 
 \section{Sent2Vec Analysis}
-\blindtext
+
+\begin{figure}[H]
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/s2v_wiki_cosine_similarity.png}
+	\centering
+	\small
+	\text{Evaluation with the wiki model.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/s2v_twitter_cosine_similarity.png}
+	\centering
+	\small
+	\text{Evaluation with the twitter model.}
+	\endminipage\hfill
+	\caption{Results of the evaluation with Sent2Vec on the outputs of the OpenSubtitles models using the pretrained models found on the Sent2Vec GitHub page.}
+	\label{results:sent2vec:opensubtitles:results}
+\end{figure}
+
+\begin{figure}[H]
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/s2v_wiki_cosine_similarity.png}
+	\centering
+	\small
+	\text{Evaluation with the wiki model.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/s2v_twitter_cosine_similarity.png}
+	\centering
+	\small
+	\text{Evaluation with the twitter model.}
+	\endminipage\hfill
+	\caption{Results of the evaluation with Sent2Vec on the outputs of the Reddit models using the pretrained models found on the Sent2Vec GitHub page.}
+	\label{results:sent2vec:reddit:results}
+\end{figure}
+\footnotetext{https://github.com/epfml/sent2vec}
 
 \section{Internal Embedding for Input Sequences}
 \blindtext
