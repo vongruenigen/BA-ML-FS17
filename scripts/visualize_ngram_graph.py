@@ -130,9 +130,10 @@ start_color = Color('blue')
 middle_color = Color('white')
 end_color = Color('red')
 
-middle_idx = int(len(diff_positions) / 2)
-first_half_colors = list(start_color.range_to(middle_color, middle_idx))
-second_half_colors = list(middle_color.range_to(end_color, abs(len(diff_positions)-middle_idx)))
+middle_idx = diff_positions.index(0)
+first_half_colors = list(start_color.range_to(middle_color, middle_idx+1))
+second_half_colors = list(middle_color.range_to(end_color,
+                          abs(len(diff_positions)-middle_idx-1)))
 
 node_colors = first_half_colors + second_half_colors
 
@@ -185,7 +186,7 @@ elif engine == 'pydot':
 
         ngram_nodes[ngram] = pydot.Node(' '.join(ngram), style='filled',
                                         fillcolor=node_colors[diff_idx].get_web(),
-                                        fontsize=10*ngram_freq_sum/ngram_freqs[ngram])
+                                        fontsize=0.1*ngram_freq_sum/ngram_freqs[ngram])
 
         ngram_graph.add_node(ngram_nodes[ngram])
 
@@ -197,17 +198,26 @@ elif engine == 'pydot':
         if use_colored_edges and (in_node, out_node) in colored_edges:
             edge_color = alt_edge_color.get_web()
 
-        ngram_edges[edge] = pydot.Edge(in_node, out_node,
-                                       width=100)
+        ngram_edges[edge] = pydot.Edge(in_node, out_node, penwidth=3)
 
         ngram_graph.add_edge(ngram_edges[edge])
 
     print('Starting to draw graph...')
 
+    ngram_graph.set_outputorder('edgesfirst')
+
     if out_file.lower().endswith('.svg'):
-        ngram_graph.write_svg(out_file)
+        ngram_graph.write_svg(out_file, prog='fdp')
     elif out_file.lower().endswith('.png'):
-        ngram_graph.write_png(out_file)
+        ngram_graph.write_png(out_file, prog='fdp')
+    elif out_file.lower().endswith('.pdf'):
+        ngram_graph.write_pdf(out_file, prog='fdp')
+    elif out_file.lower().endswith('.ps'):
+        ngram_graph.write_ps(out_file, prog='fdp')
+    elif out_file.lower().endswith('.ps2'):
+        ngram_graph.write_ps2(out_file, prog='fdp')
+    elif out_file.lower().endswith('.dot'):
+        ngram_graph.write_dot(out_file, prog='fdp')
     else:
         print('ERROR: Out file must be an SVG or PNG!')
         sys.exit(2)
