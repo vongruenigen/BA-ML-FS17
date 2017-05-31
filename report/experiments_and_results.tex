@@ -18,27 +18,123 @@ The analysis is done in the order listed above, that means we start by analysing
 * Generated embeddings for input sentences
 * Sent2Vec analysis
 
-\section{How Did The Training Go?}
-First, let us start by analysing the evolution of the models with regard to the available performance metrics throughout the time span of the training. Below, in Figures~\ref{results:learning_process:metrics:opensubtitles} and~\ref{results:learning_process:metrics:reddit}, one can see the development of the loss and perplexity on the training sets for the two different models. What is eye-catching when comparing the two is that the OpenSubtitles seems to have much more variance in its performance on the validation set as opposed to the Reddit model. This probably comes from the fact that the OpenSubtitles datasets are much more noisey than the one of the Reddit model, as \cite{Vinyals:2015} also already noticed. This has to do with the fact, that we do not have any information about turn taking, which means it is certainly possible that consecutive utterances may be uttered by the same person even though we treat it if it were two persons. Also, there is the problematic with the time lags between utterances as analysed in Chapter~\ref{data:opensubtitles:time_lag_analysis}. In contrast, with the Reddit dataset, we always know who uttered a comment and hence can build a dataset which ensures that the dialogs make sense from a structural perspective.
-
+\section{How Did The Training Go?}\todo{vielleicht müssen wir den anpassen wegen neuer struktur}
+First, let us start by analysing the evolution of the models with regard to the available performance metrics throughout the time span of the training. Below, in Figures~\ref{results:learning_process:metrics:opensubtitles} and~\ref{results:learning_process:metrics:reddit}, one can see the development of the loss and perplexity on the training sets for the two different models.
+\todo{Heir vielleicht mit paragraph anfangen, Satz umstellen, The Opensubtitle and his variance ....}What is eye-catching when comparing the two is that the OpenSubtitles seems to have much more variance in its performance on the validation set as opposed to the Reddit model. This probably comes from the fact that the OpenSubtitles datasets are much more noisey than the one of the Reddit model, as \cite{Vinyals:2015} also already noticed. This has to do with the fact, that we do not have any information about turn taking, which means it is certainly possible that consecutive utterances may be uttered by the same person even though we treat it if it were two persons. Also, there is the problematic with the time lags between utterances as analysed in Chapter~\ref{data:opensubtitles:time_lag_analysis}. In contrast, with the Reddit dataset, we always know who uttered a comment and hence can build a dataset which ensures that the dialogs make sense from a structural perspective.
+\paragraph{The Dips in the Reddit} data..... The interesting part about the learning process of the Reddit model are the ``dips'' in the validation perplexity and hence in the loss on the validation dataset, even though there they are not as easily noticeable.\todo{Write more!}
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/train_metrics.png}
 	\caption{Development of the loss and perplexity on the training and validation set throughout the training of the OpenSubtitles model.}
 	\label{results:learning_process:metrics:opensubtitles}
-\end{figure}
-
-The interesting part about the learning process of the Reddit model are the ``dips'' in the validation perplexity and hence in the loss on the validation dataset, even though there they are not as easily noticeable.\todo{Write more!}
+\end{figure}\todo{Einheiten angeben (x = 1000-er)}
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/reddit/train_metrics.png}
 	\caption{Development of the loss and perplexity on the training and validation set throughout the training of the Reddit model.}
 	\label{results:learning_process:metrics:reddit}
-\end{figure}
+\end{figure}\todo{Einheiten angeben (x = 1000-er)}
 
-When looking at the metrics from the training, the results seem fine.
+\paragraph{Compared to each other} Hier das Bild mit der valid los/perplex beider modelle referenzieren und kurz schreiben, wer wie schnell gelernt hat und wie sich die Kurve unterscheiden.
 
-\section{How is the Performance when Evaluating the Models?}
+\begin{itemize}  
+	\item Idee (muss nicht sein) loss/perplex auf tesset auch hier, mit paragraph unterteilt
+	\item Gemäss validation loss lernt er nicht kontinuierlich sondern in abständen, nach einer verbesserung kommt eine langsame verschlechterung und anschliessend dann sprunghaft eine verbesserung. Ich suche später noch nach möglichen gründen dafür
+	\item Wir könnten hier noch ein chart erstellen, wo wir die Modelle gegeneinander vergleichen. z.B mit der loss/perplex auf dem valid set um zu zeigen, wie "schnell" welcher korpus "gelernt".
+\end{itemize}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Speaker & Utterance\\ \midrule
+			Input: 	& \texttt{Do you like Joffrey from game of thrones?}\\
+			0.5M: 	& \texttt{i m not sure if you re a fan of the movie ,}\\
+					& \texttt{but i m not sure if you re a fan of the movie .}\\
+			1.0M: 	& \texttt{i m not a fan of the game , but i m not sure if it s a game or not .}\\
+			1.5M:	& \texttt{i do nt know what i m talking about .}\\
+			2.0M:	& \texttt{i do nt }\\
+			2.5M:	& \texttt{i do nt know what i m talking about .}\\
+			3.0M:	& \texttt{i do nt know , i just do nt like him .}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example dialog with the Reddit model, one response for each checkpoint.}
+	\label{results:example_output1:reddit}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Speaker & Utterance\\ \midrule
+			Input: 	& \texttt{Which movie can you recommend me?}\\
+			0.5M: 	& \texttt{the}\\
+			1.0M: 	& \texttt{the movie .}\\
+			1.5M:	& \texttt{the one with the}\\
+			2.0M:	& \texttt{the dark knight rises}\\
+			2.5M:	& \texttt{the prestige}\\
+			3.0M:	& \texttt{the movie}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example dialog with the Reddit model, one response for each checkpoint.}
+	\label{results:example_output2:reddit}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Speaker & Utterance\\ \midrule
+			Input: 	& \texttt{Are you a man or a woman?}\\
+			0.5M: 	& \texttt{no , no , no}\\
+			1.0M: 	& \texttt{no}\\
+			1.5M:	& \texttt{i m not a man}\\
+			2.0M:	& \texttt{i m not a woman}\\
+			2.5M:	& \texttt{i m a man}\\
+			3.0M:	& \texttt{i m not a woman}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example dialog with the Reddit model, one response for each checkpoint.}
+	\label{results:example_output1:OpenSubtitle}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Speaker & Utterance\\ \midrule
+			Input: 	& \texttt{Why should it not be a good idea to improve you?}\\
+			0.5M: 	& \texttt{no}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{because i love you}\\
+			2.0M:	& \texttt{because i m a good man}\\
+			2.5M:	& \texttt{i m just trying to make a good decision}\\
+			3.0M:	& \texttt{i m not a good idea}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example dialog with the Reddit model, one response for each checkpoint.}
+	\label{results:example_output2:OpenSubtitle}
+\end{table}
+
+\section{How is the Performance when Evaluating the Models?}\todo{Testing the Models?, genereller der titel? Wie ist die Performance? (ohne when evaluating)}
 After we have seen that the training process looks fine, we are going to asses the performance of these models on our test datasets. Here we use the same metrics as within the training, namely the loss and perplexity values. We have evaluated each model on the respective test dataset for each checkpoint we have created while training (see Chapter~\ref{methods}). The resulting values are visualized in the Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}.
+
+\paragraph{Surprisingly bad values...}Apparently, the results on the test set are quite the opposite of the results from the training process. We did not expect that, but nevertheless, we are going to analyse the problem.
+\begin{itemize}
+	\item Loss Werte varieren stark
+	\item Verhalten sich überhaupt nicht ähnlich wie valid los/perplex (grafik mit valid/test?) 
+	\item Ist loss die richtige Metrik für unseren Task? Gemäss metrik dürfte sich der Output nicht verbessert haben.
+\end{itemize}
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -74,7 +170,12 @@ After we have seen that the training process looks fine, we are going to asses t
 	\label{result:test_performance:reddit}
 \end{figure}
 
-Apparently, the results on the test set are quite the opposite of the results from the training process. We did not expect that, but nevertheless, we are going to analyse the problem. Our first idea was, to see, what kind of sentences the models produce on the test dataset. We did an analysis on the generated sentences and quickly noticed, that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).
+\paragraph{However, it improved....} die loss/perplex auf dem testset zeigt an, dass er keine Fortschritte gemacht hat. Wenn wir jedoch Beispielsätze testen, sehen wir sehr wohl eine Entwicklung (hier das erste mal erwähnen, dass mehrmals über den gleichen corpus bei reddit vielleicht keine gute idee war, \ref{results:example_output1:reddit} gibt beim letzten checkpoint wieder eine schlechte frühere antwort "the movie"). Beispiele für Verbesserung des Sprachmodelles:(\ref{results:example_output1:reddit}, \ref{results:example_output2:reddit}, \ref{results:example_output1:OpenSubtitle}, \ref{results:example_output2:OpenSubtitle}) Loss/Perplx ist anscheinend keine verlässliche metrik im zusammenhang mit sprachmodell, deshalb sen2vec versuchen.
+
+
+Our first idea was, to see, what kind of sentences the models produce on the test dataset. We did an analysis on the generated sentences and quickly noticed, that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).
+
+
 
 \begin{table}[H]
 	\centering
