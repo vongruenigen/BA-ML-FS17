@@ -20,8 +20,9 @@ The analysis is done in the order listed above, that means we start by analysing
 
 \section{How Did The Training Go?}\todo{vielleicht müssen wir den anpassen wegen neuer struktur}
 First, let us start by analysing the evolution of the models with regard to the available performance metrics throughout the time span of the training. Below, in Figures~\ref{results:learning_process:metrics:opensubtitles} and~\ref{results:learning_process:metrics:reddit}, one can see the development of the loss and perplexity on the training sets for the two different models.
-\todo{Heir vielleicht mit paragraph anfangen, Satz umstellen, The Opensubtitle and his variance ....}What is eye-catching when comparing the two is that the OpenSubtitles seems to have much more variance in its performance on the validation set as opposed to the Reddit model. This probably comes from the fact that the OpenSubtitles datasets are much more noisey than the one of the Reddit model, as \cite{Vinyals:2015} also already noticed. This has to do with the fact, that we do not have any information about turn taking, which means it is certainly possible that consecutive utterances may be uttered by the same person even though we treat it if it were two persons. Also, there is the problematic with the time lags between utterances as analysed in Chapter~\ref{data:opensubtitles:time_lag_analysis}. In contrast, with the Reddit dataset, we always know who uttered a comment and hence can build a dataset which ensures that the dialogs make sense from a structural perspective.
-\paragraph{The Dips in the Reddit} data..... The interesting part about the learning process of the Reddit model are the ``dips'' in the validation perplexity and hence in the loss on the validation dataset, even though there they are not as easily noticeable.\todo{Write more!}
+
+\paragraph{The Opensubtitle and his variance...}What is eye-catching when comparing the two is that the OpenSubtitles seems to have much more variance in its performance on the validation set as opposed to the Reddit model. This probably comes from the fact that the OpenSubtitles datasets are much more noisey than the one of the Reddit model, as \cite{Vinyals:2015} also already noticed. This has to do with the fact, that we do not have any information about turn taking, which means it is certainly possible that consecutive utterances may be uttered by the same person even though we treat it if it were two persons. Also, there is the problematic with the time lags between utterances as analysed in Chapter~\ref{data:opensubtitles:time_lag_analysis}. In contrast, with the Reddit dataset, we always know who uttered a comment and hence can build a dataset which ensures that the dialogs make sense from a structural perspective.
+\paragraph{The Dips in the Reddit} data..... The interesting part about the learning process of the Reddit model are the ``dips'' in the validation perplexity and hence in the loss on the validation dataset, even though there they are not as easily noticeable.\todo{Gemäss validation loss lernt er nicht kontinuierlich sondern in abständen, nach einer verbesserung kommt eine langsame verschlechterung und anschliessend dann sprunghaft eine verbesserung. Ich suche später noch nach möglichen gründen dafür}
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/train_metrics.png}
 	\caption{Development of the loss and perplexity on the training and validation set throughout the training of the OpenSubtitles model.}
@@ -36,11 +37,57 @@ First, let us start by analysing the evolution of the models with regard to the 
 
 \paragraph{Compared to each other} Hier das Bild mit der valid los/perplex beider modelle referenzieren und kurz schreiben, wer wie schnell gelernt hat und wie sich die Kurve unterscheiden.
 
-\begin{itemize}  
-	\item Idee (muss nicht sein) loss/perplex auf tesset auch hier, mit paragraph unterteilt
-	\item Gemäss validation loss lernt er nicht kontinuierlich sondern in abständen, nach einer verbesserung kommt eine langsame verschlechterung und anschliessend dann sprunghaft eine verbesserung. Ich suche später noch nach möglichen gründen dafür
-	\item Wir könnten hier noch ein chart erstellen, wo wir die Modelle gegeneinander vergleichen. z.B mit der loss/perplex auf dem valid set um zu zeigen, wie "schnell" welcher korpus "gelernt".
+\paragraph{In general, the training seems successful}... Kurz Fazit pro Section? sieht gut aus insgesamt, überleitung zu Performance test section
+
+
+\section{Performance when Testing the Models}
+After we have seen that the training process looks fine, we are going to asses the performance of these models on our test datasets. Here we use the same metrics as within the training, namely the loss and perplexity values. We have evaluated each model on the respective test dataset for each checkpoint we have created while training (see Chapter~\ref{methods}). The resulting values are visualized in the Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}.
+
+\paragraph{Surprisingly bad values...}Apparently, the results on the test set are quite the opposite of the results from the training process. We did not expect that, but nevertheless, we are going to analyse the problem.
+The results of the OpenSubtitles model seem to vary across the different checkpoints, with the best result having a perplexity of $71.07$ and a loss of $6.15$ and coming from the evaluation with the first checkpoint. The best result of the Reddit model is also achieved on the first checkpoint, with all other checkpoints having a worse perplexity.\paragraph{diesen Paragraph habe ich hierherkopiert, muss aber noch angepasst werden}
+This result stands in contradiction to what we have expected. Instead of 
+\begin{itemize}
+	\item Loss Werte varieren stark
+	\item Verhalten sich überhaupt nicht ähnlich wie valid los/perplex (grafik mit valid/test vergliech?) 
+	\item Ist loss die richtige Metrik für unseren Task? Gemäss metrik dürfte sich der Output nicht verbessert haben.
 \end{itemize}
+
+\begin{figure}[H]
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/test_metrics_both.png}
+	\centering
+	\small
+	\text{The loss and perplexity.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/test_metrics_loss.png}
+	\centering
+	\small
+	\text{Only the loss.}
+	\endminipage\hfill
+	\caption{The loss and perplexity by running the six different snapshots against the test dataset using the OpenSubtitles model.}
+	\label{result:test_performance:opensubtitles}
+\end{figure}
+
+\begin{figure}[H]
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/test_metrics_both.png}
+	\centering
+	\small
+	\text{The loss and perplexity.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/test_metrics_loss.png}
+	\centering
+	\small
+	\text{Only the loss.}
+	\endminipage\hfill
+	\caption{The loss and perplexity by running the six different snapshots against the test dataset using the Reddit model.}
+	\label{result:test_performance:reddit}
+\end{figure}
+
+\paragraph{However, it improved....} die loss/perplex auf dem testset zeigt wie vorhergehend besprochen, dass er keine Fortschritte gemacht hat. Wenn wir jedoch Beispielsätze testen, sehen wir sehr wohl eine positive Entwicklung (hier das erste mal erwähnen, dass mehrmals über den gleichen corpus bei reddit vielleicht keine gute idee war, \ref{results:example_output1:reddit} gibt beim letzten checkpoint wieder eine schlechte frühere antwort "the movie"). Beispiele für Verbesserung des Sprachmodelles:(\ref{results:example_output1:reddit}, \ref{results:example_output2:reddit}, \ref{results:example_output1:OpenSubtitle}, \ref{results:example_output2:OpenSubtitle}) Loss/Perplx ist anscheinend keine verlässliche metrik im zusammenhang mit sprachmodell, deshalb sen2vec versuchen.
+
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -50,7 +97,7 @@ First, let us start by analysing the evolution of the models with regard to the 
 			Speaker & Utterance\\ \midrule
 			Input: 	& \texttt{Do you like Joffrey from game of thrones?}\\
 			0.5M: 	& \texttt{i m not sure if you re a fan of the movie ,}\\
-					& \texttt{but i m not sure if you re a fan of the movie .}\\
+			& \texttt{but i m not sure if you re a fan of the movie .}\\
 			1.0M: 	& \texttt{i m not a fan of the game , but i m not sure if it s a game or not .}\\
 			1.5M:	& \texttt{i do nt know what i m talking about .}\\
 			2.0M:	& \texttt{i do nt }\\
@@ -126,58 +173,11 @@ First, let us start by analysing the evolution of the models with regard to the 
 	\label{results:example_output2:OpenSubtitle}
 \end{table}
 
-\section{How is the Performance when Evaluating the Models?}\todo{Testing the Models?, genereller der titel? Wie ist die Performance? (ohne when evaluating)}
-After we have seen that the training process looks fine, we are going to asses the performance of these models on our test datasets. Here we use the same metrics as within the training, namely the loss and perplexity values. We have evaluated each model on the respective test dataset for each checkpoint we have created while training (see Chapter~\ref{methods}). The resulting values are visualized in the Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}.
-
-\paragraph{Surprisingly bad values...}Apparently, the results on the test set are quite the opposite of the results from the training process. We did not expect that, but nevertheless, we are going to analyse the problem.
-\begin{itemize}
-	\item Loss Werte varieren stark
-	\item Verhalten sich überhaupt nicht ähnlich wie valid los/perplex (grafik mit valid/test?) 
-	\item Ist loss die richtige Metrik für unseren Task? Gemäss metrik dürfte sich der Output nicht verbessert haben.
-\end{itemize}
-
-\begin{figure}[H]
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/test_metrics_both.png}
-	\centering
-	\small
-	\text{The loss and perplexity.}
-	\endminipage\hfill
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/test_metrics_loss.png}
-	\centering
-	\small
-	\text{Only the loss.}
-	\endminipage\hfill
-	\caption{The loss and perplexity by running the six different snapshots against the test dataset using the OpenSubtitles model.}
-	\label{result:test_performance:opensubtitles}
-\end{figure}
-
-\begin{figure}[H]
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/reddit/test_metrics_both.png}
-	\centering
-	\small
-	\text{The loss and perplexity.}
-	\endminipage\hfill
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/reddit/test_metrics_loss.png}
-	\centering
-	\small
-	\text{Only the loss.}
-	\endminipage\hfill
-	\caption{The loss and perplexity by running the six different snapshots against the test dataset using the Reddit model.}
-	\label{result:test_performance:reddit}
-\end{figure}
-
-\paragraph{However, it improved....} die loss/perplex auf dem testset zeigt wie vorhergehend besprochen, dass er keine Fortschritte gemacht hat. Wenn wir jedoch Beispielsätze testen, sehen wir sehr wohl eine positive Entwicklung (hier das erste mal erwähnen, dass mehrmals über den gleichen corpus bei reddit vielleicht keine gute idee war, \ref{results:example_output1:reddit} gibt beim letzten checkpoint wieder eine schlechte frühere antwort "the movie"). Beispiele für Verbesserung des Sprachmodelles:(\ref{results:example_output1:reddit}, \ref{results:example_output2:reddit}, \ref{results:example_output1:OpenSubtitle}, \ref{results:example_output2:OpenSubtitle}) Loss/Perplx ist anscheinend keine verlässliche metrik im zusammenhang mit sprachmodell, deshalb sen2vec versuchen.
-
 \subsection{Sent2Vec Analysis}
 As described in Chapter~\ref{fundamentals:sent2vec_test}
 Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec:opensubtitles:results} und \ref{results:sent2vec:reddit:result}.
-\paragraph{The semantic accuracy } nim insgesamt leicht zu. Reddit scheint bei den twitter Embeddings schlechter zu werden, dies zeigt, dass die Resultate
- 
- \paragraph{The semantic accuracy}
+\paragraph{The semantic accuracy } nimt insgesamt leicht zu. Reddit erreicht einen höheren score, durchgehend. Reddit scheint bei den twitter Embeddings schlechter zu werden, dies zeigt, dass die Resultate mit vorsicht zu geniessen sind, da sie eben abhängig von den embeddings sind. 
+
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/s2v_wiki_cosine_similarity.png}
@@ -213,10 +213,8 @@ Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec
 \end{figure}
 \footnotetext{https://github.com/epfml/sent2vec}
 
-
-
-
-Our first idea was, to see, what kind of sentences the models produce on the test dataset. We did an analysis on the generated sentences and quickly noticed, that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).
+\paragraph{Generic answer sentences}.. Eine mögliche Ursache für die schlechten Ergebnisse wären generische Antwortsätze. DEshalb zählten wir die identischen Sätze, Resultate in (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}). ersichtlich. Unsere Idee, wir möchten noch einmal mit HIlfe Sent2Vec scores berechnen, jedoch ohne die Top n generischen Antworten. Resultate sind in \ref{} ersichtlich. (Je nachdem wie sie aussehen, hier text)
+\todo{Ich lasse deinen Text erstmal noch hier, muss aber angepasst werden an neue Struktur.}Our first idea was, to see, what kind of sentences the models produce on the test dataset. We did an analysis on the generated sentences and quickly noticed, that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -239,31 +237,33 @@ Our first idea was, to see, what kind of sentences the models produce on the tes
 	\end{adjustbox}
 	\caption{Top 10 most generated sentences with respective occurence frequencies when using the last OpenSubtitles model on the test dataset.}
 	\label{results:test_performance:opensubtitles_sample_outputs}
-\end{table}
+\end{table}\todo{Totale Anzahl sätze angeben? (können wir ja berechnen?)}
 
 \begin{table}[H]
-\centering
-\ra{1.3}
-\begin{adjustbox}{max width=\textwidth}
-	\begin{tabular}{ll}
-		\toprule
-		Sentence & Frequency\\ \midrule
-		\texttt{i m not sure if i m being sarcastic or not .} & 17486\\
-		\texttt{i think it s a bit of a stretch .} & 13058\\
-		\texttt{i m not sure if you re being sarcastic or not .} & 11647\\
-		\texttt{i m not sure if i m a <unknown> or not .} & 8307\\
-		\texttt{i m not sure if you re joking or not .} & 7932\\
-		\texttt{i was thinking the same thing .} & 7579\\
-		\texttt{<unknown>} & 6210\\
-		\texttt{i m not sure if i m going to watch this or not .} & 4257\\
-		\specialcell{\texttt{i m not sure if i m a fan of the show , but i m}\\\texttt{pretty sure that s a <unknown> .}} & 3232\\
-		\texttt{i m not sure if i m going to watch it or not .} & 3079\\
-		\bottomrule
-	\end{tabular}
-\end{adjustbox}
-\caption{Top 10 most generated sentences with respective occurence frequencies when using the last Reddit model on the test dataset.}
-\label{results:test_performance:reddit_sample_outputs}
-\end{table}
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Sentence & Frequency\\ \midrule
+			\texttt{i m not sure if i m being sarcastic or not .} & 17486\\
+			\texttt{i think it s a bit of a stretch .} & 13058\\
+			\texttt{i m not sure if you re being sarcastic or not .} & 11647\\
+			\texttt{i m not sure if i m a <unknown> or not .} & 8307\\
+			\texttt{i m not sure if you re joking or not .} & 7932\\
+			\texttt{i was thinking the same thing .} & 7579\\
+			\texttt{<unknown>} & 6210\\
+			\texttt{i m not sure if i m going to watch this or not .} & 4257\\
+			\specialcell{\texttt{i m not sure if i m a fan of the show , but i m}\\\texttt{pretty sure that s a <unknown> .}} & 3232\\
+			\texttt{i m not sure if i m going to watch it or not .} & 3079\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Top 10 most generated sentences with respective occurence frequencies when using the last Reddit model on the test dataset.}
+	\label{results:test_performance:reddit_sample_outputs}
+\end{table}\todo{Totale Anzahl sätze angeben? (können wir ja berechnen?)}
+
+\paragraph{So the Performance...} Fazit Section und überleitung zu analyse Sprachmodell
 
 \section{What Language Model do the Models produce?}
 \blindtext
@@ -274,44 +274,7 @@ Our first idea was, to see, what kind of sentences the models produce on the tes
 \section{How can we fix the detected problems?}
 \blindtext
 
-\section{Performance on Test Sets}
-The models were evaluated on the test set after the training has been finished. In total, we evaluated both models on all six checkpoints and the results can be seen in the Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}. The results of the OpenSubtitles model seem to vary across the different checkpoints, with the best result having a perplexity of $71.07$ and a loss of $6.15$ and coming from the evaluation with the first checkpoint. The best result of the Reddit model is also achieved on the first checkpoint, with all other checkpoints having a worse perplexity.
 
-This result stands in contradiction to what we have expected. Instead of 
-
-\begin{figure}[H]
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/test_metrics_both.png}
-	\centering
-	\small
-	\text{The loss and perplexity.}
-	\endminipage\hfill
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/test_metrics_loss.png}
-	\centering
-	\small
-	\text{Only the loss.}
-	\endminipage\hfill
-	\caption{The loss and perplexity by running the six different snapshots against the test dataset using the OpenSubtitles model.}
-	\label{result:test_performance:opensubtitles}
-\end{figure}
-
-\begin{figure}[H]
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/reddit/test_metrics_both.png}
-	\centering
-	\small
-	\text{The loss and perplexity.}
-	\endminipage\hfill
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/reddit/test_metrics_loss.png}
-	\centering
-	\small
-	\text{Only the loss.}
-	\endminipage\hfill
-	\caption{The loss and perplexity by running the six different snapshots against the test dataset using the Reddit model.}
-	\label{result:test_performance:reddit}
-\end{figure}
 
 \section{Generated outputs over time}
 \blindtext
