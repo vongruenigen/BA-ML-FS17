@@ -267,16 +267,17 @@ Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec
 \paragraph{So the Performance...} ist ernüchternd. Die loss Werte auf dem Testset implizieren ein nicht vorhandenes Lernverhalten, welches wir aber mit einzelnen Beispielen widerlegt haben. Wir versuchten anschliessend mit Hilfe Sent2vec einen den Lernfortschritt mit Hilfe der generierter embeddings und der cos distanz sichtbar zu machen. Ohne Erfolg, auch das entfernen der häufigsten Sätze und somit eine Überprüfung von Subsamples, konnte den anhand Beispielen gezeigten Lernfortschritt, nicht stützen. Aufgrund dieser Erkenntnisse möchten wir genauer analysieren, wann welche Elemente des Sprachmodells aus den Trainingsdaten übernommen wurde.
 
 \section{Influence of training data on output}
-- Möchten herausfinden, wie sich das Sprachmodell auf n-Gramm Stufe entwickelt. Dies machen wir zuerst auf Stufe bi-gramm und anschliessend auf den uni-grammen.
+- Möchten herausfinden, wie sich das Sprachmodell auf n-Gramm Stufe entwickelt. Dies machen wir zuerst auf Stufe bi-Gramm und anschliessend auf den uni-grammen.
 - Herausfinden, inwiefern die Struktur der Testdaten übernommen werden
 	- Werden die n-gramme mit deren Häufigkeit übernommen?
 	- Oder wird nur die Verteilung der häufigsten n-gramme übernommen, nicht aber n-gramme selber.
 Anschliessend möchten wir herausfinden, wie unser Modell die Semantik lernt. Wir werden dies mit ähnlichen Sätzen und einer PCA auf 2D durchführen.
+Und finaly möchten wir mit einzelnen Beispielen herausfinden, wie der attention mechanismus funktioniert und dessen entscheidung im Kontext sinnvoll ist.
 \subsection{Bi-Gramm}
-In den grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results:ngram:distributions:reddit} wirde dargestellt (erklären, was genau man sieht, muss genau sein, da nicht ganz einfach.)
-
-\paragraph{The distribution will be right-handed} of the words... Für beide Modelle gilt: Starten gleichverteilter, als expected, nähern sich dann dem expected Werten an. Dieser Virgang scheint von links nacht rechts stattzufinden. Das ist insofern nachvollziehbar, dass er schnell merkt, welche bi-gramme nicht oft vorkommen nur, welches das richtige ist, scheint ein schwierigerer lernprozess zu sein. Aber wir sehen eine Annäherung, zumindest bezüglich der Verteilung.
-\paragraph{Reddit will be right-handed...} Reddit ist 
+In den Grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results:ngram:distributions:reddit} wird dargestellt (erklären, was genau man sieht, muss genau sein, da nicht ganz einfach.)
+\paragraph{Die bi-gramme und deren Wahrscheinlichkeiten werden übernommen.}
+\todo{grafiken interpretieren}
+\paragraph{The distribution is right-handed} of the words... Für beide Modelle gilt: Starten gleichverteilter, als expected, nähern sich dann dem expected Werten an. Dieser Virgang scheint von links nacht rechts stattzufinden. Das scheint insofern nachvollziehbar, dass er schnell merkt, welche bi-gramme nicht oft vorkommen und entsprechend diese fast nie verwendet.Jedoch herauszufinden, welches der top n n-gramme das Richtige ist, ist ein deutlich schwierigerer Lernprozess. Wir sehen im groben zumindest eine Annäherung der Verteilung. Wünschenswert wäre natürlich hier eine ähnliche Verteilung wie expected, wobei vor allem die weniger häufigen Bigramme für eine vielfältige Sprache stehen. Dies würde sich ganz generell als mass für die Sprachvielfalt eigenen, indem man z.B. die umgekehrte Wahrscheinlichkeit als Gewicht Einfliessen lässt.
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/bigram_distribution_comparison_step_500000.pdf}
@@ -359,7 +360,33 @@ In den grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results
 	\label{results:ngram:distributions:reddit}
 \end{figure}
 
-\subsection{Unigramm/Wörter}
+\subsection{Uni-gramm/Wörter}
+\todo{grafiken erstellen und referenzieren und beschreiben}
+\paragraph{Die Uni-gramm und deren Wahrscheinlichkeiten werden übernommen.}
+\todo{grafiken interpretieren}
+\paragraph{The distribution is}
+\todo{grafiken interpretieren}
+
+\subsection{Does the Model have an understanding of natural language sentiment?}
+
+\paragraph{Thought Vectors for Input Sequences}After the encoder has processed the whole input sequences, it pass it forward to the decoder to construct the output sequence (see Chapter~\ref{fundamentals:seq2seq}). It is the only direct connection the encoder and decoder have in such a model, which means, that the encoder has to ``encode'' all the information into this thought vector before passing it to the decoder. The thought vector hence represents an embedding of the input sequence in an $n$ dimensional vector space, where $n$ stands for the size of the thought vector. To analyze this embeddings, we collected them for 15 different sample sentences and projected them via PCA into two dimensional space, the results of this projection can be see in Figure~\ref{results:thougth_vectors:embeddings:opensubtitles} and~\ref{results:thougth_vectors:embeddings:reddit} below.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=16cm]{img/opensubtitles_thought_vector_embeddings.png}
+	\caption{The projected thought vectors for 15 different sentences when using the OpenSubtitles model. PCA was used for the projection.}
+	\label{results:thougth_vectors:embeddings:opensubtitles}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=16cm]{img/reddit_thought_vector_embeddings.png}
+	\caption{The projected thought vectors for 15 different sentences when using the Reddit model. PCA was used for the projection.}
+	\label{results:thougth_vectors:embeddings:reddit}
+\end{figure}
+
+Both of the models seem to have no problems understanding clear, direct sentences where the intent is clear (e.g. ``I have no interest in your opinion on movies, your taste is bad!''). This can be seen because similar sentences are clustered together in the projected space. However, when it comes to curses and questions regarding the gender, the OpenSubtitles model starts to struggle, which can be seen by taking a look at the respective points in the projected space. For example, the questions regarding the gender or the curses are scattered throughout the space, even though they should have been embedded closely to each other. The Reddit model seems to have less problems with this, as the embeddings for these sentences are quite close together. But what is interesting to see is that the Reddit model embeds the sentences with curses close to the sentences regarding the gender.\todo{write more}
+
 
 
 \section{What Language Model do the Models produce?}
@@ -379,29 +406,6 @@ In den grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results
 \section{Comparison with CleverBot and ``Neural Conversational Model''}
 \blindtext
 
-\section{N-Gram Analysis}
-
-\paragraph{OpenSubtitles} \blindtext
-
-
-\section{Thought Vectors for Input Sequences}
-After the encoder has processed the whole input sequences, it pass it forward to the decoder to construct the output sequence (see Chapter~\ref{fundamentals:seq2seq}). It is the only direct connection the encoder and decoder have in such a model, which means, that the encoder has to ``encode'' all the information into this thought vector before passing it to the decoder. The thought vector hence represents an embedding of the input sequence in an $n$ dimensional vector space, where $n$ stands for the size of the thought vector. To analyze this embeddings, we collected them for 15 different sample sentences and projected them via PCA into two dimensional space, the results of this projection can be see in Figure~\ref{results:thougth_vectors:embeddings:opensubtitles} and~\ref{results:thougth_vectors:embeddings:reddit} below.
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=16cm]{img/opensubtitles_thought_vector_embeddings.png}
-	\caption{The projected thought vectors for 15 different sentences when using the OpenSubtitles model. PCA was used for the projection.}
-	\label{results:thougth_vectors:embeddings:opensubtitles}
-\end{figure}
-
-\begin{figure}[H]
-	\centering
-	\includegraphics[width=16cm]{img/reddit_thought_vector_embeddings.png}
-	\caption{The projected thought vectors for 15 different sentences when using the Reddit model. PCA was used for the projection.}
-	\label{results:thougth_vectors:embeddings:reddit}
-\end{figure}
-
-Both of the models seem to have no problems understanding clear, direct sentences where the intent is clear (e.g. ``I have no interest in your opinion on movies, your taste is bad!''). This can be seen because similar sentences are clustered together in the projected space. However, when it comes to curses and questions regarding the gender, the OpenSubtitles model starts to struggle, which can be seen by taking a look at the respective points in the projected space. For example, the questions regarding the gender or the curses are scattered throughout the space, even though they should have been embedded closely to each other. The Reddit model seems to have less problems with this, as the embeddings for these sentences are quite close together. But what is interesting to see is that the Reddit model embeds the sentences with curses close to the sentences regarding the gender.\todo{write more}
 
 \section{Reverse Input Feeding}
 \blindtext
