@@ -1,4 +1,5 @@
 \chapter{Analysis of Results}
+\todo{Diese Seite habe ich noch nicht genau angeschaut, aber ich denke wir geben hier auch unsere grobe struktur bekannt: Satz/Testset, n-Gramm, Wörter, thought Vektor. Von Ganz aussen nach innen, sozusagen.}
 In this chapter, we are going to analyze the evolution and final results of the two models (see chapter \ref{methods:both_models}), trained on the OpenSubtitles and Reddit corpus, under several different aspects. This includes the analysis of the learning process throughout the training. Then we are going to analyse the language model of the trained models and try to find a correlation between the language model in the training dataset and the language model the trained models produce.\todo{Two times model is ugly!} In the end, we are going to focus on how well the model understands and percepts them, combined with an analysis
 
 \begin{enumerate}[noitemsep]
@@ -265,26 +266,16 @@ Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec
 
 \paragraph{So the Performance...} Fazit Section und überleitung zu analyse Sprachmodell
 
-\section{What Language Model do the Models produce?}
-\blindtext
+\section{Influence of training data on output}
+- Möchten herausfinden, wie sich das Sprachmodell auf n-Gramm Stufe entwickelt. Dies machen wir für uni und bi-gramm
+- Herausfinden, inwiefern die Struktur der Testdaten übernommen werden
+	- Werden die Wörter und deren Häufigkeit übernommen
+	- Oder eben nur die Verteilung
 
-\section{Does the Model have an understanding of natural language?}
-\blindtext
-
-\section{How can we fix the detected problems?}
-\blindtext
-
-
-
-\section{Generated outputs over time}
-\blindtext
-
-\section{Comparison with CleverBot and ``Neural Conversational Model''}
-\blindtext
-
-\section{N-Gram Analysis}
-
-\paragraph{OpenSubtitles} \blindtext
+\section{Bi-Gramm}
+In den grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results:ngram:distributions:reddit} wirde dargestellt (erklären, was genau man sieht, muss genau sein, da nicht ganz einfach.)
+Für beide Modelle gilt: Starten gleichverteilter, als expected, nähern sich dann dem an und 
+\paragraph{Reddit will be right-handed...} Reddit ist 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/bigram_distribution_comparison_step_500000.pdf}
@@ -322,11 +313,10 @@ Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec
 	\small
 	\text{Distribution at training step 3'000'000.}
 	\endminipage\hfill
-	\caption{Distributions of the top 100 bigrams in the generated answers when using the test set over multiple time steps of the training.}
+	\caption{Distributions of the top 100 opensubtitles bigrams in the generated answers when using the test set over multiple time steps of the training.}
 	\label{results:ngram:distributions:opensubtitles}
 \end{figure}
 
-\paragraph{Reddit} \blindtext
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
 	\includegraphics[width=\linewidth]{img/plots/reddit/bigram_distribution_comparison_step_500000.pdf}
@@ -364,9 +354,34 @@ Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec
 	\small
 	\text{Distribution at training step 3'000'000.}
 	\endminipage\hfill
-	\caption{Distributions of the top 100 bigrams in the generated answers when using the test set over multiple time steps of the training.}
-	\label{results:ngram:distributions:opensubtitles}
+	\caption{Distributions of the top 100 reddit bigrams in the generated answers when using the test set over multiple time steps of the training.}
+	\label{results:ngram:distributions:reddit}
 \end{figure}
+
+\section{Unigramm/Wörter}
+
+
+\section{What Language Model do the Models produce?}
+\blindtext
+
+\section{Does the Model have an understanding of natural language?}
+\blindtext
+
+\section{How can we fix the detected problems?}
+\blindtext
+
+
+
+\section{Generated outputs over time}
+\blindtext
+
+\section{Comparison with CleverBot and ``Neural Conversational Model''}
+\blindtext
+
+\section{N-Gram Analysis}
+
+\paragraph{OpenSubtitles} \blindtext
+
 
 \section{Thought Vectors for Input Sequences}
 After the encoder has processed the whole input sequences, it pass it forward to the decoder to construct the output sequence (see Chapter~\ref{fundamentals:seq2seq}). It is the only direct connection the encoder and decoder have in such a model, which means, that the encoder has to ``encode'' all the information into this thought vector before passing it to the decoder. The thought vector hence represents an embedding of the input sequence in an $n$ dimensional vector space, where $n$ stands for the size of the thought vector. To analyze this embeddings, we collected them for 15 different sample sentences and projected them via PCA into two dimensional space, the results of this projection can be see in Figure~\ref{results:thougth_vectors:embeddings:opensubtitles} and~\ref{results:thougth_vectors:embeddings:reddit} below.
