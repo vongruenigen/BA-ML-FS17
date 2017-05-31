@@ -184,8 +184,13 @@ As seen in the examples above, there has indeed been an improvement in the answe
 \end{figure}
 \footnotetext{https://github.com/epfml/sent2vec}
 
+<<<<<<< HEAD
 \paragraph{Generic Response are a Problem} One potential reason for the bad results when using the Sent2Vec metric is that we witnessed both models generating generic responses a lot of the time. To analyze this our first idea was to see, what kind of sentences the models produce with the inputs of the test datasets. We did an analysis on the generated responses and quickly noticed that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).
 \\
+=======
+\paragraph{Generic answer sentences}.. Eine mögliche Ursache für die schlechten Ergebnisse wären generische Antwortsätze. Diese könnten die Metriken in der Masse so stark beeinflussen, dass vielversprechende Ergebnisse nicht ins Gewicht fallen. Deshalb zählten wir die Anzahl identischer Sätze, Resultate in (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}). ersichtlich. Anhand der Anzahl gleicher Sätze (Vielleicht können wir proentual angeben, wieviel die top10 sätze ausmachen), scheint es tatsächlich so, dass es generische Antworten gibt. Wir möchten noch einmal mit Hilfe  Sent2Vec scores berechnen, jedoch ohne die Top 1/5/10 häufigsten Antworten. Die Resultate sind dem ursprünglichen so ähnlich, dass wir hier auf eine Visualisierung verzichten. Vielleicht ist dieser Ansatz erfolgreich, wenn man noch mehr generische Antworten aus der Berechnung entfernt. Dies könnte genutzt werden, um in diesem Subsample dann einen Lernfortschritt zu erkennen. Dies ist ja unser ursprüngliches Problem, wir sehen Beispiele, welche besser werden, aber wir können dies nicht in Zahlen darstellen.
+
+>>>>>>> 92243a2275f4312eda0d14b8b2499fe50334b475
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -237,7 +242,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
  \todo{Table for results of sent2vec analysis}
 
 As seen in the both tables above, there are certain responses which are generated a lot of time and are pretty generic and meaningless. Because of that, we thought it would be a good idea to evaluate the models under the Sent2Vec metric one more time, but this time with the top $n$ generic sentences filtered out. We did this with the hope that the generic sentences are the cause of the small average similarity. The results of the analysis with the top $n$ sentences filtered out can be found in Table~\ref{results:sent2vec:opensubtitles:top_n_results_table} and~\ref{results:sent2vec:reddit:top_n_results_table}. For this analysis, we have only used the Wikipedia model as it has shown a better performance for both of our models before.
-
+\\
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -280,20 +285,21 @@ As seen in the both tables above, there are certain responses which are generate
 	\label{results:sent2vec:reddit:top_n_results_table}
 \end{table}
 
+As seen in the tables above, the filtering of the most used responses does not help a lot when it comes to the Sent2Vec evaluation.
+
 
 .. Eine mögliche Ursache für die schlechten Ergebnisse wären generische Antwortsätze. DEshalb zählten wir die identischen Sätze, Resultate in (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}). ersichtlich. Unsere Idee, wir möchten noch einmal mit HIlfe Sent2Vec scores berechnen, jedoch ohne die Top n generischen Antworten. Resultate sind in \ref{} ersichtlich. (Je nachdem wie sie aussehen, hier text)
 \todo{Ich lasse deinen Text erstmal noch hier, muss aber angepasst werden an neue Struktur.}
 
-
 \paragraph{Mixed Feelings about Performance Metrics} As seen in this chapter, the performance metrics used to evaluate the models tell us a mixed story about the resulting models. On one hand, we see that the training went fine and the learning process run as expected. However, when we then test these trained models against the test datasets with the different metrics, it looks like the performance got worse and worse over the time of the training. This is not true in our subjective opinion after ``talking'' to both models for a prolonged period of time. We think the biggest problem for the evaluation are the generic responses both models seem to generate much more than actual answers. To find the cause of this generic responses, we will now try to analyze the language model which both models have learned while training and try to establish a connection between the language model in the datasets and the ones produced by the models.
 
 \section{Influence of training data on output}
-- Möchten herausfinden, wie sich das Sprachmodell auf n-Gramm Stufe entwickelt. Dies machen wir für uni und bi-gramm
+- Möchten herausfinden, wie sich das Sprachmodell auf n-Gramm Stufe entwickelt. Dies machen wir zuerst auf Stufe bi-gramm und anschliessend auf den uni-grammen.
 - Herausfinden, inwiefern die Struktur der Testdaten übernommen werden
-	- Werden die Wörter und deren Häufigkeit übernommen
-	- Oder eben nur die Verteilung
-
-\section{Bi-Gramm}
+	- Werden die n-gramme mit deren Häufigkeit übernommen?
+	- Oder wird nur die Verteilung der häufigsten n-gramme übernommen, nicht aber n-gramme selber.
+Anschliessend möchten wir herausfinden, wie unser Modell die Semantik lernt. Wir werden dies mit ähnlichen Sätzen und einer PCA auf 2D durchführen.
+\subsection{Bi-Gramm}
 In den grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results:ngram:distributions:reddit} wirde dargestellt (erklären, was genau man sieht, muss genau sein, da nicht ganz einfach.)
 
 \paragraph{The distribution will be right-handed} of the words... Für beide Modelle gilt: Starten gleichverteilter, als expected, nähern sich dann dem expected Werten an. Dieser Virgang scheint von links nacht rechts stattzufinden. Das ist insofern nachvollziehbar, dass er schnell merkt, welche bi-gramme nicht oft vorkommen nur, welches das richtige ist, scheint ein schwierigerer lernprozess zu sein. Aber wir sehen eine Annäherung, zumindest bezüglich der Verteilung.
@@ -380,7 +386,7 @@ In den grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results
 	\label{results:ngram:distributions:reddit}
 \end{figure}
 
-\section{Unigramm/Wörter}
+\subsection{Unigramm/Wörter}
 
 
 \section{What Language Model do the Models produce?}
