@@ -170,13 +170,53 @@ After we have seen that the training process looks fine, we are going to asses t
 	\label{result:test_performance:reddit}
 \end{figure}
 
-\paragraph{However, it improved....} die loss/perplex auf dem testset zeigt an, dass er keine Fortschritte gemacht hat. Wenn wir jedoch Beispielsätze testen, sehen wir sehr wohl eine Entwicklung (hier das erste mal erwähnen, dass mehrmals über den gleichen corpus bei reddit vielleicht keine gute idee war, \ref{results:example_output1:reddit} gibt beim letzten checkpoint wieder eine schlechte frühere antwort "the movie"). Beispiele für Verbesserung des Sprachmodelles:(\ref{results:example_output1:reddit}, \ref{results:example_output2:reddit}, \ref{results:example_output1:OpenSubtitle}, \ref{results:example_output2:OpenSubtitle}) Loss/Perplx ist anscheinend keine verlässliche metrik im zusammenhang mit sprachmodell, deshalb sen2vec versuchen.
+\paragraph{However, it improved....} die loss/perplex auf dem testset zeigt wie vorhergehend besprochen, dass er keine Fortschritte gemacht hat. Wenn wir jedoch Beispielsätze testen, sehen wir sehr wohl eine positive Entwicklung (hier das erste mal erwähnen, dass mehrmals über den gleichen corpus bei reddit vielleicht keine gute idee war, \ref{results:example_output1:reddit} gibt beim letzten checkpoint wieder eine schlechte frühere antwort "the movie"). Beispiele für Verbesserung des Sprachmodelles:(\ref{results:example_output1:reddit}, \ref{results:example_output2:reddit}, \ref{results:example_output1:OpenSubtitle}, \ref{results:example_output2:OpenSubtitle}) Loss/Perplx ist anscheinend keine verlässliche metrik im zusammenhang mit sprachmodell, deshalb sen2vec versuchen.
+
+\subsection{Sent2Vec Analysis}
+As described in Chapter~\ref{fundamentals:sent2vec_test}
+Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec:opensubtitles:results} und \ref{results:sent2vec:reddit:result}.
+\paragraph{The semantic accuracy } nim insgesamt leicht zu. Reddit scheint bei den twitter Embeddings schlechter zu werden, dies zeigt, dass die Resultate
+ 
+ \paragraph{The semantic accuracy}
+\begin{figure}[H]
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/s2v_wiki_cosine_similarity.png}
+	\centering
+	\small
+	\text{Evaluation with the wiki model.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/s2v_twitter_cosine_similarity.png}
+	\centering
+	\small
+	\text{Evaluation with the twitter model.}
+	\endminipage\hfill
+	\caption{Results of the evaluation with Sent2Vec on the outputs of the OpenSubtitles models using the pretrained models found on the Sent2Vec GitHub page.}
+	\label{results:sent2vec:opensubtitles:results}
+\end{figure}
+
+\begin{figure}[H]
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/s2v_wiki_cosine_similarity.png}
+	\centering
+	\small
+	\text{Evaluation with the wiki model.}
+	\endminipage\hfill
+	\minipage{0.5\textwidth}
+	\includegraphics[width=\linewidth]{img/plots/reddit/s2v_twitter_cosine_similarity.png}
+	\centering
+	\small
+	\text{Evaluation with the twitter model.}
+	\endminipage\hfill
+	\caption{Results of the evaluation with Sent2Vec on the outputs of the Reddit models using the pretrained models found on the Sent2Vec GitHub page.}
+	\label{results:sent2vec:reddit:results}
+\end{figure}
+\footnotetext{https://github.com/epfml/sent2vec}
+
+
 
 
 Our first idea was, to see, what kind of sentences the models produce on the test dataset. We did an analysis on the generated sentences and quickly noticed, that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).
-
-
-
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -364,44 +404,6 @@ This result stands in contradiction to what we have expected. Instead of
 	\caption{Distributions of the top 100 bigrams in the generated answers when using the test set over multiple time steps of the training.}
 	\label{results:ngram:distributions:opensubtitles}
 \end{figure}
-
-\section{Sent2Vec Analysis}
-As described in Chapter~\ref{fundamentals:sent2vec_test}
-
-\begin{figure}[H]
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/s2v_wiki_cosine_similarity.png}
-	\centering
-	\small
-	\text{Evaluation with the wiki model.}
-	\endminipage\hfill
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/s2v_twitter_cosine_similarity.png}
-	\centering
-	\small
-	\text{Evaluation with the twitter model.}
-	\endminipage\hfill
-	\caption{Results of the evaluation with Sent2Vec on the outputs of the OpenSubtitles models using the pretrained models found on the Sent2Vec GitHub page.}
-	\label{results:sent2vec:opensubtitles:results}
-\end{figure}
-
-\begin{figure}[H]
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/reddit/s2v_wiki_cosine_similarity.png}
-	\centering
-	\small
-	\text{Evaluation with the wiki model.}
-	\endminipage\hfill
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/reddit/s2v_twitter_cosine_similarity.png}
-	\centering
-	\small
-	\text{Evaluation with the twitter model.}
-	\endminipage\hfill
-	\caption{Results of the evaluation with Sent2Vec on the outputs of the Reddit models using the pretrained models found on the Sent2Vec GitHub page.}
-	\label{results:sent2vec:reddit:results}
-\end{figure}
-\footnotetext{https://github.com/epfml/sent2vec}
 
 \section{Thought Vectors for Input Sequences}
 After the encoder has processed the whole input sequences, it pass it forward to the decoder to construct the output sequence (see Chapter~\ref{fundamentals:seq2seq}). It is the only direct connection the encoder and decoder have in such a model, which means, that the encoder has to ``encode'' all the information into this thought vector before passing it to the decoder. The thought vector hence represents an embedding of the input sequence in an $n$ dimensional vector space, where $n$ stands for the size of the thought vector. To analyze this embeddings, we collected them for 15 different sample sentences and projected them via PCA into two dimensional space, the results of this projection can be see in Figure~\ref{results:thougth_vectors:embeddings:opensubtitles} and~\ref{results:thougth_vectors:embeddings:reddit} below.
