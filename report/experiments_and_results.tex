@@ -177,7 +177,7 @@ This result stands in contradiction to what we have expected. Instead of
 As described in Chapter~\ref{fundamentals:sent2vec_test}
 Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec:opensubtitles:results} und \ref{results:sent2vec:reddit:result}. Ersichtlich die Cos Distanz auf der y Achse und auf der X-Achse der Fortschritt des Trainings.
 
-\paragraph{The semantic accuracy } nimt insgesamt leicht zu. OpenSubtitle startet bei wiki emb bei $16.75\%$ und steigt auf $20.45\%$, mit twitter emb bei $13.82\%$ und steigt auf $1628\%$ Der Score von Reddit ist insgesamt höher als derjenige von OpenSubtitle. (ich hab keine Ahnung wieso). Auffällig ist, dass Reddit bei den twitter Embeddings schlechter wird, dies zeigt, dass die Resultate mit vorsicht zu geniessen sind, da sie eben abhängig von den zur Verfügung stehenden embeddings sind. 
+\paragraph{The semantic accuracy } nimt insgesamt leicht zu. OpenSubtitle startet bei wiki emb bei $16.75\%$ und steigt auf $20.45\%$, mit twitter emb bei $13.82\%$ und steigt auf $16.28\%$. Reddit wiki emb startet bei $33.69\%$ und endet bei $35.96\%$, twitter emb $30.84\%$ und endet bei $28.68\%$ Der Score von Reddit ist insgesamt höher als derjenige von OpenSubtitle. (ich hab keine Ahnung wieso). Auffällig ist, dass Reddit bei den twitter Embeddings mit zunehmendem Training schlechter wird. Die Ursache könnte vielschichtig sein, einerseits könnte sich das training in einem lokalen minimum befinden, solche Knicks sehen wir bei allen Kurve. Zusätzlich sind die Resultate aber auch mit vorsicht zu geniessen, da wir nicht genau wissen, wie gut die Embeddings zu unseren Anforderungen passen.
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -214,8 +214,8 @@ Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec
 \end{figure}
 \footnotetext{https://github.com/epfml/sent2vec}
 
-\paragraph{Generic answer sentences}.. Eine mögliche Ursache für die schlechten Ergebnisse wären generische Antwortsätze. DEshalb zählten wir die identischen Sätze, Resultate in (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}). ersichtlich. Unsere Idee, wir möchten noch einmal mit HIlfe Sent2Vec scores berechnen, jedoch ohne die Top n generischen Antworten. Resultate sind in \ref{} ersichtlich. (Je nachdem wie sie aussehen, hier text)
-\todo{Ich lasse deinen Text erstmal noch hier, muss aber angepasst werden an neue Struktur.}Our first idea was, to see, what kind of sentences the models produce on the test dataset. We did an analysis on the generated sentences and quickly noticed, that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).
+\paragraph{Generic answer sentences}.. Eine mögliche Ursache für die schlechten Ergebnisse wären generische Antwortsätze. Diese könnten die Metriken in der Masse so stark beeinflussen, dass vielversprechende Ergebnisse nicht ins Gewicht fallen. Deshalb zählten wir die Anzahl identischer Sätze, Resultate in (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}). ersichtlich. Anhand der Anzahl gleicher Sätze (Vielleicht können wir proentual angeben, wieviel die top10 sätze ausmachen), scheint es tatsächlich so, dass es generische Antworten gibt. Wir möchten noch einmal mit Hilfe  Sent2Vec scores berechnen, jedoch ohne die Top 1/5/10 häufigsten Antworten. Die Resultate sind dem ursprünglichen so ähnlich, dass wir hier auf eine Visualisierung verzichten. Vielleicht ist dieser Ansatz erfolgreich, wenn man noch mehr generische Antworten aus der Berechnung entfernt. Dies könnte genutzt werden, um in diesem Subsample dann einen Lernfortschritt zu erkennen. Dies ist ja unser ursprüngliches Problem, wir sehen Beispiele, welche besser werden, aber wir können dies nicht in Zahlen darstellen.
+
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -264,15 +264,15 @@ Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec
 	\label{results:test_performance:reddit_sample_outputs}
 \end{table}\todo{Totale Anzahl sätze angeben? (können wir ja berechnen?)}
 
-\paragraph{So the Performance...} Fazit Section und überleitung zu analyse Sprachmodell
+\paragraph{So the Performance...} ist ernüchternd. Die loss Werte auf dem Testset implizieren ein nicht vorhandenes Lernverhalten, welches wir aber mit einzelnen Beispielen widerlegt haben. Wir versuchten anschliessend mit Hilfe Sent2vec einen den Lernfortschritt mit Hilfe der generierter embeddings und der cos distanz sichtbar zu machen. Ohne Erfolg, auch das entfernen der häufigsten Sätze und somit eine Überprüfung von Subsamples, konnte den anhand Beispielen gezeigten Lernfortschritt, nicht stützen. Aufgrund dieser Erkenntnisse möchten wir genauer analysieren, wann welche Elemente des Sprachmodells aus den Trainingsdaten übernommen wurde.
 
 \section{Influence of training data on output}
-- Möchten herausfinden, wie sich das Sprachmodell auf n-Gramm Stufe entwickelt. Dies machen wir für uni und bi-gramm
+- Möchten herausfinden, wie sich das Sprachmodell auf n-Gramm Stufe entwickelt. Dies machen wir zuerst auf Stufe bi-gramm und anschliessend auf den uni-grammen.
 - Herausfinden, inwiefern die Struktur der Testdaten übernommen werden
-	- Werden die Wörter und deren Häufigkeit übernommen
-	- Oder eben nur die Verteilung
-
-\section{Bi-Gramm}
+	- Werden die n-gramme mit deren Häufigkeit übernommen?
+	- Oder wird nur die Verteilung der häufigsten n-gramme übernommen, nicht aber n-gramme selber.
+Anschliessend möchten wir herausfinden, wie unser Modell die Semantik lernt. Wir werden dies mit ähnlichen Sätzen und einer PCA auf 2D durchführen.
+\subsection{Bi-Gramm}
 In den grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results:ngram:distributions:reddit} wirde dargestellt (erklären, was genau man sieht, muss genau sein, da nicht ganz einfach.)
 
 \paragraph{The distribution will be right-handed} of the words... Für beide Modelle gilt: Starten gleichverteilter, als expected, nähern sich dann dem expected Werten an. Dieser Virgang scheint von links nacht rechts stattzufinden. Das ist insofern nachvollziehbar, dass er schnell merkt, welche bi-gramme nicht oft vorkommen nur, welches das richtige ist, scheint ein schwierigerer lernprozess zu sein. Aber wir sehen eine Annäherung, zumindest bezüglich der Verteilung.
@@ -359,7 +359,7 @@ In den grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results
 	\label{results:ngram:distributions:reddit}
 \end{figure}
 
-\section{Unigramm/Wörter}
+\subsection{Unigramm/Wörter}
 
 
 \section{What Language Model do the Models produce?}
