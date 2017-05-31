@@ -22,8 +22,8 @@ The analysis is done in the order listed above, that means we start by analysing
 \section{How Did The Training Go?}\todo{vielleicht müssen wir den anpassen wegen neuer struktur}
 First, let us start by analysing the evolution of the models with regard to the available performance metrics throughout the time span of the training. Below, in Figures~\ref{results:learning_process:metrics:opensubtitles} and~\ref{results:learning_process:metrics:reddit}, one can see the development of the loss and perplexity on the training sets for the two different models.
 
-\paragraph{The Opensubtitle and his variance...}What is eye-catching when comparing the two is that the OpenSubtitles seems to have much more variance in its performance on the validation set as opposed to the Reddit model. This probably comes from the fact that the OpenSubtitles datasets are much more noisey than the one of the Reddit model, as \cite{Vinyals:2015} also already noticed. This has to do with the fact, that we do not have any information about turn taking, which means it is certainly possible that consecutive utterances may be uttered by the same person even though we treat it if it were two persons. Also, there is the problematic with the time lags between utterances as analysed in Chapter~\ref{data:opensubtitles:time_lag_analysis}. In contrast, with the Reddit dataset, we always know who uttered a comment and hence can build a dataset which ensures that the dialogs make sense from a structural perspective.
-\paragraph{The Dips in the Reddit} data..... The interesting part about the learning process of the Reddit model are the ``dips'' in the validation perplexity and hence in the loss on the validation dataset, even though there they are not as easily noticeable.\todo{Gemäss validation loss lernt er nicht kontinuierlich sondern in abständen, nach einer verbesserung kommt eine langsame verschlechterung und anschliessend dann sprunghaft eine verbesserung. Ich suche später noch nach möglichen gründen dafür}
+\paragraph{The Opensubtitle and his variance} stechen bei der Betrachtung der loss ins Auge. is eye-catching when comparing the two is that the OpenSubtitles seems to have much more variance in its performance on the validation set as opposed to the Reddit model. This probably comes from the fact that the OpenSubtitles datasets are much more noisey than the one of the Reddit model, as \cite{Vinyals:2015} also already noticed. This has to do with the fact, that we do not have any information about turn taking, which means it is certainly possible that consecutive utterances may be uttered by the same person even though we treat it if it were two persons. Also, there is the problematic with the time lags between utterances as analysed in Chapter~\ref{data:opensubtitles:time_lag_analysis}. In contrast, with the Reddit dataset, we always know who uttered a comment and hence can build a dataset which ensures that the dialogs make sense from a structural perspective.
+\paragraph{The Dips in the Reddit} Das Lernverhalten von reddit weist ebenfalls Besonderheit auf. Die loss Werte der trainingsdaten ziemlich genau alle 400k stark nach unten. Wir können uns dieses Verhalten "noch" nicht erklären. Ebenfalls alle 400k fallen die loss Werte der Validierungsdaten, um dann anschliessend langsam wieder zu steigen. Dieses Verhalten können wir für das gesamte Training beobachten. Wie bereits erwähnt, kennen wir die Ursache für diese 400k Schritte nicht.\todo{400k für uns im kopf behalten, vielleicht finden wir es ja noch heraus.}
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/train_metrics.png}
 	\caption{Development of the loss and perplexity on the training and validation set throughout the training of the OpenSubtitles model.}
@@ -36,16 +36,15 @@ First, let us start by analysing the evolution of the models with regard to the 
 	\label{results:learning_process:metrics:reddit}
 \end{figure}\todo{Einheiten angeben (x = 1000-er)}
 
-\paragraph{Compared to each other} Hier das Bild mit der valid los/perplex beider modelle referenzieren und kurz schreiben, wer wie schnell gelernt hat und wie sich die Kurve unterscheiden.
+\paragraph{Compared to each other}\todo{können wir auch weglassen diesen paragraphen. Weiss nicht welche Erkenntnis wir daraus ziehen können} In der Abbildung \ref{} sehen wir die loss Werte auf den Vailidierungsdaten beider Modell in einem Bild. Hier das Bild mit der valid los/perplex beider Modelle referenzieren und kurz schreiben, wer wie schnell gelernt hat und wie sich die Kurve unterscheiden.
 
-\paragraph{In general, the training seems successful}... Kurz Fazit pro Section? sieht gut aus insgesamt, überleitung zu Performance test section
-
+\paragraph{In general, the training seems successful}, die loss funktion reduzierte sich auf den Trainingsdaten, wie auch auf den Validierungsdaten. Daraus schliessen wir, dass der Trainingsprozess erfolgreich war. Wir sahen Auffälligkeiten und Unterschiede, wie die Modelle gelernt haben, können aber noch keine weiteren Schlüsse daraus ziehen. Wir möchten in der nächsten Section die Performanz der Modelle anhand unserer Testdaten testen.
 
 \section{Performance when Testing the Models}
 After we have seen that the training process looks fine, we are going to asses the performance of these models on our test datasets. Here we use the same metrics as within the training, namely the loss and perplexity values. We have evaluated each model on the respective test dataset for each checkpoint we have created while training (see Chapter~\ref{methods}). The resulting values are visualized in the Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}.
 
-\paragraph{Surprisingly bad values...}Apparently, the results on the test set are quite the opposite of the results from the training process. We did not expect that, but nevertheless, we are going to analyse the problem.
-The results of the OpenSubtitles model seem to vary across the different checkpoints, with the best result having a perplexity of $71.07$ and a loss of $6.15$ and coming from the evaluation with the first checkpoint. The best result of the Reddit model is also achieved on the first checkpoint, with all other checkpoints having a worse perplexity.\paragraph{diesen Paragraph habe ich hierherkopiert, muss aber noch angepasst werden}
+\paragraph{Surprisingly the results} on the test set are quite the opposite of the results from the training process. We did not expect that, but nevertheless, we are going to analyse the problem.
+The results of the OpenSubtitles model seem to vary across the different checkpoints, with the best result having a perplexity of $71.07$ and a loss of $6.15$ and coming from the evaluation with the first checkpoint. The best result of the Reddit model is also achieved on the first checkpoint, with all other checkpoints having a worse perplexity.
 This result stands in contradiction to what we have expected. Instead of 
 \begin{itemize}
 	\item Loss Werte varieren stark
@@ -87,7 +86,7 @@ This result stands in contradiction to what we have expected. Instead of
 	\label{result:test_performance:reddit}
 \end{figure}
 
-\paragraph{However, it improved....} die loss/perplex auf dem testset zeigt wie vorhergehend besprochen, dass er keine Fortschritte gemacht hat. Wenn wir jedoch Beispielsätze testen, sehen wir sehr wohl eine positive Entwicklung (hier das erste mal erwähnen, dass mehrmals über den gleichen corpus bei reddit vielleicht keine gute idee war, \ref{results:example_output1:reddit} gibt beim letzten checkpoint wieder eine schlechte frühere antwort "the movie"). Beispiele für Verbesserung des Sprachmodelles:(\ref{results:example_output1:reddit}, \ref{results:example_output2:reddit}, \ref{results:example_output1:OpenSubtitle}, \ref{results:example_output2:OpenSubtitle}) Loss/Perplx ist anscheinend keine verlässliche metrik im zusammenhang mit sprachmodell, deshalb sen2vec versuchen.
+\paragraph{However, it improved....} die loss/perplex auf dem testset suggerieren wie vorhergehend besprochen, dass er keine Fortschritte gemacht hat. Wenn wir jedoch Beispielsätze testen, sehen wir sehr wohl eine positive Entwicklung (hier das erste mal erwähnen, dass mehrmals über den gleichen corpus bei reddit vielleicht keine gute idee war, \ref{results:example_output1:reddit} gibt beim letzten checkpoint wieder eine schlechte frühere antwort "the movie"). Beispiele für Verbesserung des Sprachmodelles:(\ref{results:example_output1:reddit}, \ref{results:example_output2:reddit}, \ref{results:example_output1:OpenSubtitle}, \ref{results:example_output2:OpenSubtitle}) Wie in diesen Beispielen ersichtlich, findet offensichtlich eine Verbesserung der Antwort statt. Gemäss den loss werten auf den Testdaten, hätten die Resultate sogar schlechter werden müssen. Wir schliessen daraus, dass loss/perplex als metrik nicht gut ist/aussagekräftig. Das Problem dabei, wir trainierten auf loss/perplex. Wenn loss nicht geeignet wäre, müsste man auch während dem training andere metrik verwenden. Es gibt nicht die eine Metrik für Dialogsysteme. Deshalb entschieden wir  uns Sent2vec auszuprobieren.
 
 \begin{table}[H]
 	\centering
@@ -176,8 +175,9 @@ This result stands in contradiction to what we have expected. Instead of
 
 \subsection{Sent2Vec Analysis}
 As described in Chapter~\ref{fundamentals:sent2vec_test}
-Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec:opensubtitles:results} und \ref{results:sent2vec:reddit:result}.
-\paragraph{The semantic accuracy } nimt insgesamt leicht zu. Reddit erreicht einen höheren score, durchgehend. Reddit scheint bei den twitter Embeddings schlechter zu werden, dies zeigt, dass die Resultate mit vorsicht zu geniessen sind, da sie eben abhängig von den embeddings sind. 
+Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec:opensubtitles:results} und \ref{results:sent2vec:reddit:result}. Ersichtlich die Cos Distanz auf der y Achse und auf der X-Achse der Fortschritt des Trainings.
+
+\paragraph{The semantic accuracy } nimt insgesamt leicht zu. OpenSubtitle startet bei wiki emb bei $16.75\%$ und steigt auf $20.45\%$, mit twitter emb bei $13.82\%$ und steigt auf $1628\%$ Der Score von Reddit ist insgesamt höher als derjenige von OpenSubtitle. (ich hab keine Ahnung wieso). Auffällig ist, dass Reddit bei den twitter Embeddings schlechter wird, dies zeigt, dass die Resultate mit vorsicht zu geniessen sind, da sie eben abhängig von den zur Verfügung stehenden embeddings sind. 
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -274,7 +274,8 @@ Ergebnisse für die beiden Sent2Vec Embeddings, pro Modell \ref{results:sent2vec
 
 \section{Bi-Gramm}
 In den grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results:ngram:distributions:reddit} wirde dargestellt (erklären, was genau man sieht, muss genau sein, da nicht ganz einfach.)
-Für beide Modelle gilt: Starten gleichverteilter, als expected, nähern sich dann dem an und 
+
+\paragraph{The distribution will be right-handed} of the words... Für beide Modelle gilt: Starten gleichverteilter, als expected, nähern sich dann dem expected Werten an. Dieser Virgang scheint von links nacht rechts stattzufinden. Das ist insofern nachvollziehbar, dass er schnell merkt, welche bi-gramme nicht oft vorkommen nur, welches das richtige ist, scheint ein schwierigerer lernprozess zu sein. Aber wir sehen eine Annäherung, zumindest bezüglich der Verteilung.
 \paragraph{Reddit will be right-handed...} Reddit ist 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
