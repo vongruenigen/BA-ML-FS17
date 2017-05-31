@@ -147,7 +147,7 @@ After we have seen that the training process looks fine, we are going to asses t
 
 As seen in the examples above, there has indeed been an improvement in the answers, what stands in contradiction to the development of the performance of the models on the test datasets. Our conclusion from this is, again, that the cross-entropy loss and perplexity are not fit to asses if the responses are meaningful.\todo{Write more?} As we have already described in Chapter~\ref{fundamentals:sent2vec_test}, we were aware of the fact, that our current set of metrics is not satisfying for evaluating if the responses are meaningful, why we decided to use yet another metric, namely Sent2Vec embeddings, which we are going to use in the next section.
 
-\paragraph{Sent2Vec Analysis} As described in Chapter~\ref{fundamentals:sent2vec_test}, we use Sent2Vec embeddings for measuring the semantic similarity between the generated and expected responses on the test dataset. For this purpose, we have used the pretrained models available on the GitHub page of the project\footnote{https://github.com/epfml/sent2vec}. We have decided, that we use both the \emph{twitter} and \emph{wiki} models for the assessment. The results can be seen in the Figures~\ref{results:sent2vec:opensubtitles:results} and~\ref{results:sent2vec:reddit:results}. What can be directly seen is that both the Reddit and OpenSubtitles models perform better on the pretrained Wikipedia model in comparison to the pretrained twitter model. This probably has to do with the fact that ``compressed'' language used when writing tweets (e.g. ``w/o'' instead of ``without'') and with the coverage of the vocabulary, which is higher with the Wikipedia model.\todo{Need to check that!} However, both results are pretty bad, with the Reddit results being much better than the OpenSubtitles, about twice as good. The OpenSubtitles model starts with an average similarity of $0.167$ for the first snapshot and climbs up to $0.204$ for the last snapshot. The Reddit model starts with an average value of $0.336$ for the first snapshot and increases to $0.359$ for the last snapshot. This means, that the responses of the Reddit model match the expected responses much better from a semantic perspective as the responses of the OpenSubtitles model do. In summary, the results of both models are pretty bad, as the maximum similarity is $1.0$.\todo{Write, or remove that?}
+\paragraph{Sent2Vec Analysis} As described in Chapter~\ref{fundamentals:sent2vec_test}, we use Sent2Vec embeddings for measuring the semantic similarity between the generated and expected responses on the test dataset. For this purpose, we have used the pretrained models available on the GitHub page of the project\footnote{https://github.com/epfml/sent2vec}. We have decided, that we use both the \emph{Twitter} and \emph{Wikipedia} models for the assessment. The results can be seen in the Figures~\ref{results:sent2vec:opensubtitles:results} and~\ref{results:sent2vec:reddit:results}. What can be directly seen is that both the Reddit and OpenSubtitles models perform better on the pretrained Wikipedia model in comparison to the pretrained twitter model. This probably has to do with the fact that ``compressed'' language used when writing tweets (e.g. ``w/o'' instead of ``without'') and with the coverage of the vocabulary, which is higher with the Wikipedia model.\todo{Need to check that!} However, both results are pretty bad, with the Reddit results being much better than the OpenSubtitles, about twice as good (see Tables~\ref{results:sent2vec:opensubtitles:results_table} and~\ref{results:sent2vec:reddit:results_table}). The OpenSubtitles model starts with an average similarity of $0.167$ for the first snapshot and climbs up to $0.204$ for the last snapshot. The Reddit model starts with an average value of $0.336$ for the first snapshot and increases to $0.359$ for the last snapshot. This means, that the responses of the Reddit model match the expected responses much better from a semantic perspective as the responses of the OpenSubtitles model do. In summary, the results of both models are pretty bad, as the maximum similarity is $1.0$.\todo{Write, or remove that?}
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -166,31 +166,68 @@ As seen in the examples above, there has indeed been an improvement in the answe
 	\label{results:sent2vec:opensubtitles:results}
 \end{figure}
 
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{lcc}
+			\toprule
+			Snapshot & Avg. Similarity (Wikipedia) & Avg. Similarity (Twitter)\\
+			\midrule
+			0.5M & $0.16749$ & $0.13827$\\
+			1.0M & $0.19111$ & $0.13811$\\
+			1.5M & $0.19418$ & $0.14831$\\
+			2.0M & $0.19176$ & $0.13840$\\
+			2.5M & $0.20118$ & $0.15258$\\
+			3.0M & $0.20452$ & $0.16285$\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{The average similarities when applying the Sent2Vec metric on the expected and generated responses from the OpenSubtitles model.}
+	\label{results:sent2vec:opensubtitles:results_table}
+\end{table}
+
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
 	\includegraphics[width=\linewidth]{img/plots/reddit/s2v_wiki_cosine_similarity.png}
 	\centering
 	\small
-	\text{Twitter}
+	\text{Wikipedia}
 	\endminipage\hfill
 	\minipage{0.5\textwidth}
 	\includegraphics[width=\linewidth]{img/plots/reddit/s2v_twitter_cosine_similarity.png}
 	\centering
 	\small
-	\text{Wikipedia}
+	\text{Twitter}
 	\endminipage\hfill
-	\caption{Results of the evaluation with Sent2Vec on the outputs of the Reddit models using the pretrained models. The ticks on the x-axis show the different snapshots and the y-axis the average semantic similarity when using Sent2Vec for each snapshot}
+	\caption{Results of the evaluation with Sent2Vec on the outputs of the Reddit models using the pretrained models. The ticks on the x-axis show the different snapshots and the y-axis the average semantic similarity when using Sent2Vec for each snapshot.}
 	\label{results:sent2vec:reddit:results}
 \end{figure}
-\footnotetext{https://github.com/epfml/sent2vec}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{lcc}
+			\toprule
+			Snapshot & Avg. Similarity (Wikipedia) & Avg. Similarity (Twitter)\\
+			\midrule
+			0.5M & $0.33691$ & $0.30837$\\
+			1.0M & $0.33689$ & $0.28694$\\
+			1.5M & $0.35340$ & $0.28777$\\
+			2.0M & $0.33843$ & $0.30713$\\
+			2.5M & $0.35828$ & $0.28908$\\
+			3.0M & $0.35956$ & $0.28676$\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{The average similarities when applying the Sent2Vec metric on the expected and generated responses from the Reddit model.}
+	\label{results:sent2vec:reddit:results_table}
+\end{table}
 
-<<<<<<< HEAD
+\todo{Fazit for this paragraph?}
+
 \paragraph{Generic Response are a Problem} One potential reason for the bad results when using the Sent2Vec metric is that we witnessed both models generating generic responses a lot of the time. To analyze this our first idea was to see, what kind of sentences the models produce with the inputs of the test datasets. We did an analysis on the generated responses and quickly noticed that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).
 \\
-=======
-\paragraph{Generic answer sentences}.. Eine mögliche Ursache für die schlechten Ergebnisse wären generische Antwortsätze. Diese könnten die Metriken in der Masse so stark beeinflussen, dass vielversprechende Ergebnisse nicht ins Gewicht fallen. Deshalb zählten wir die Anzahl identischer Sätze, Resultate in (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}). ersichtlich. Anhand der Anzahl gleicher Sätze (Vielleicht können wir proentual angeben, wieviel die top10 sätze ausmachen), scheint es tatsächlich so, dass es generische Antworten gibt. Wir möchten noch einmal mit Hilfe  Sent2Vec scores berechnen, jedoch ohne die Top 1/5/10 häufigsten Antworten. Die Resultate sind dem ursprünglichen so ähnlich, dass wir hier auf eine Visualisierung verzichten. Vielleicht ist dieser Ansatz erfolgreich, wenn man noch mehr generische Antworten aus der Berechnung entfernt. Dies könnte genutzt werden, um in diesem Subsample dann einen Lernfortschritt zu erkennen. Dies ist ja unser ursprüngliches Problem, wir sehen Beispiele, welche besser werden, aber wir können dies nicht in Zahlen darstellen.
-
->>>>>>> 92243a2275f4312eda0d14b8b2499fe50334b475
 \begin{table}[H]
 	\centering
 	\ra{1.3}
