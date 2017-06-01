@@ -42,6 +42,7 @@ if type(metrics) is list:
 
 x_values = list(map(float, metrics.keys()))
 y_values = list(map(float, metrics.values()))
+
 width = 1
 
 if x_values[1] < 1.1:
@@ -52,9 +53,9 @@ plt.xticks(x_values)
 
 if plot_mode == 'bar':
     plt.yscale(y_scale)
-    plt.bar(x_values, y_values, color='blue', width=width)
+    plt.bar(x_values, y_values, color='lightblue', width=width)
 elif plot_mode == 'plot':
-    plt.plot(x_values, y_values, color='blue')
+    plt.plot(x_values, y_values, color='lightblue')
 
 if value_mode == 'perc':
     gca = plt.gca()

@@ -529,13 +529,160 @@ In den Grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results
 
 Both of the models seem to have no problems understanding clear, direct sentences where the intent is clear (e.g. ``I have no interest in your opinion on movies, your taste is bad!''). This can be seen because similar sentences are clustered together in the projected space. However, when it comes to curses and questions regarding the gender, the OpenSubtitles model starts to struggle, which can be seen by taking a look at the respective points in the projected space. For example, the questions regarding the gender or the curses are scattered throughout the space, even though they should have been embedded closely to each other. The Reddit model seems to have less problems with this, as the embeddings for these sentences are quite close together. But what is interesting to see is that the Reddit model embeds the sentences with curses close to the sentences regarding the gender.\todo{write more}
 
+\subsection{Attention??}
+\todo{noch entscheiden, ob wir das kapitel wollen}
+\section{Some Examples Compared with Other Systems}
+Wir möchten nun noch einige ausgesuchte Beispiele Präsentieren, die gewissen Fähigkeiten der Modelle veranschaulichen. Gleichzeitig möchten wir unsere responses mit denjenigen von Cleverbot vergleichen. Kurz erklären unterschiede zu Cleverbot.
+Anschliessend noch Beisiele aus conversational paper suchen und vergleiche. (unterschied zum paper erwähnen, grösse des 
 
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{Hi, how are you?}\\
+			\midrule
+			0.5M: 	& \texttt{how are you ?}\\
+			1.0M: 	& \texttt{i m fine}\\
+			1.5M:	& \texttt{i m good}\\
+			2.0M:	& \texttt{good}\\
+			2.5M:	& \texttt{good}\\
+			3.0M:	& \texttt{good}\\
+			Cleverbot:	& \texttt{I'm good. How are you?}\\
+			\midrule
+			Input: 	& \texttt{Can birds fly?}\\
+			\midrule
+			0.5M: 	& \texttt{no}\\
+			1.0M: 	& \texttt{i can t}\\
+			1.5M:	& \texttt{yeah , but in the meantime , i can t swim}\\
+			2.0M:	& \texttt{no}\\
+			2.5M:	& \texttt{i can t}\\
+			3.0M:	& \texttt{sure}\\
+			Cleverbot:	& \texttt{Some say they can.}\\
+			\midrule
+			Input: 	& \texttt{What color is the sky?}\\
+			\midrule
+			0.5M: 	& \texttt{the jews}\\
+			1.0M: 	& \texttt{it s a}\\
+			1.5M:	& \texttt{oh , it s not}\\
+			2.0M:	& \texttt{it s the blue}\\
+			2.5M:	& \texttt{the red}\\
+			3.0M:	& \texttt{blue}\\
+			Cleverbot:&\texttt{*Kisses playfully*.}\\
+			\midrule
+			Input: 	& \texttt{I wear a blue jeans. What color do my jeans have?}\\
+			\midrule
+			0.5M: 	& \texttt{<unknown> <unknown>}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{oh , yeah}\\
+			2.0M:	& \texttt{i m not a prostitute}\\
+			2.5M:	& \texttt{i got a blue blue}\\
+			3.0M:	& \texttt{i m not a fan}\\
+			Cleverbot:	& \texttt{You don't have any.}\\
+			\midrule
+			Input: 	& \texttt{How much is 1 added to 2?}\\
+			\midrule
+			0.5M: 	& \texttt{i don t know}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{i don t know}\\
+			2.0M:	& \texttt{ten dollars}\\
+			2.5M:	& \texttt{50}\\
+			3.0M:	& \texttt{2}\\
+			Cleverbot:	& \texttt{I don't know.}\\
+			\midrule
+			Input: 	& \texttt{i invited her to a ppublic reading of my work , but she never came .}\\
+			\midrule
+			0.5M: 	& \texttt{she was a}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{really ?}\\
+			2.0M:	& \texttt{i m sorry}\\
+			2.5M:	& \texttt{she s been in a lot of trouble}\\
+			3.0M:	& \texttt{she s not a fan}\\
+			Cleverbot:	& \texttt{Who?}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example dialogs with the OpenSubtitle model with one response per snapshot and the Cleverbot results. Resultate ändern sich bei Cleverbot mit der Zeit. Wurde gemacht am 01.06.2017 12:00}
+	\label{results:example_output:OpenSubtitle_compared}
+\end{table}
+
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{Hi there, i m john!}\\
+			\midrule
+			0.5M:	& \texttt{<unknown>}\\
+			1.0M: 	& \texttt{i m not a fan of the <unknown> , but i m not sure if you re a <unknown> .}\\
+			1.5M: 	& \texttt{i m not the only one who thought this was a good idea .}\\
+			2.0M:	& \texttt{i m a <unknown> !}\\
+			2.5M:	& \texttt{i m not your buddy , guy .}\\
+			3.0M:	& \texttt{i m not .}\\
+			Cleverbot:	& \texttt{So what are you doing?}\\
+			\midrule
+			Input: 	& \texttt{Can birds fly?}\\
+			\midrule
+			0.5M: 	& \texttt{no}\\
+			1.0M: 	& \texttt{i can t}\\
+			1.5M:	& \texttt{yeah , but in the meantime , i can t swim}\\
+			2.0M:	& \texttt{no}\\
+			2.5M:	& \texttt{i can t}\\
+			3.0M:	& \texttt{sure}\\
+			Cleverbot:	& \texttt{Some say they can.}\\
+			\midrule
+			Input: 	& \texttt{What color is the sky?}\\
+			\midrule
+			0.5M: 	& \texttt{the jews}\\
+			1.0M: 	& \texttt{it s a}\\
+			1.5M:	& \texttt{oh , it s not}\\
+			2.0M:	& \texttt{it s the blue}\\
+			2.5M:	& \texttt{the red}\\
+			3.0M:	& \texttt{blue}\\
+			Cleverbot:&\texttt{*Kisses playfully*.}\\
+			\midrule
+			Input: 	& \texttt{I wear a blue jeans. What color do my jeans have?}\\
+			\midrule
+			0.5M: 	& \texttt{<unknown> <unknown>}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{oh , yeah}\\
+			2.0M:	& \texttt{i m not a prostitute}\\
+			2.5M:	& \texttt{i got a blue blue}\\
+			3.0M:	& \texttt{i m not a fan}\\
+			Cleverbot:	& \texttt{You don't have any.}\\
+			\midrule
+			Input: 	& \texttt{Is 5 greater then 3?}\\
+			\midrule
+			0.5M: 	& \texttt{i don t know}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{i don t know}\\
+			2.0M:	& \texttt{ten dollars}\\
+			2.5M:	& \texttt{50}\\
+			3.0M:	& \texttt{2}\\
+			Cleverbot:	& \texttt{I don't know.}\\
+			\midrule
+			Input: 	& \texttt{i invited her to a ppublic reading of my work , but she never came .}\\
+			\midrule
+			0.5M: 	& \texttt{she was a}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{really ?}\\
+			2.0M:	& \texttt{i m sorry}\\
+			2.5M:	& \texttt{she s been in a lot of trouble}\\
+			3.0M:	& \texttt{she s not a fan}\\
+			Cleverbot:	& \texttt{Who?}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example dialogs with the Reddit model with one response per snapshot and the Cleverbot results. Resultate ändern sich bei Cleverbot mit der Zeit. Wurde gemacht am 01.06.2017 12:00}
+	\label{results:example_output:Reddit_compared}
+\end{table}
 
 \section{What Language Model do the Models produce?}
 \blindtext
 
-\section{Does the Model have an understanding of natural language?}
-\blindtext
 
 \section{How can we fix the detected problems?}
 \blindtext
