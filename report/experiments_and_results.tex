@@ -532,9 +532,13 @@ Both of the models seem to have no problems understanding clear, direct sentence
 \subsection{Attention??}
 \todo{noch entscheiden, ob wir das kapitel wollen}
 \section{Some Examples Compared with Other Systems}
-Wir möchten nun noch einige ausgesuchte Beispiele Präsentieren, die gewissen Fähigkeiten der Modelle veranschaulichen. Gleichzeitig möchten wir unsere responses mit denjenigen von Cleverbot vergleichen. Kurz erklären unterschiede zu Cleverbot.
+Wir möchten nun noch einige ausgesuchte Beispiele präsentieren, die gewissen Fähigkeiten und auch einen Lernprozess der Modelle veranschaulichen. Gleichzeitig möchten wir unsere responses mit denjenigen von Cleverbot vergleichen. Kurz erklären unterschiede zu Cleverbot.
 Anschliessend noch Beisiele aus conversational paper suchen und vergleiche. (unterschied zum paper erwähnen, grösse des 
+\todo{Cleverbott antoworten wurden am 01.06.17 1200-1500 generiert. (nicht immer der gleiche output)}
 
+
+We tested the quality of the responses of our model with differently difficult utterances and types of utterances. We would like to find out where there are strengths and weaknesses.
+First we start with with a simple greeting question. As you can see in the Table  \ref{results:example1_output:OpenSubtitle_compared} and \ref{results:example1_output:Reddit_compared} the OpenSubtitle and Cleverbot question are appropriate according to the question "Hi, how are you?". The Reddit responses for the slightly changed question to "Hi there, i m john!" is rather bad. whereby the Cleverbot response is not much better.
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -550,64 +554,12 @@ Anschliessend noch Beisiele aus conversational paper suchen und vergleiche. (unt
 			2.5M:	& \texttt{good}\\
 			3.0M:	& \texttt{good}\\
 			Cleverbot:	& \texttt{I'm good. How are you?}\\
-			\midrule
-			Input: 	& \texttt{Can birds fly?}\\
-			\midrule
-			0.5M: 	& \texttt{no}\\
-			1.0M: 	& \texttt{i can t}\\
-			1.5M:	& \texttt{yeah , but in the meantime , i can t swim}\\
-			2.0M:	& \texttt{no}\\
-			2.5M:	& \texttt{i can t}\\
-			3.0M:	& \texttt{sure}\\
-			Cleverbot:	& \texttt{Some say they can.}\\
-			\midrule
-			Input: 	& \texttt{What color is the sky?}\\
-			\midrule
-			0.5M: 	& \texttt{the jews}\\
-			1.0M: 	& \texttt{it s a}\\
-			1.5M:	& \texttt{oh , it s not}\\
-			2.0M:	& \texttt{it s the blue}\\
-			2.5M:	& \texttt{the red}\\
-			3.0M:	& \texttt{blue}\\
-			Cleverbot:&\texttt{*Kisses playfully*.}\\
-			\midrule
-			Input: 	& \texttt{I wear a blue jeans. What color do my jeans have?}\\
-			\midrule
-			0.5M: 	& \texttt{<unknown> <unknown>}\\
-			1.0M: 	& \texttt{i don t know}\\
-			1.5M:	& \texttt{oh , yeah}\\
-			2.0M:	& \texttt{i m not a prostitute}\\
-			2.5M:	& \texttt{i got a blue blue}\\
-			3.0M:	& \texttt{i m not a fan}\\
-			Cleverbot:	& \texttt{You don't have any.}\\
-			\midrule
-			Input: 	& \texttt{How much is 1 added to 2?}\\
-			\midrule
-			0.5M: 	& \texttt{i don t know}\\
-			1.0M: 	& \texttt{i don t know}\\
-			1.5M:	& \texttt{i don t know}\\
-			2.0M:	& \texttt{ten dollars}\\
-			2.5M:	& \texttt{50}\\
-			3.0M:	& \texttt{2}\\
-			Cleverbot:	& \texttt{I don't know.}\\
-			\midrule
-			Input: 	& \texttt{i invited her to a ppublic reading of my work , but she never came .}\\
-			\midrule
-			0.5M: 	& \texttt{she was a}\\
-			1.0M: 	& \texttt{i don t know}\\
-			1.5M:	& \texttt{really ?}\\
-			2.0M:	& \texttt{i m sorry}\\
-			2.5M:	& \texttt{she s been in a lot of trouble}\\
-			3.0M:	& \texttt{she s not a fan}\\
-			Cleverbot:	& \texttt{Who?}\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example dialogs with the OpenSubtitle model with one response per snapshot and the Cleverbot results. Resultate ändern sich bei Cleverbot mit der Zeit. Wurde gemacht am 01.06.2017 12:00}
-	\label{results:example_output:OpenSubtitle_compared}
+\caption{Example simple dialog with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+\label{results:example1_output:OpenSubtitle_compared}
 \end{table}
-
-
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -623,7 +575,22 @@ Anschliessend noch Beisiele aus conversational paper suchen und vergleiche. (unt
 			2.5M:	& \texttt{i m not your buddy , guy .}\\
 			3.0M:	& \texttt{i m not .}\\
 			Cleverbot:	& \texttt{So what are you doing?}\\
-			\midrule
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example simple dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\label{results:example1_output:Reddit_compared}
+\end{table}
+
+In the Table \ref{results:example2_output:OpenSubtitle_compared} and \ref{results:example2_output:Reddit_compared} you find the responses of a closed question. We would like to test whether he understands the concept of the closed question and the answers are just yes or no. Unfortunately You can see that Cleverbot gives two different answers to the same question. The problem with Cleverbot is, that the results are not deterministic. 
+Apart from this we see, apparently our models understand the concept behind this question, whereas Cleverbot gives us a more relativistic response.
+	
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
 			Input: 	& \texttt{Can birds fly?}\\
 			\midrule
 			0.5M: 	& \texttt{no}\\
@@ -633,7 +600,42 @@ Anschliessend noch Beisiele aus conversational paper suchen und vergleiche. (unt
 			2.5M:	& \texttt{i can t}\\
 			3.0M:	& \texttt{sure}\\
 			Cleverbot:	& \texttt{Some say they can.}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example closed question dialog with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+	\label{results:example2_output:OpenSubtitle_compared}
+\end{table}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{Can birds fly?}\\
 			\midrule
+			0.5M: 	& \texttt{i m not sure if this is a movie , but i m not sure if it s a movie .}\\
+			1.0M: 	& \texttt{i can not imagine how much i can get this .}\\
+			1.5M:	& \texttt{i m sure he s a <unknown> .}\\
+			2.0M:	& \texttt{yes}\\
+			2.5M:	& \texttt{yes}\\
+			3.0M:	& \texttt{yes}\\
+			Cleverbot:	& \texttt{Some of them can.}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example closed question dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\label{results:example2_output:Reddit_compared}
+\end{table}
+
+Mit der nächsten Frage möchten wir herausfinden, ob unsere Modelle Wissen besitzen. In der Tabelle \ref{results:example3_output:OpenSubtitle_compared} fragen wir nicht der Farbe des Himmels. Die entwicklung der Antwort ist erstaunlich gut. Von einer absolut kontextfreien Antwort, lernt das Modell mit fortlaufendem Training die korrekte Antwort blau. Die Antwort von Cleverbot in diesem Beispiel ist ebenfalls Kontextfrei.
+In der Tabelle \ref{results:example3_output:Reddit_compared} fragen wir ihn nach seinem Standort. Die Antworten dabei von Reddit sind insofern gut, dass es Orte sind, welche als Antwort zurückkommen. Somit hat das Modell den Kontext der Frage verstanden. Die Antworten selber sind natürlich alle falsch. Vermutlich ist Schweiz im 50k Vokabular sowieso nicht vorhanden. Dagegen ist die Antwort von Cleverbot korrekt.
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
 			Input: 	& \texttt{What color is the sky?}\\
 			\midrule
 			0.5M: 	& \texttt{the jews}\\
@@ -643,7 +645,43 @@ Anschliessend noch Beisiele aus conversational paper suchen und vergleiche. (unt
 			2.5M:	& \texttt{the red}\\
 			3.0M:	& \texttt{blue}\\
 			Cleverbot:&\texttt{*Kisses playfully*.}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example environment knowledge dialog with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+	\label{results:example3_output:OpenSubtitle_compared}
+\end{table}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{In which country do you live?}\\
 			\midrule
+			0.5M: 	& \texttt{i m not sure if you re a <unknown> .}\\
+			1.0M: 	& \texttt{i live in canada .}\\
+			1.5M:	& \texttt{i live in the uk .}\\
+			2.0M:	& \texttt{the country}\\
+			2.5M:	& \texttt{canada}\\
+			3.0M:	& \texttt{sweden}\\
+			Cleverbot:&\texttt{The United States.}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example environment knowledge dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\label{results:example3_output:Reddit_compared}
+\end{table}
+
+Mit den nächsten Beispielen wollten wir eruieren, ob wie das Modell auf Informationen reagiert und uns diese wieder zurückgeben kann. Wie in der Tabelle \ref{results:example4_output:OpenSubtitle_compared} ersichtlich, sind die OpenSubtitle Responses alle unpassend. Lediglich die Antwort des 2.5M Snapshots liefert immerhin auch! die richtige Farbe. Die Antwort von Cleverbot scheint ein wenig sinnvoller, jedoch entspricht sie auch nicht dem gewünschten Resultat.
+
+Die Responses des Reddit Modells sind in der Tabelle \ref{results:example4_output:Reddit_compared} ersichtlich. Obwohl die erhoffte Response auch bei diesem Modell ausbleibt, sind die Antworten passender zur Frage. Die Antwort von Cleverbot hingegen ist absolut Kontextlos zur Frage.
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
 			Input: 	& \texttt{I wear a blue jeans. What color do my jeans have?}\\
 			\midrule
 			0.5M: 	& \texttt{<unknown> <unknown>}\\
@@ -653,8 +691,46 @@ Anschliessend noch Beisiele aus conversational paper suchen und vergleiche. (unt
 			2.5M:	& \texttt{i got a blue blue}\\
 			3.0M:	& \texttt{i m not a fan}\\
 			Cleverbot:	& \texttt{You don't have any.}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{An example dialog with context knowledge with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+	\label{results:example4_output:OpenSubtitle_compared}
+\end{table}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{I wear a red pullover and blue jeans. What color do my jeans have?}\\
 			\midrule
-			Input: 	& \texttt{Is 5 greater then 3?}\\
+			0.5M: 	& \texttt{i m a big fan of the <unknown> .}\\
+			1.0M: 	& \texttt{i m not a fan of the <unknown> , but i do nt know what you re talking about .}\\
+			1.5M:	& \texttt{i m a white male and i wear pants .}\\
+			2.0M:	& \texttt{i wear a red shirt and i wear glasses .}\\
+			2.5M:	& \texttt{i m a red blue and blue blue .}\\
+			3.0M:	& \texttt{i m a white male and i have a blue blue shirt .}\\
+			Cleverbot:	& \texttt{What is your opinion on President Obama. And don't ask me mine without saying}\\
+			& \texttt{yours first!.}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{An example dialog with context knowledge with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\label{results:example4_output:Reddit_compared}
+\end{table}
+
+Wir stellen nun noch eine spezielle Frage pro Modell. Das OpenSubtitle Modell erfragen wir nach einem mathematischem Resultat, die Uterrances dazu sind in der Tabelle \ref{results:example5_output:OpenSubtitle_compared}. Das richtige Resultat 3, kommt leder nicht vor. Jedoch wird mit zunehmendem Training der Antworttyp passend zur Frage. Die Antwort von Cleverbot entspricht denjenigen unserer wenig trainierten Snapshots und ist entweder ehrlich oder eben eine generischer Antwortsatz.
+
+Das Reddit Modell erfragen wir nach Informationen über einen Film, diese Resultate sind in der Tabelle \ref{results:example5_output:Reddit_compared} ersichtich. Grundsätzlich sind die Antworten schlecht und es finden sich einige generische Utterances in den Replies wieder. Jedoch die letzte Antwort, welche "...hodor..." ist interessant, da es eine Szene aus dem erfragen Film "Game of Thrones" ist. Die Antwort von Cleverbot hingegen verstehe ich nicht Dani is alife? \todo{Dirk, kennsch du die Szene?}
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{How much is 1 added to 2?}\\
 			\midrule
 			0.5M: 	& \texttt{i don t know}\\
 			1.0M: 	& \texttt{i don t know}\\
@@ -663,8 +739,47 @@ Anschliessend noch Beisiele aus conversational paper suchen und vergleiche. (unt
 			2.5M:	& \texttt{50}\\
 			3.0M:	& \texttt{2}\\
 			Cleverbot:	& \texttt{I don't know.}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{An example dialog with mathematical knowledge with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+	\label{results:example5_output:OpenSubtitle_compared}
+\end{table}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{Can you tell me something about game of thrones?}\\
 			\midrule
-			Input: 	& \texttt{i invited her to a ppublic reading of my work , but she never came .}\\
+			0.5M: 	& \texttt{i m not sure if you re a fan of the movie , but i m not sure if you re going to be}\\
+			& \texttt{a fan of the}\\
+			1.0M: 	& \texttt{i m not sure what you re saying .}\\
+			1.5M:	& \texttt{i m not sure if i m going to be watching this .}\\
+			2.0M:	& \texttt{i m not sure if you re joking , but i m pretty sure that s the case .}\\
+			2.5M:	& \texttt{i m not sure if you re talking about the game or the game , but i think the game}\\
+			& \texttt{is a little different .}\\
+			3.0M:	& \texttt{hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor }\\
+			& \texttt{hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor}\\
+			Cleverbot:	& \texttt{Dani is life.}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example movies knowledge dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\label{results:example5_output:Reddit_compared}
+\end{table}
+
+Wir haben bis jetzt nur Fragen gestellt, wir möchte nun noch die responses testen auf Aussagen, oder Imperativ. In der Tabelle \ref{results:example6_output:OpenSubtitle_compared} sind die Ergebnisse des OpenSubtitle Modells. Die Responses sind ab dem 3. Snapshot alle brauchbar und passend. Cleverbot gibt ebenfalls eine mögliche Antwort, wobei diese recht kurz ausfällt. Im Gegensatz dazu ist z.B. "i m sorry" eine emphatische Reaktion auf den Inhalt.
+
+In der Tabelle \ref{results:example6_output:Reddit_compared} sind die Ergebnisse des Reddit Models ersichtlich. Diese sind durchgehend schlecht und bestehen grösstenteils aus den generischen responses. Die Antwort von Cleverbot ist hier um einiges besser/schlagfertiger.
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{i invited her to a public reading of my work , but she never came .}\\
 			\midrule
 			0.5M: 	& \texttt{she was a}\\
 			1.0M: 	& \texttt{i don t know}\\
@@ -676,8 +791,52 @@ Anschliessend noch Beisiele aus conversational paper suchen und vergleiche. (unt
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example dialogs with the Reddit model with one response per snapshot and the Cleverbot results. Resultate ändern sich bei Cleverbot mit der Zeit. Wurde gemacht am 01.06.2017 12:00}
-	\label{results:example_output:Reddit_compared}
+	\caption{Example statement dialog with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+	\label{results:example6_output:OpenSubtitle_compared}
+\end{table}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{Your film taste is bad and your opinion does not interest me!}\\
+			\midrule
+			0.5M: 	& \texttt{i m not sure what you re saying .}\\
+			1.0M: 	& \texttt{i m not your friend , but i m not a fan of the <unknown> .}\\
+			1.5M:	& \texttt{i m sorry , i did nt know that .}\\
+			2.0M:	& \texttt{i m not a fan of the movie , but i m not sure if you re going to be a fan of the film .}\\
+			2.5M:	& \texttt{i m not a fan of the film , but i think it s a good movie .}\\
+			3.0M:	& \texttt{i m not sure if you re being sarcastic or not .}\\
+			Cleverbot:	& \texttt{And for me your opinion does not matter.}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example statement dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\label{results:example6_output:Reddit_compared}
+\end{table}
+
+Als letztes möchten wir Ihnen noch ein witziges Beispiel \ref{results:example7_output:OpenSubtitle_compared} zeigen. Wir können uns nicht wirklich erklären, wie die letzte Antwort zustande kam, da die Texte für das Training ja eigentlich von Menschenhand stammen.
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{What are you?}\\
+			\midrule
+			0.5M: 	& \texttt{i m not a fan of the movie , but i m a huge fan of the movie .}\\
+			1.0M: 	& \texttt{i m not a fan of the <unknown> , but i m not a fan of the <unknown> .}\\
+			1.5M:	& \texttt{i m not .}\\
+			2.0M:	& \texttt{i m not .}\\
+			2.5M:	& \texttt{i m not .}\\
+			3.0M:	& \texttt{i m a bot .}\\
+			Cleverbot:	& \texttt{A human, what are you??}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Example self-knowledge dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\label{results:example7_output:Reddit_compared}
 \end{table}
 
 \section{What Language Model do the Models produce?}
