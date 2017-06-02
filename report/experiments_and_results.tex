@@ -480,12 +480,15 @@ In den Grafiken \ref{results:ngram:distributions:opensubtitles} und \ref{results
 \todo{grafiken interpretieren}
 \paragraph{The distribution is right-handed} of the words... Für beide Modelle gilt: Starten gleichverteilter, als expected, nähern sich dann dem expected Werten an. Dieser Virgang scheint von links nacht rechts stattzufinden. Das scheint insofern nachvollziehbar, dass er schnell merkt, welche bi-gramme nicht oft vorkommen und entsprechend diese fast nie verwendet.Jedoch herauszufinden, welches der top n n-gramme das Richtige ist, ist ein deutlich schwierigerer Lernprozess. Wir sehen im groben zumindest eine Annäherung der Verteilung. Wünschenswert wäre natürlich hier eine ähnliche Verteilung wie expected, wobei vor allem die weniger häufigen Bigramme für eine vielfältige Sprache stehen. Dies würde sich ganz generell als mass für die Sprachvielfalt eigenen, indem man z.B. die umgekehrte Wahrscheinlichkeit als Gewicht Einfliessen lässt.
 
-\subsection{Uni-gramm/Wörter}
-\todo{grafiken erstellen und referenzieren und beschreiben}
-\paragraph{Die Uni-gramm und deren Wahrscheinlichkeiten werden übernommen.}
-\todo{grafiken interpretieren}
-\paragraph{The distribution is}
-\todo{grafiken interpretieren}
+\subsection{Sprachvielfalt}
+\todo{Schreiben}
+
+\paragraph{Fazit}
+Wegen generischen Sätze, wollten wir sparchmodell analysieren
+zuerst haben wir Verteilungen der Bi-Gramme und Uni-Gramme verglichen mit gleichen bi/unigrammen Verteilung aus dem ganzen set. Nähert sich an, wird aber eher rechtslastig, auffällig, wenig genutzte bi/unigramme werden vernachlässigt.
+Anschliessend Sprachvielfalt analysiert, damit konnten wir unseren beim testen bemerkten Lernfortschritt im Opensubtitle MOdell erstmals mit zahlen unterlegen. Wobei, die Sprachvielfalt eher auf Stufe Satz/Wort sich verbesserte, auf Stufe bigramm sehen wir diese entwicklung nocht nicht??? Und es zeigt sich, dass der Anteil der generischen Antworten tendenziell sinkt.
+Bei Reddit konnten wir ebenfalls unseren visuellenen Eindruck bestätigen, das Modell 2.0M war für uns das Beste, und dies wird durch die Grafik \ref{label} bestätigt. Sobald mehrmals mit gleichen Daten trainiert wird, werden resultate subjektiv schlechter, dies bestätigt auch unsere Grafik, dass ab diesem Punkt die Sätze wieder einfältiger werden.
+Wir konnten die Ursache für die genereischen Sätze zwar nicht herausfinden, jedoch konnten wir aufzeigen, dass sich die Vielfält mit fortlaufendem Training langsam aber stetig verbessert.
 
 \section{Comparison with Other Models}
 As the next part, we want to compare the results of our model with two others we use as a reference: The CleverBot\footnote{http://www.cleverbot.com/} chatbot and the results from the paper ``Neural Conversational Model''~\cite{Vinyals:2015}, whose model architecture serves as the base of our model.\todo{name differences?} We test the quality of the responses from our models when confronted with utterances of different type and difficulty. We do this in the hope that we can reveal where the strengths and weaknesses of our models lie.
@@ -1018,9 +1021,9 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 	\label{results:example14_output:Neural_Conversational_Model_compared}
 \end{table}
 
-\paragraph{Fazit} Es scheint so, dass unsere Modelle für einfachere Fragen gut funktionieren, für komplexere Fragen aber die Sprachvielfalt fehlt. \todo{vielleicht noch ergännzen, indem resultate pro Conversation genauer beschrieben werden. Zusätzlich vielleicht noch cpations überarbeiten}
-
-\paragraph{Brings Beam-search Surprises?}\todo{Wenn wir die gleiche Struktur wie "immer" machen, müssten wir hier das Fazit des Vergleichs machen und dann mit einem Satz eine Überleitung zu Beam Search?}
+\paragraph{Fazit}
+Im Vergleich zu Cleverbot schneidet unser Modell gleichgut oder besser ab (subjektiv), Test war schwer für Cleverbot weil die Aussagen anhand der responses unseres Modells ausgewählt haben. 
+Beim Vergleich mit den verschiednen NCM Utterance Aussagentypen scheint es so, dass unsere Modelle für einfachere Fragen etwa gleichgut funbktioniert und für komplexere Fragen aber die Sprachvielfalt vermutlich noch fehlt. (und gröösse Modell)
 
 \section{Beam-Search}
 \label{results:beam_search}
