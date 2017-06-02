@@ -533,12 +533,15 @@ Both of the models seem to have no problems understanding clear, direct sentence
 \todo{noch entscheiden, ob wir das kapitel wollen}
 \section{Some Examples Compared with Other Systems}
 Wir möchten nun noch einige ausgesuchte Beispiele präsentieren, die gewissen Fähigkeiten und auch einen Lernprozess der Modelle veranschaulichen. Gleichzeitig möchten wir unsere responses mit denjenigen von Cleverbot vergleichen. Kurz erklären unterschiede zu Cleverbot.
-Anschliessend noch Beisiele aus conversational paper suchen und vergleiche. (unterschied zum paper erwähnen, grösse des 
+Anschliessend noch Beispiele aus conversational paper suchen und vergleiche. (unterschied zum paper erwähnen, grösse des Modells, Trainingszeit, deshalb ergebnisse zwangsläufig schlechter)
+
+\subsection{Cleverbot}
 \todo{Cleverbott antoworten wurden am 01.06.17 1200-1500 generiert. (nicht immer der gleiche output)}
 
 
 We tested the quality of the responses of our model with differently difficult utterances and types of utterances. We would like to find out where there are strengths and weaknesses.
-First we start with with a simple greeting question. As you can see in the Table  \ref{results:example1_output:OpenSubtitle_compared} and \ref{results:example1_output:Reddit_compared} the OpenSubtitle and Cleverbot question are appropriate according to the question "Hi, how are you?". The Reddit responses for the slightly changed question to "Hi there, i m john!" is rather bad. whereby the Cleverbot response is not much better.
+
+\paragraph{Simple Question}First we start with with a simple greeting question. As you can see in the Table  \ref{results:example1_output:OpenSubtitle_compared} and \ref{results:example1_output:Reddit_compared} the OpenSubtitle and Cleverbot question are appropriate according to the question "Hi, how are you?". The Reddit responses for the slightly changed question to "Hi there, i m john!" is rather bad. whereby the Cleverbot response is not much better.
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -582,7 +585,7 @@ First we start with with a simple greeting question. As you can see in the Table
 	\label{results:example1_output:Reddit_compared}
 \end{table}
 
-In the Table \ref{results:example2_output:OpenSubtitle_compared} and \ref{results:example2_output:Reddit_compared} you find the responses of a closed question. We would like to test whether he understands the concept of the closed question and the answers are just yes or no. Unfortunately You can see that Cleverbot gives two different answers to the same question. The problem with Cleverbot is, that the results are not deterministic. 
+\paragraph{Closed question}In the Table \ref{results:example2_output:OpenSubtitle_compared} and \ref{results:example2_output:Reddit_compared} you find the responses of a closed question. We would like to test whether he understands the concept of the closed question and the answers are just yes or no. Unfortunately You can see that Cleverbot gives two different answers to the same question. The problem with Cleverbot is, that the results are not deterministic. 
 Apart from this we see, apparently our models understand the concept behind this question, whereas Cleverbot gives us a more relativistic response.
 	
 \begin{table}[H]
@@ -628,7 +631,7 @@ Apart from this we see, apparently our models understand the concept behind this
 	\label{results:example2_output:Reddit_compared}
 \end{table}
 
-Mit der nächsten Frage möchten wir herausfinden, ob unsere Modelle Wissen besitzen. In der Tabelle \ref{results:example3_output:OpenSubtitle_compared} fragen wir nicht der Farbe des Himmels. Die entwicklung der Antwort ist erstaunlich gut. Von einer absolut kontextfreien Antwort, lernt das Modell mit fortlaufendem Training die korrekte Antwort blau. Die Antwort von Cleverbot in diesem Beispiel ist ebenfalls Kontextfrei.
+\paragraph{Knowledge question}Mit der nächsten Frage möchten wir herausfinden, ob unsere Modelle Wissen besitzen. In der Tabelle \ref{results:example3_output:OpenSubtitle_compared} fragen wir nicht der Farbe des Himmels. Die entwicklung der Antwort ist erstaunlich gut. Von einer absolut kontextfreien Antwort, lernt das Modell mit fortlaufendem Training die korrekte Antwort blau. Die Antwort von Cleverbot in diesem Beispiel ist ebenfalls Kontextfrei.
 In der Tabelle \ref{results:example3_output:Reddit_compared} fragen wir ihn nach seinem Standort. Die Antworten dabei von Reddit sind insofern gut, dass es Orte sind, welche als Antwort zurückkommen. Somit hat das Modell den Kontext der Frage verstanden. Die Antworten selber sind natürlich alle falsch. Vermutlich ist Schweiz im 50k Vokabular sowieso nicht vorhanden. Dagegen ist die Antwort von Cleverbot korrekt.
 \begin{table}[H]
 	\centering
@@ -673,7 +676,7 @@ In der Tabelle \ref{results:example3_output:Reddit_compared} fragen wir ihn nach
 	\label{results:example3_output:Reddit_compared}
 \end{table}
 
-Mit den nächsten Beispielen wollten wir eruieren, ob wie das Modell auf Informationen reagiert und uns diese wieder zurückgeben kann. Wie in der Tabelle \ref{results:example4_output:OpenSubtitle_compared} ersichtlich, sind die OpenSubtitle Responses alle unpassend. Lediglich die Antwort des 2.5M Snapshots liefert immerhin auch! die richtige Farbe. Die Antwort von Cleverbot scheint ein wenig sinnvoller, jedoch entspricht sie auch nicht dem gewünschten Resultat.
+\paragraph{Context knowledge question}Mit den nächsten Beispielen wollten wir eruieren, ob wie das Modell auf Informationen reagiert und uns diese wieder zurückgeben kann. Wie in der Tabelle \ref{results:example4_output:OpenSubtitle_compared} ersichtlich, sind die OpenSubtitle Responses alle unpassend. Lediglich die Antwort des 2.5M Snapshots liefert immerhin auch! die richtige Farbe. Die Antwort von Cleverbot scheint ein wenig sinnvoller, jedoch entspricht sie auch nicht dem gewünschten Resultat.
 
 Die Responses des Reddit Modells sind in der Tabelle \ref{results:example4_output:Reddit_compared} ersichtlich. Obwohl die erhoffte Response auch bei diesem Modell ausbleibt, sind die Antworten passender zur Frage. Die Antwort von Cleverbot hingegen ist absolut Kontextlos zur Frage.
 \begin{table}[H]
@@ -720,7 +723,7 @@ Die Responses des Reddit Modells sind in der Tabelle \ref{results:example4_outpu
 	\label{results:example4_output:Reddit_compared}
 \end{table}
 
-Wir stellen nun noch eine spezielle Frage pro Modell. Das OpenSubtitle Modell erfragen wir nach einem mathematischem Resultat, die Uterrances dazu sind in der Tabelle \ref{results:example5_output:OpenSubtitle_compared}. Das richtige Resultat 3, kommt leder nicht vor. Jedoch wird mit zunehmendem Training der Antworttyp passend zur Frage. Die Antwort von Cleverbot entspricht denjenigen unserer wenig trainierten Snapshots und ist entweder ehrlich oder eben eine generischer Antwortsatz.
+\paragraph{Specific question}Wir stellen nun noch eine spezielle Frage pro Modell. Das OpenSubtitle Modell erfragen wir nach einem mathematischem Resultat, die Uterrances dazu sind in der Tabelle \ref{results:example5_output:OpenSubtitle_compared}. Das richtige Resultat 3, kommt leder nicht vor. Jedoch wird mit zunehmendem Training der Antworttyp passend zur Frage. Die Antwort von Cleverbot entspricht denjenigen unserer wenig trainierten Snapshots und ist entweder ehrlich oder eben eine generischer Antwortsatz.
 
 Das Reddit Modell erfragen wir nach Informationen über einen Film, diese Resultate sind in der Tabelle \ref{results:example5_output:Reddit_compared} ersichtich. Grundsätzlich sind die Antworten schlecht und es finden sich einige generische Utterances in den Replies wieder. Jedoch die letzte Antwort, welche "...hodor..." ist interessant, da es eine Szene aus dem erfragen Film "Game of Thrones" ist. Die Antwort von Cleverbot hingegen verstehe ich nicht Dani is alife? \todo{Dirk, kennsch du die Szene?}
 
@@ -770,7 +773,7 @@ Das Reddit Modell erfragen wir nach Informationen über einen Film, diese Result
 	\label{results:example5_output:Reddit_compared}
 \end{table}
 
-Wir haben bis jetzt nur Fragen gestellt, wir möchte nun noch die responses testen auf Aussagen, oder Imperativ. In der Tabelle \ref{results:example6_output:OpenSubtitle_compared} sind die Ergebnisse des OpenSubtitle Modells. Die Responses sind ab dem 3. Snapshot alle brauchbar und passend. Cleverbot gibt ebenfalls eine mögliche Antwort, wobei diese recht kurz ausfällt. Im Gegensatz dazu ist z.B. "i m sorry" eine emphatische Reaktion auf den Inhalt.
+\paragraph{Statement and command?} Wir haben bis jetzt nur Fragen gestellt, wir möchte nun noch die responses testen auf Aussagen, oder Imperativ. In der Tabelle \ref{results:example6_output:OpenSubtitle_compared} sind die Ergebnisse des OpenSubtitle Modells. Die Responses sind ab dem 3. Snapshot alle brauchbar und passend. Cleverbot gibt ebenfalls eine mögliche Antwort, wobei diese recht kurz ausfällt. Im Gegensatz dazu ist z.B. "i m sorry" eine emphatische Reaktion auf den Inhalt.
 
 In der Tabelle \ref{results:example6_output:Reddit_compared} sind die Ergebnisse des Reddit Models ersichtlich. Diese sind durchgehend schlecht und bestehen grösstenteils aus den generischen responses. Die Antwort von Cleverbot ist hier um einiges besser/schlagfertiger.
 \begin{table}[H]
@@ -801,7 +804,6 @@ In der Tabelle \ref{results:example6_output:Reddit_compared} sind die Ergebnisse
 		\begin{tabular}{ll}
 			\toprule
 			Input: 	& \texttt{Your film taste is bad and your opinion does not interest me!}\\
-			\midrule
 			0.5M: 	& \texttt{i m not sure what you re saying .}\\
 			1.0M: 	& \texttt{i m not your friend , but i m not a fan of the <unknown> .}\\
 			1.5M:	& \texttt{i m sorry , i did nt know that .}\\
@@ -816,7 +818,7 @@ In der Tabelle \ref{results:example6_output:Reddit_compared} sind die Ergebnisse
 	\label{results:example6_output:Reddit_compared}
 \end{table}
 
-Als letztes möchten wir Ihnen noch ein witziges Beispiel \ref{results:example7_output:OpenSubtitle_compared} zeigen. Wir können uns nicht wirklich erklären, wie die letzte Antwort zustande kam, da die Texte für das Training ja eigentlich von Menschenhand stammen.
+\paragraph{Self knowledge}Als letztes möchten wir Ihnen noch ein witziges Beispiel \ref{results:example7_output:OpenSubtitle_compared} zeigen. Wir können uns nicht wirklich erklären, wie die letzte Antwort zustande kam, da die Texte für das Training ja eigentlich von Menschenhand stammen.
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -824,7 +826,6 @@ Als letztes möchten wir Ihnen noch ein witziges Beispiel \ref{results:example7_
 		\begin{tabular}{ll}
 			\toprule
 			Input: 	& \texttt{What are you?}\\
-			\midrule
 			0.5M: 	& \texttt{i m not a fan of the movie , but i m a huge fan of the movie .}\\
 			1.0M: 	& \texttt{i m not a fan of the <unknown> , but i m not a fan of the <unknown> .}\\
 			1.5M:	& \texttt{i m not .}\\
@@ -839,21 +840,198 @@ Als letztes möchten wir Ihnen noch ein witziges Beispiel \ref{results:example7_
 	\label{results:example7_output:Reddit_compared}
 \end{table}
 
-\section{What Language Model do the Models produce?}
-\blindtext
+\subsection{Neural Conversational Model}
+In diesem Abschnitt möchten wir einige Resultate aus dem "Neural Conversational Model" im folgendenals NCM abgekürzt, mit unsren Vergleichen. Dazu wählen pro Conversation ein paar zufällige aussagen und füttern diese unseren beiden Modellen. Da die Beispielsätze aus dem OpenSubtitle stammen, schreiben wir jeweils pro OpenSubtitle Modell Snapshot den response heraus und zusätzlich die subjektiv beste Antwort von unseren Reddit Modellen. (Vermutlich müssen wir hier nochmals erwähnen, dass wir weniger trainieren konnten und das modell kleiner ist)
+Die jeweilige Zugehörigkeit zu den Experimenten im Paper, sind in der Tabellenbeschreibung vermerkt.
 
+Die Resultate befinden sich in den Tabellen \ref{results:example8_output: Neural_Conversational_Model_compared} bis \ref{results:example14_output: Neural_Conversational_Model_compared}, zusätzliche Resultate befinden sich im Anhang \ref{apendix:results:compared_with_NCM}. Ganz generell sind die Resultate wie erwartet schlechter, als diejenigen vom NCM Paper. Es scheint so, dass unsere Modelle für einfachere Fragen gut funktionieren, für komplexere Fragen aber die Sprachvielfalt fehlt. \todo{vielleicht noch ergännzen, indem resultate pro Conversation genauer beschrieben werden. Zusätzlich vielleicht noch cpations überarbeiten}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{what year were you born ?}\\
+			\midrule
+			OpenSubtitle\\
+			0.5M: 	& \texttt{a lot of people}\\
+			1.0M: 	& \texttt{i was a}\\
+			1.5M:	& \texttt{a little}\\
+			2.0M:	& \texttt{i was born}\\
+			2.5M:	& \texttt{i don t know}\\
+			3.0M:	& \texttt{i don t know}\\
+			\midrule
+			Reddit\\
+			2.0M:	& \texttt{i was born in the 90s .}\\
+			\midrule
+			NCM:	& \texttt{1977 .}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 1: BASIC }
+	\label{results:example8_output: Neural_Conversational_Model_compared}
+\end{table}
 
-\section{How can we fix the detected problems?}
-\blindtext
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{why are we here ?}\\
+			\midrule
+			OpenSubtitle\\
+			0.5M: 	& \texttt{because we were here}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{i don t know}\\
+			2.0M:	& \texttt{i m sorry}\\
+			2.5M:	& \texttt{we re here}\\
+			3.0M:	& \texttt{we re here}\\
+			\midrule
+			Reddit\\
+			2.5M:	& \texttt{because we re here .}\\
+			\midrule
+			NCM:	& \texttt{i ’m not sure .}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 1: BASIC }
+	\label{results:example9_output: Neural_Conversational_Model_compared}
+\end{table}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{are you a leader or a follower ?}\\
+			\midrule
+			OpenSubtitle\\
+			0.5M: 	& \texttt{no}\\
+			1.0M: 	& \texttt{i m not a}\\
+			1.5M:	& \texttt{i m sorry}\\
+			2.0M:	& \texttt{i m not a prostitute}\\
+			2.5M:	& \texttt{i m a}\\
+			3.0M:	& \texttt{i m a}\\
+			\midrule
+			Reddit\\
+			2.0M:	& \texttt{i m a cyborg .}\\
+			\midrule
+			NCM:	& \texttt{i ’m a leader .}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 3: General knowledge Q\&A}
+	\label{results:example10_output: Neural_Conversational_Model_compared}
+\end{table}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{how much is ten minus two ?}\\
+			\midrule
+			OpenSubtitle\\
+			0.5M: 	& \texttt{four}\\
+			1.0M: 	& \texttt{ten}\\
+			1.5M:	& \texttt{two , two , three}\\
+			2.0M:	& \texttt{ten dollars}\\
+			2.5M:	& \texttt{ten}\\
+			3.0M:	& \texttt{ten}\\
+			\midrule
+			Reddit\\
+			2.5M:	& \texttt{i m not sure what you re talking about .}\\
+			\midrule
+			NCM:	& \texttt{seventy - two .}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 3: General knowledge Q\&A}
+	\label{results:example11_output: Neural_Conversational_Model_compared}
+\end{table}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{what is the color of a yellow car ?}\\
+			\midrule
+			OpenSubtitle\\
+			0.5M: 	& \texttt{a <unknown> ?}\\
+			1.0M: 	& \texttt{it s a}\\
+			1.5M:	& \texttt{what ?}\\
+			2.0M:	& \texttt{it s a blue blue}\\
+			2.5M:	& \texttt{it s a blue}\\
+			3.0M:	& \texttt{it s a yellow}\\
+			\midrule
+			Reddit\\
+			2.5M:	& \texttt{the yellow yellow yellow yellow yellow yellow yellow yellow}\\
+					& \texttt{yellow yellow yellow yellow yellow yellow yellow yellow yellow}\\
+					& \texttt{yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow}\\
+					\midrule
+			NCM:	& \texttt{yellow .}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 3: General knowledge Q\&A}
+	\label{results:example12_output: Neural_Conversational_Model_compared}
+\end{table}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{what is the purpose of existence ?}\\
+			\midrule
+			OpenSubtitle\\
+			0.5M: 	& \texttt{the jews}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{you re just a fucking boy , man}\\
+			2.0M:	& \texttt{i don t know}\\
+			2.5M:	& \texttt{i m sorry}\\
+			3.0M:	& \texttt{i m not sure}\\
+			\midrule
+			Reddit\\
+			1.5M:	& \texttt{i m not sure if you re joking or not , but i m sure you re }\\
+			& \texttt{not familiar with the word .}\\
+			\midrule
+			NCM:	& \texttt{to find out what happens when we get to the planet earth .}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 4: Philosophical Q\&A}
+	\label{results:example13_output: Neural_Conversational_Model_compared}
+\end{table}
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{what are the things that i do to be immoral?}\\
+			\midrule
+			OpenSubtitle\\
+			0.5M: 	& \texttt{i don t know}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{what s the big idea ?}\\
+			2.0M:	& \texttt{i don t know}\\
+			2.5M:	& \texttt{i m a}\\
+			3.0M:	& \texttt{i m not a criminal}\\
+			\midrule
+			Reddit\\
+			2.5M:	& \texttt{i think you re missing the point .}\\
+			& \texttt{i don ’t know .}\\
+			\midrule
+			NCM:	& \texttt{to find out what happens when we get to the planet earth .}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 5: Morality}
+	\label{results:example14_output: Neural_Conversational_Model_compared}
+\end{table}
 
-
-
-\section{Generated outputs over time}
-\blindtext
-
-\section{Comparison with CleverBot and ``Neural Conversational Model''}
-\blindtext
-
-
-\section{Reverse Input Feeding}
+\section{Reverse Input Feeding}\todo{raus?}
 \blindtext
