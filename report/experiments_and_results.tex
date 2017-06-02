@@ -1018,9 +1018,47 @@ Die Resultate befinden sich in den Tabellen \ref{results:example8_output: Neural
 \paragraph{Brings Beam-search Surprises?}\todo{Wenn wir die gleiche Struktur wie "immer" machen, müssten wir hier das Fazit des Vergleichs machen und dann mit einem Satz eine Überleitung zu Beam Search?}
 
 \section{Beam-search}
-In den bisherigen Beispielen gabt es immer wieder sehr schlechte replies. Wir möchten mit beam search \ref{fundamentals:decoding_approach} mit einer beam-width von 200 testen, ob unser Modell subjektiv bessere Antworten hätte, diese aber nicht
+In den bisherigen Beispielen gabt es immer wieder sehr schlechte replies. Wir möchten mit Beam-search \ref{fundamentals:decoding_approach} testen, ob unser Modell subjektiv bessere Antworten hätte, diese aber mit Greedy decoding nicht erscheinen. Wir testen drei Beispiele mit dem OpenSubtitle 3.0M Modell und einer Beam-width von 200.
 
 
+\paragraph{Als Erstes} testen wir die Input Utterance "what year were you born ?". Die Antworten mit Greedy decoding befinden sich im Abschnitt \ref{label} (label fürs kapitel setzen) in der Tabelle \ref{results:example8_output:Neural_Conversational_Model_compared}. Die Antworten des OpenSubtitle Modells sind alle kontextlos, bis auf diejenige des 2.0M Modells mit "i was born". Die Ursprüngliche Antwort des 3.0M Modells war "i don t know".\\
 
+Die 200 Antworten des Beam-search zum ersten Input befinden sich im Anhang \ref{apendix:result1:Beam-search-200:OpenSubtitle}. Darunter finden wir Antworten wie: "1991", "last year", "five years ago". Diese Antworten sind deutlich besser, als die ursprünglichen.
+
+\paragraph{Als Zweites} prüften wir die Responses der Input Utterance "I wear a blue jeans. What color do my jeans have?". Die Greedy decoding Resultate befinden sich hierzu im Kapitel \ref{?} in der Tabelle \ref{results:example4_output:OpenSubtitle_compared} und sind teilweise schlecht. Das 2.5M Modell liefert das beste Resultate mit "i got a blue blue", welches die erwünschte Antwort immerhin enhält. Der response des 3.0M war "i m not a fan", was für uns eine Kontextfreie utterance ist.\\
+
+Die Antworten des Beam-search befinden sich im Anhang \ref{apendix:result2:Beam-search-200:OpenSubtitle}. Daruntern befinden sich gute Responses wie: "blue", "you know that". Wir sehen also auch hier 2 deutlich bessere responses als "i m not a fan".
+
+\paragraph{Als Drittes} testen möchten wir die etwas schwierigere Aussage "what is the purpose of being intelligent?" mit Beam-search testen.
+Die Antworten mit Greedy decoding befinden sich hier unterhalb in der Tabelle \ref{results:example20_output:OpenSubtitle} und bestehen fast ausschliesslich aus der generischen response "i don t know", welche zwar im Kontext korrekt ist, jedoch ist diese reponse für viele Fragen eine gute Antwort. 
+Wir möchten herausfinden, ob mit Beam-search bessere und spannendere responses möglich sind.\\
+
+Alle responses befinden sich im Anhang \ref{apendix:result3:Beam-search-200:OpenSubtitle}. Hier können nun mehrere Antworten als passend angesehen, da es eben eine philosophical question is. Hier ein einige gute Antworten:  "well , it s complicated", "you know ?", "you can t know", "well , it s nothing".
+
+\begin{table}[H]
+	\centering
+	\ra{1.3}
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{ll}
+			\toprule
+			Input: 	& \texttt{what is the purpose of being intelligent?}\\
+			\midrule
+			OpenSubtitle\\
+			0.5M: 	& \texttt{the jews}\\
+			1.0M: 	& \texttt{i don t know}\\
+			1.5M:	& \texttt{i don t know}\\
+			2.0M:	& \texttt{i don t know}\\
+			2.5M:	& \texttt{i don t know}\\
+			3.0M:	& \texttt{i don t know}\\
+			\midrule
+			NCM:	& \texttt{to find out what it is .}\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 4: Philosophical Q\&A}
+	\label{results:example20_output:OpenSubtitle}
+\end{table}
+
+\paragraph{Zusammenfassend} waren die Beam-search Resultate erfolgreich. Es ist jedoch schwierig, wie das beste Resultat ausgewählt werden soll. Dazu müsste man vermutlich wenn ein Modell trainieren, welches aus einem set von 200 replies den passendsten zu einem gegebene Input suchen. Vielleicht könnte man so eine bessere Qualität der Sprache erzielen. Aber wir können unmöglich über mehrere Checkpoints pro utterance jweils 200 responses auswerten. Deshalb konnten wir Beam-Search nicht für die Evaluierung der Modelle brauchen. Auch haben wir Beam-search nicht genau gemäss Theorie implementiert/nicht damit trainiert (hier weisst du vermutlich besser was schreiben, wenn wir das erwähnen möchten)
 \section{Reverse Input Feeding}\todo{raus?}
 \blindtext
