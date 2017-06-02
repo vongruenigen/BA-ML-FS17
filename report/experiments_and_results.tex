@@ -515,17 +515,15 @@ Both of the models seem to have no problems understanding clear, direct sentence
 
 \subsection{Attention??}\todo{move to own chapter at the end} 
 \todo{noch entscheiden, ob wir das kapitel wollen}
-\section{Some Examples Compared with Other Systems}
-Wir möchten nun noch einige ausgesuchte Beispiele präsentieren, die gewissen Fähigkeiten und auch einen Lernprozess der Modelle veranschaulichen. Gleichzeitig möchten wir unsere responses mit denjenigen von Cleverbot vergleichen. Kurz erklären unterschiede zu Cleverbot.
-Anschliessend noch Beispiele aus conversational paper suchen und vergleiche. (unterschied zum paper erwähnen, grösse des Modells, Trainingszeit, deshalb ergebnisse zwangsläufig schlechter)
+
+\section{Comparison with Other Models}
+As the next part, we want to compare the results of our model with two others we use as a reference: The CleverBot\footnote{http://www.cleverbot.com/} chatbot and the results from the paper ``Neural Conversational Model''~\cite{Vinyals:2015}, whose model architecture serves as the base of our model.\todo{name differences?} We test the quality of the responses from our models when confronted with utterances of different type and difficulty. We do this in the hope that we can reveal where the strengths and weaknesses of our models lie.
 
 \subsection{Cleverbot}
-\todo{Cleverbott antoworten wurden am 01.06.17 1200-1500 generiert. (nicht immer der gleiche output)}
+We start with the comparison with the CleverBot. Keep in mind, that the CleverBot is a non-deterministic chatbot which means that the responses might be different if it is fed with the same inputs but a different point in time. The responses listed below were generated at the first of June between 12am and 15am.
 
-
-We tested the quality of the responses of our model with differently difficult utterances and types of utterances. We would like to find out where there are strengths and weaknesses.
-
-\paragraph{Simple Question}First we start with with a simple greeting question. As you can see in the Table  \ref{results:example1_output:OpenSubtitle_compared} and \ref{results:example1_output:Reddit_compared} the OpenSubtitle and Cleverbot question are appropriate according to the question "Hi, how are you?". The Reddit responses for the slightly changed question to "Hi there, i m john!" is rather bad. whereby the Cleverbot response is not much better.
+\paragraph{Simple Utterance} We start by using the two simple utterances ``How are you?'' and ``Hi there, i m john!''. As one can see in the Tables~\ref{results:example1_output:OpenSubtitle_compared} and~\ref{results:example1_output:Reddit_compared}, both our OpenSubtitles model and the CleverBot answered this question with satisfying responses. The responses of the Reddit model to the utterance ``Hi there, i m john!'' are pretty bad as none of them is really useful. The response of the CleverBot to this utterance makes more sense in this case.
+\\
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -544,8 +542,9 @@ We tested the quality of the responses of our model with differently difficult u
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-\caption{Example simple dialog with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+\caption{Responses from the OpenSubtitles model for each snapshot, compared to the CleverBot response. The input utterance is ``How are you?''.}
 \label{results:example1_output:OpenSubtitle_compared}
+
 \end{table}
 \begin{table}[H]
 	\centering
@@ -565,13 +564,14 @@ We tested the quality of the responses of our model with differently difficult u
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example simple dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\caption{sponses from the Reddit model for each snapshot, compared to the CleverBot response. The input utterance is ``Hi there, i m john!''.}
 	\label{results:example1_output:Reddit_compared}
 \end{table}
 
-\paragraph{Closed question}In the Table \ref{results:example2_output:OpenSubtitle_compared} and \ref{results:example2_output:Reddit_compared} you find the responses of a closed question. We would like to test whether he understands the concept of the closed question and the answers are just yes or no. Unfortunately You can see that Cleverbot gives two different answers to the same question. The problem with Cleverbot is, that the results are not deterministic. 
-Apart from this we see, apparently our models understand the concept behind this question, whereas Cleverbot gives us a more relativistic response.
-	
+\paragraph{Closed Question} As next, we are trying to see which responses are produced when using a closed question as the utterance. The results can be seen in the Tables~\ref{results:example2_output:OpenSubtitle_compared} and~\ref{results:example2_output:Reddit_compared}. With this type of utterance, we would like to evaluate if the models understand a closed question and can respond appropriately.
+
+From the looks it seems that our models can respond to closed questions appropriately, as both of them gave appropriate answers. The CleverBot has problems with this question, probably because it does not understand how the concepts of flying and birds are related.
+\\
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -590,7 +590,7 @@ Apart from this we see, apparently our models understand the concept behind this
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example closed question dialog with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a contextual question from the OpenSubtitles models and the CleverBot response.}
 	\label{results:example2_output:OpenSubtitle_compared}
 \end{table}
 \begin{table}[H]
@@ -611,12 +611,17 @@ Apart from this we see, apparently our models understand the concept behind this
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example closed question dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a closed question from the Reddit models and the CleverBot response.}
 	\label{results:example2_output:Reddit_compared}
 \end{table}
 
-\paragraph{Knowledge question}Mit der nächsten Frage möchten wir herausfinden, ob unsere Modelle Wissen besitzen. In der Tabelle \ref{results:example3_output:OpenSubtitle_compared} fragen wir nicht der Farbe des Himmels. Die entwicklung der Antwort ist erstaunlich gut. Von einer absolut kontextfreien Antwort, lernt das Modell mit fortlaufendem Training die korrekte Antwort blau. Die Antwort von Cleverbot in diesem Beispiel ist ebenfalls Kontextfrei.
-In der Tabelle \ref{results:example3_output:Reddit_compared} fragen wir ihn nach seinem Standort. Die Antworten dabei von Reddit sind insofern gut, dass es Orte sind, welche als Antwort zurückkommen. Somit hat das Modell den Kontext der Frage verstanden. Die Antworten selber sind natürlich alle falsch. Vermutlich ist Schweiz im 50k Vokabular sowieso nicht vorhanden. Dagegen ist die Antwort von Cleverbot korrekt.
+\paragraph{Knowledge Question}
+The next kind of utterance are knowledge questions. With this kind of questions we would like to evaluate if the models have knowledge about the world. The results can be seen in the Tables~\ref{results:example3_output:OpenSubtitle_compared} and~\ref{results:example3_output:Reddit_compared}.
+
+The responses to the question about the color of the sky have an interesting development. Until the snapshot 2.0M, the responses were not appropriate and did not have any meaningful content\footnote{The response ``the jews'' comes from the fact, that in the beginning of the OpenSubtitles dataset, there are a lot of conversations related to movies about Nazism.}. However, from the snapshot 2.0M on the model answered in a correct way, even though it one time replied with red as the answer, which is obviously wrong. But it also had it right two times, whereas the last response from the 3.0M seems to be the best. The answer of the CleverBot to this question is quite meaningless and has absolutely nothing to do with the provided question.
+
+The response to the question where the Reddit model lives was answered in a satisfying way, maybe except for the response of the 2.0M snapshot. It clearly understands the context of the question, as it always answers with a location-related answer. The CleverBot answers this question completely correct.
+
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -635,7 +640,7 @@ In der Tabelle \ref{results:example3_output:Reddit_compared} fragen wir ihn nach
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example environment knowledge dialog with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a knowledge question with the OpenSubtitles models and the CleverBot response.}
 	\label{results:example3_output:OpenSubtitle_compared}
 \end{table}
 \begin{table}[H]
@@ -656,13 +661,17 @@ In der Tabelle \ref{results:example3_output:Reddit_compared} fragen wir ihn nach
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example environment knowledge dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a knowledge question from the Reddit models and the CleverBot response.}
 	\label{results:example3_output:Reddit_compared}
 \end{table}
 
-\paragraph{Context knowledge question}Mit den nächsten Beispielen wollten wir eruieren, ob wie das Modell auf Informationen reagiert und uns diese wieder zurückgeben kann. Wie in der Tabelle \ref{results:example4_output:OpenSubtitle_compared} ersichtlich, sind die OpenSubtitle Responses alle unpassend. Lediglich die Antwort des 2.5M Snapshots liefert immerhin auch! die richtige Farbe. Die Antwort von Cleverbot scheint ein wenig sinnvoller, jedoch entspricht sie auch nicht dem gewünschten Resultat.
+\paragraph{Contextual Question} 
+With the next question, we want to try to evaluate if the models are capable of using contextual informations to build an appropriate response. The results can be seen in the Tables~\ref{results:example4_output:OpenSubtitle_compared} and~\ref{results:example4_output:Reddit_compared}.
 
-Die Responses des Reddit Modells sind in der Tabelle \ref{results:example4_output:Reddit_compared} ersichtlich. Obwohl die erhoffte Response auch bei diesem Modell ausbleibt, sind die Antworten passender zur Frage. Die Antwort von Cleverbot hingegen ist absolut Kontextlos zur Frage.
+As visible below, the OpenSubtitles models has big problems with this kind of utterances, as all the responses are not fitting. The only response that is close to being useful is the one of the 2.5M model, where it at least includes the right color in the response. The response of the CleverBot is in this case also not of relevance.
+
+The responses of the Reddit model are more fitting to the question, but they are also pretty bad in comparison to what we have expected. At least it tries to formulate responses where the two colors of the question are comprised. The answer of the CleverBot is again useless, this time even more in comparison with the response given when using the question from the OpenSubtitles model.
+\\
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -681,7 +690,7 @@ Die Responses des Reddit Modells sind in der Tabelle \ref{results:example4_outpu
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{An example dialog with context knowledge with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a contextual question from the OpenSubtitles models and the CleverBot response.}
 	\label{results:example4_output:OpenSubtitle_compared}
 \end{table}
 \begin{table}[H]
@@ -703,14 +712,17 @@ Die Responses des Reddit Modells sind in der Tabelle \ref{results:example4_outpu
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{An example dialog with context knowledge with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a contextual question from the Reddit models and the CleverBot response.}
 	\label{results:example4_output:Reddit_compared}
 \end{table}
 
-\paragraph{Specific question}Wir stellen nun noch eine spezielle Frage pro Modell. Das OpenSubtitle Modell erfragen wir nach einem mathematischem Resultat, die Uterrances dazu sind in der Tabelle \ref{results:example5_output:OpenSubtitle_compared}. Das richtige Resultat 3, kommt leder nicht vor. Jedoch wird mit zunehmendem Training der Antworttyp passend zur Frage. Die Antwort von Cleverbot entspricht denjenigen unserer wenig trainierten Snapshots und ist entweder ehrlich oder eben eine generischer Antwortsatz.
+\paragraph{Specific Question}
+The next questions are more specific, we are going to ask the OpenSubtitles model a simple mathematical question and the Reddit models a question about the TV series ``Game of Thrones''. The results can be seen in the Tables~\ref{results:example5_output:OpenSubtitle_compared} and~\ref{results:example5_output:Reddit_compared}.
 
-Das Reddit Modell erfragen wir nach Informationen über einen Film, diese Resultate sind in der Tabelle \ref{results:example5_output:Reddit_compared} ersichtich. Grundsätzlich sind die Antworten schlecht und es finden sich einige generische Utterances in den Replies wieder. Jedoch die letzte Antwort, welche "...hodor..." ist interessant, da es eine Szene aus dem erfragen Film "Game of Thrones" ist. Die Antwort von Cleverbot hingegen verstehe ich nicht Dani is alife? \todo{Dirk, kennsch du die Szene?}
+The responses of the OpenSubtitles in the beginning are quite clear, it does not know the answer or does not understand the question at all. However, the later snapshots (i.e. from 2.0M on), it seems to understand that it has to answer with a number. Sadly, the correct results is not in the generated responses. The CleverBot also does not understand how to answer such a question.
 
+The Reddit model has an interesting twist in its responses. In the beginning, it starts by responding with generic responses which do not seem to have anything to do with the series itself. However, the funny response\footnote{``Hodor'' is a character in the ``Game of Thrones'' series who is only capable of saying its own name. In case of danger he starts yelling its name over and over several time throughout the series.} at the end indicates that it understands the question at least to some degree, even though the response does not contain any actual information about the series. The CleverBot response is a mysterious to us, as we cannot remember any scene from the series where a ``Dani'' plays a major role.
+\\
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -729,7 +741,7 @@ Das Reddit Modell erfragen wir nach Informationen über einen Film, diese Result
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{An example dialog with mathematical knowledge with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a mathematical question from the OpenSubtitles models and the CleverBot response.}
 	\label{results:example5_output:OpenSubtitle_compared}
 \end{table}
 \begin{table}[H]
@@ -753,13 +765,17 @@ Das Reddit Modell erfragen wir nach Informationen über einen Film, diese Result
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example movies knowledge dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a question about a TV series from the Reddit models and the CleverBot response.}
 	\label{results:example5_output:Reddit_compared}
 \end{table}
 
-\paragraph{Statement and command?} Wir haben bis jetzt nur Fragen gestellt, wir möchte nun noch die responses testen auf Aussagen, oder Imperativ. In der Tabelle \ref{results:example6_output:OpenSubtitle_compared} sind die Ergebnisse des OpenSubtitle Modells. Die Responses sind ab dem 3. Snapshot alle brauchbar und passend. Cleverbot gibt ebenfalls eine mögliche Antwort, wobei diese recht kurz ausfällt. Im Gegensatz dazu ist z.B. "i m sorry" eine emphatische Reaktion auf den Inhalt.
+\paragraph{Answers to Statements}
+Until now, we have only asked questions to our models. We would now like to see how the responses are if we input a statement instead of a question. The results can be seen in the Tables~\ref{results:example6_output:OpenSubtitle_compared} and~\ref{results:example6_output:Reddit_compared}.
 
-In der Tabelle \ref{results:example6_output:Reddit_compared} sind die Ergebnisse des Reddit Models ersichtlich. Diese sind durchgehend schlecht und bestehen grösstenteils aus den generischen responses. Die Antwort von Cleverbot ist hier um einiges besser/schlagfertiger.
+The responses of the OpenSubtitles model are useful from the snapshot 2.0M and forward. Especially the answer for the snapshot 2.0M is interesting, as this seems to indicate that the model has some kind of empathy for the other person in the dialog, as it say ``i m sorry''. The response of the CleverBot signifies that it understands the statement to some degree, but does not know what to answer.
+
+The responses of the Reddit model to the statement that it has a bad opinion are pretty bad across the board, with the response from the 1.5M model being the only one which is useful. The response of the CleverBot is a pretty speedy answer in this case.
+\\
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -778,7 +794,7 @@ In der Tabelle \ref{results:example6_output:Reddit_compared} sind die Ergebnisse
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example statement dialog with the OpenSubtitle model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a statement from the OpenSubtitles models and the CleverBot response.}
 	\label{results:example6_output:OpenSubtitle_compared}
 \end{table}
 \begin{table}[H]
@@ -798,11 +814,12 @@ In der Tabelle \ref{results:example6_output:Reddit_compared} sind die Ergebnisse
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example statement dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a statement from the Reddit models and the CleverBot response.}
 	\label{results:example6_output:Reddit_compared}
 \end{table}
 
-\paragraph{Self knowledge}Als letztes möchten wir Ihnen noch ein witziges Beispiel \ref{results:example7_output:OpenSubtitle_compared} zeigen. Wir können uns nicht wirklich erklären, wie die letzte Antwort zustande kam, da die Texte für das Training ja eigentlich von Menschenhand stammen.
+\paragraph{Self-Concept} At the end, we have an interesting answer from the Reddit model to the question ``What are you?''. The responses can be seen in Table~\ref{results:example7_output:Reddit_compared}. All snapshots produce bad responses, apart from the last, which answered that it is a bot. This is an interesting answer because it shows that the model seems to have some kind of self-concept. We cannot explain that, as the model was trained on comments from Reddit discussion about movies and series. Nevertheless, it is an interesting answer to see.
+
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -820,9 +837,11 @@ In der Tabelle \ref{results:example6_output:Reddit_compared} sind die Ergebnisse
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Example self-knowledge dialog with the Reddit model with one response per snapshot and the Cleverbot results.}
+	\caption{Responses to a self-concept question from the Reddit models and the CleverBot response..}
 	\label{results:example7_output:Reddit_compared}
 \end{table}
+
+Sadly, we were not able to find a similar response when using the OpenSubtitles model.
 
 \subsection{Neural Conversational Model}
 In diesem Abschnitt möchten wir einige Resultate aus dem "Neural Conversational Model" im folgendenals NCM abgekürzt, mit unsren Vergleichen. Dazu wählen pro Conversation ein paar zufällige aussagen und füttern diese unseren beiden Modellen. Da die Beispielsätze aus dem OpenSubtitle stammen, schreiben wir jeweils pro OpenSubtitle Modell Snapshot den response heraus und zusätzlich die subjektiv beste Antwort von unseren Reddit Modellen. (Vermutlich müssen wir hier nochmals erwähnen, dass wir weniger trainieren konnten und das modell kleiner ist)
