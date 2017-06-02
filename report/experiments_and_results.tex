@@ -1089,5 +1089,29 @@ Alle responses befinden sich im Anhang \ref{apendix:result3:Beam-search-200:Open
 \end{table}
 
 \paragraph{Zusammenfassend} waren die Beam-search Resultate erfolgreich. Es ist jedoch schwierig, wie das beste Resultat ausgewählt werden soll. Dazu müsste man vermutlich wenn ein Modell trainieren, welches aus einem set von 200 replies den passendsten zu einem gegebene Input suchen. Vielleicht könnte man so eine bessere Qualität der Sprache erzielen. Aber wir können unmöglich über mehrere Checkpoints pro utterance jweils 200 responses auswerten. Deshalb konnten wir Beam-Search nicht für die Evaluierung der Modelle brauchen. Auch haben wir Beam-search nicht genau gemäss Theorie implementiert/nicht damit trainiert (hier weisst du vermutlich besser was schreiben, wenn wir das erwähnen möchten)
+\section{Attention}
+Wir möchten abschliessend noch den attention mechanism (see Chapter~\ref{fundamentals:soft_attention}) untersuchen. Dabei gehen wir folgendermassen vor, wir geben einen entsprechenden Input in unser Modell und visualisieren dann für denen Zeitschritt die Attention auf dem Input. Wir verwenden eine heat-map um dies anschliessend zu visualisieren. Als Beispielaussagen verwendeten wir eine generelle Frage, eine Mathematische Frage und 2 Sätze aneinander mit einem realtivpronomen im zweiten Satz, welches sich auf das Subjekt im Esten Teil bezieht.
+
+\paragraph{Die Attention Ergebnisse} befinden sich in den Tabellen \ref{results:attention:example1:opensubtitles-3M} bis \ref{results:attention:example3:opensubtitles-3M. Es gibt dabei einzelne gute Beispiele, wie in \ref{results:attention:example3:opensubtitles-3M}, die Mehrheit der Visualisierungen zeigte aber keine nennenswerte Ergebnise Besonderheiten im Attention mechanismmus. Unser Eindruck bestätigt sich die Aussage aus dem Paper \cite{Nguyen:2016}, dass dieser Mechanismus beim verstehen der Sprache und dem modelieren der Antworten keine entscheidende Funktion hat.\todo{reddit Ergebnisse hinzufügen, ergänzen mit welchem reddit modell getestet wirde und bei deutlich anderen Ergebnisse text anpassen.}
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=16cm]{img/attention/attention_visualization1_OpenSubtitle-3M.png}
+	\caption{Attention verhalten mit OpenSubtitle 3.0M Modell beim input "Good morning, i'm david, what's your name?"}
+	\label{results:attention:example1:opensubtitles-3M}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=16cm]{img/attention/attention_visualization2_OpenSubtitle-3M.png}
+	\caption{Attention verhalten mit OpenSubtitle 3.0M Modell beim input "How much is it when adding 3 to 5?"}
+	\label{results:attention:example2:opensubtitles-3M}
+\end{figure}
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=16cm]{img/attention/attention_visualization3_OpenSubtitle-3M.png}
+	\caption{Attention verhalten mit OpenSubtitle 3.0M Modell beim input "Anna is 18 years old. How old is she?"}
+	\label{results:attention:example3:opensubtitles-3M}
+\end{figure}
 \section{Reverse Input Feeding}\todo{raus?}
 \blindtext
