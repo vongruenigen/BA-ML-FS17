@@ -520,6 +520,7 @@ Both of the models seem to have no problems understanding clear, direct sentence
 As the next part, we want to compare the results of our model with two others we use as a reference: The CleverBot\footnote{http://www.cleverbot.com/} chatbot and the results from the paper ``Neural Conversational Model''~\cite{Vinyals:2015}, whose model architecture serves as the base of our model.\todo{name differences?} We test the quality of the responses from our models when confronted with utterances of different type and difficulty. We do this in the hope that we can reveal where the strengths and weaknesses of our models lie.
 
 \subsection{Cleverbot}
+\label{results:comparison:cleverbot}
 We start with the comparison with the CleverBot. Keep in mind, that the CleverBot is a non-deterministic chatbot which means that the responses might be different if it is fed with the same inputs but a different point in time. The responses listed below were generated at the first of June between 12am and 15am.
 
 \paragraph{Simple Utterance} We start by using the two simple utterances ``How are you?'' and ``Hi there, i m john!''. As one can see in the Tables~\ref{results:example1_output:OpenSubtitle_compared} and~\ref{results:example1_output:Reddit_compared}, both our OpenSubtitles model and the CleverBot answered this question with satisfying responses. The responses of the Reddit model to the utterance ``Hi there, i m john!'' are pretty bad as none of them is really useful. The response of the CleverBot to this utterance makes more sense in this case.
@@ -843,11 +844,14 @@ The responses of the Reddit model to the statement that it has a bad opinion are
 
 Sadly, we were not able to find a similar response when using the OpenSubtitles model.
 
-\subsection{Neural Conversational Model}
-In diesem Abschnitt möchten wir einige Resultate aus dem "Neural Conversational Model" im folgendenals NCM abgekürzt, mit unsren Vergleichen. Dazu wählen pro Conversation ein paar zufällige aussagen und füttern diese unseren beiden Modellen. Da die Beispielsätze aus dem OpenSubtitle stammen, schreiben wir jeweils pro OpenSubtitle Modell Snapshot den response heraus und zusätzlich die subjektiv beste Antwort von unseren Reddit Modellen. (Vermutlich müssen wir hier nochmals erwähnen, dass wir weniger trainieren konnten und das modell kleiner ist)
-Die jeweilige Zugehörigkeit zu den Experimenten im Paper, sind in der Tabellenbeschreibung vermerkt.
+\paragraph{Fazit}\todo{Fazit!}
 
-Die Resultate befinden sich in den Tabellen \ref{results:example8_output: Neural_Conversational_Model_compared} bis \ref{results:example14_output: Neural_Conversational_Model_compared}, zusätzliche Resultate befinden sich im Anhang \ref{apendix:results:compared_with_NCM}. Ganz generell sind die Resultate wie erwartet schlechter, als diejenigen vom NCM Paper. Es scheint so, dass unsere Modelle für einfachere Fragen gut funktionieren, für komplexere Fragen aber die Sprachvielfalt fehlt. \todo{vielleicht noch ergännzen, indem resultate pro Conversation genauer beschrieben werden. Zusätzlich vielleicht noch cpations überarbeiten}
+\subsection{Neural Conversational Model}
+\label{results:comparison:ncm}
+In this section, we are going to compare the results from the paper ``Neural Conversation Model'' (NCM) with the results from our models. To compare the responses, we are going to use utterances from the paper and show all the responses from all OpenSubtitles snapshots, but only the (subjectively) best response from the Reddit model, as the NCM model was trained on the OpenSubtitles dataset. The responses can be seen in the Tables~\ref{results:example8_output:Neural_Conversational_Model_compared} to~\ref{results:example14_output:Neural_Conversational_Model_compared}. The categories where the input utterances came from in the paper are noted in the table descriptions.
+
+We are only showing a part of the dialogs which were evaluated. All others can be found in Appendix~\ref{apendix:results:compared_with_NCM}.
+\\
 \begin{table}[H]
 	\centering
 	\ra{1.3}
@@ -871,8 +875,8 @@ Die Resultate befinden sich in den Tabellen \ref{results:example8_output: Neural
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 1: BASIC }
-	\label{results:example8_output: Neural_Conversational_Model_compared}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using a question from the ``Basic'' category in the paper.}
+	\label{results:example8_output:Neural_Conversational_Model_compared}
 \end{table}
 
 \begin{table}[H]
@@ -898,8 +902,8 @@ Die Resultate befinden sich in den Tabellen \ref{results:example8_output: Neural
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 1: BASIC }
-	\label{results:example9_output: Neural_Conversational_Model_compared}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using a question from the ``Basic'' category in the paper.}
+	\label{results:example9_output:Neural_Conversational_Model_compared}
 \end{table}
 \begin{table}[H]
 	\centering
@@ -920,12 +924,12 @@ Die Resultate befinden sich in den Tabellen \ref{results:example8_output: Neural
 			Reddit\\
 			2.0M:	& \texttt{i m a cyborg .}\\
 			\midrule
-			NCM:	& \texttt{i ’m a leader .}\\
+			NCM:	& \texttt{i'm a leader .}\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 3: General knowledge Q\&A}
-	\label{results:example10_output: Neural_Conversational_Model_compared}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using a question from the ``General Knowledge Q\&A'' category in the paper.}
+	\label{results:example10_output:Neural_Conversational_Model_compared}
 \end{table}
 \begin{table}[H]
 	\centering
@@ -950,8 +954,8 @@ Die Resultate befinden sich in den Tabellen \ref{results:example8_output: Neural
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 3: General knowledge Q\&A}
-	\label{results:example11_output: Neural_Conversational_Model_compared}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using a question from the ``General Knowledge Q\&A'' category in the paper.}
+	\label{results:example11_output:Neural_Conversational_Model_compared}
 \end{table}
 \begin{table}[H]
 	\centering
@@ -978,8 +982,8 @@ Die Resultate befinden sich in den Tabellen \ref{results:example8_output: Neural
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 3: General knowledge Q\&A}
-	\label{results:example12_output: Neural_Conversational_Model_compared}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using a question from the ``General Knowledge Q\&A'' category in the paper.}
+	\label{results:example12_output:Neural_Conversational_Model_compared}
 \end{table}
 \begin{table}[H]
 	\centering
@@ -1005,8 +1009,8 @@ Die Resultate befinden sich in den Tabellen \ref{results:example8_output: Neural
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 4: Philosophical Q\&A}
-	\label{results:example13_output: Neural_Conversational_Model_compared}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using a question from the ``Philosophical Q\&A'' category in the paper.}
+	\label{results:example13_output:Neural_Conversational_Model_compared}
 \end{table}
 \begin{table}[H]
 	\centering
@@ -1032,19 +1036,23 @@ Die Resultate befinden sich in den Tabellen \ref{results:example8_output: Neural
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Beispiel Vergleich aus Paper Neural Conversational Model Resultate Conversation 5: Morality}
-	\label{results:example14_output: Neural_Conversational_Model_compared}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using a question from the ``Morality'' category in the paper.}
+	\label{results:example14_output:Neural_Conversational_Model_compared}
 \end{table}
+
+\paragraph{Fazit} Es scheint so, dass unsere Modelle für einfachere Fragen gut funktionieren, für komplexere Fragen aber die Sprachvielfalt fehlt. \todo{vielleicht noch ergännzen, indem resultate pro Conversation genauer beschrieben werden. Zusätzlich vielleicht noch cpations überarbeiten}
 
 \paragraph{Brings Beam-search Surprises?}\todo{Wenn wir die gleiche Struktur wie "immer" machen, müssten wir hier das Fazit des Vergleichs machen und dann mit einem Satz eine Überleitung zu Beam Search?}
 
 \section{Beam-search}
-In den bisherigen Beispielen gabt es immer wieder sehr schlechte replies. Wir möchten mit Beam-search \ref{fundamentals:decoding_approach} testen, ob unser Modell subjektiv bessere Antworten hätte, diese aber mit Greedy decoding nicht erscheinen. Wir testen drei Beispiele mit dem OpenSubtitle 3.0M Modell und einer Beam-width von 200.
+There are always some bad replies in the examples seen above. To fix this, we would like to use a simple beam-search implementation as described in Chapter~\ref{fundamentals:decoding_approaches} to see if that helps to fix this problem. We will evaluate this for three different examples, and judge in a subjective if the responses generated by the beam-search decoder are superior to the responses of the greedy decoder. This is only done with the OpenSubtitle 3.0M snapshot and a beam-width of $200$.
 
+\paragraph{``what year were you born?''} The responses of the greedy decoder to this question can be found in Chapter~\ref{results:comparison:ncm} in the Table~\ref{results:example8_output:Neural_Conversational_Model_compared}. The original answers of the OpenSubtitles model were all pretty bad, and it seemed that it did not fully understand the question.
 
-\paragraph{Als Erstes} testen wir die Input Utterance "what year were you born ?". Die Antworten mit Greedy decoding befinden sich im Abschnitt \ref{label} (label fürs kapitel setzen) in der Tabelle \ref{results:example8_output:Neural_Conversational_Model_compared}. Die Antworten des OpenSubtitle Modells sind alle kontextlos, bis auf diejenige des 2.0M Modells mit "i was born". Die Ursprüngliche Antwort des 3.0M Modells war "i don t know".\\
+However, when using the beam-search decoder, there are several useful responses, such as ``1991'', ``last year'' or ``five years ago''. This responses are much better than what the greedy decoder initially produced. However, they are not the highest ranked response and hence are not returned by the model if we only take a look at the best response.
 
-Die 200 Antworten des Beam-search zum ersten Input befinden sich im Anhang \ref{apendix:result1:Beam-search-200:OpenSubtitle}. Darunter finden wir Antworten wie: "1991", "last year", "five years ago". Diese Antworten sind deutlich besser, als die ursprünglichen.
+\paragraph{``i wear a blue jeans. what color do my jeans have?''} \blindtext
+\paragraph{``what is the purpose of being intelligent?''} \blindtext
 
 \paragraph{Als Zweites} prüften wir die Responses der Input Utterance "I wear a blue jeans. What color do my jeans have?". Die Greedy decoding Resultate befinden sich hierzu im Kapitel \ref{?} in der Tabelle \ref{results:example4_output:OpenSubtitle_compared} und sind teilweise schlecht. Das 2.5M Modell liefert das beste Resultate mit "i got a blue blue", welches die erwünschte Antwort immerhin enhält. Der response des 3.0M war "i m not a fan", was für uns eine Kontextfreie utterance ist.\\
 
