@@ -1,23 +1,5 @@
 \chapter{Analysis of Results}
-\todo{Diese Seite habe ich noch nicht genau angeschaut, aber ich denke wir geben hier auch unsere grobe struktur bekannt: Satz/Testset, n-Gramm, Wörter, thought Vektor. Von Ganz aussen nach innen, sozusagen.}
-In this chapter, we are going to analyze the evolution and final results of the two models (see chapter \ref{methods:both_models}), trained on the OpenSubtitles and Reddit corpus, under several different aspects. This includes the analysis of the learning process throughout the training. Then we are going to analyse the language model of the trained models and try to find a correlation between the language model in the training dataset and the language model the trained models produce.\todo{Two times model is ugly!} In the end, we are going to focus on how well the model understands and percepts them, combined with an analysis
-
-\begin{enumerate}[noitemsep]
-	\item \textbf{Quantitive}: This part focuses on evaluating metrics and other measurements. We are going to look into the metrics at train time, a similarity analysis using Sent2Vec and an analysis of the produced language models by using n-gram collocations.\todo{Not correct: What are we going to do with ngrams?}
-	\item \textbf{Qualitative}: This part focuses on the quality of the language produced by the models. This includes a comparison between our models and \emph{CleverBot}\footnote{http://www.cleverbot.com/} and the development of the language model of the models throughout the training time.
-	\item \textbf{Miscellaneous}: This part focuses on theoretical analysis, such as analyzing the internal embeddings for the input sequence or if and how the models are using the soft-attention mechanism in their favor.
-\end{enumerate}
-
-The analysis is done in the order listed above, that means we start by analysing the quantitive measures
-\blindtext
-
-* Attention
-* Learning process
-* Generated outputs over time
-* Generation at the end and comparison with cleverbot and paper
-* Generated outputs at the end and related ngram analysis
-* Generated embeddings for input sentences
-* Sent2Vec analysis
+We are going to analyze the resulting models after training them as specified in Chapter~\ref{methods:training}. As the first part, we are going to analyze how the training went and take a look at the results of the metric-based evaluation. Because we identified some problems with this quantitative analysis, we then show that progress was indeed achieved throughout the training and go into detail why the results of the evaluation are as bad as they are. This includes an analysis into the language model to determine why the models often time respond with generic outputs. The next part is then dedicated to comparing our models with the results from the paper of Vinyals and Le~\cite{Vinyals:2015} and with the CleverBot chatbot. The subjects of the last part are analysis related beam-search and the soft-attention mechanism.\todo{gut so?}
 
 \section{How Did The Training Go?}\todo{vielleicht müssen wir den anpassen wegen neuer struktur}
 First, let us start by analyzing the evolution of the models with regard to the available performance metrics throughout the time span of the training. Below, in Figures~\ref{results:learning_process:metrics:opensubtitles} and~\ref{results:learning_process:metrics:reddit}, one can see the development of the loss and perplexity on the training datasets for the two different models.
