@@ -259,7 +259,7 @@ As this analysis has shown, most utterances lie so close to one another that thi
 
 \section{N-Gram Analysis}
 \label{chapter:data:ngram}
-We also do an n-gram analysis of the used corpora. For this purpose, we generated uni- and bigrams for both the OpenSubtitles and Reddit corpora. We do this so that we can compare the n-grams of the outputs produced by our models after they have been trained with the n-grams obtained when analyzing the preprocessed corpora. This enables us to find correlations between the n-grams produced by this analysis and n-grams extracted from the outputs of the trained models. The results of analyzing the preprocessed datasets are visualized in the figures~\ref{data:ngram:freq_top_30} and \ref{data:ngram:graph_top_50}. For the second visualizations, we use a custom graph visualization which we call ``N-Gram Graph''. This allows us to visualize how n-grams can be connected to each other (through edges) and at the same time visualize their relative occurrence frequencies to all other n-grams in the graph.\todo{What to do with the graphs?!}
+We also do an n-gram analysis of the used corpora. For this purpose, we generated uni- and bigrams for both the OpenSubtitles and Reddit corpora. We do this so that we can compare the n-grams of the outputs produced by our models after they have been trained with the n-grams obtained when analyzing the preprocessed corpora. This enables us to find correlations between the n-grams produced by this analysis and n-grams extracted from the outputs of the trained models. The results of analyzing the preprocessed datasets are visualized in the figures~\ref{data:ngram:freq_top_30} and \ref{data:ngram:graph_top_50}. For the second visualizations, we use a custom graph visualization which we call ``N-Gram Graph''. This allows us to visualize how n-grams can be connected to each other (through edges) and at the same time visualize their relative occurrence frequencies to all other n-grams in the graph.
  
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -276,22 +276,5 @@ We also do an n-gram analysis of the used corpora. For this purpose, we generate
 	\endminipage\hfill
 	\caption{Occurrence frequencies of the 30 most used bigrams in the OpenSubtitles~(left) and Reddit (right) datasets.}
 	\label{data:ngram:freq_top_30}
-\end{figure}
-
-\begin{figure}[H]
-	\minipage{1\textwidth}
-	\includegraphics[width=\linewidth]{img/opensubtitles_bigram_top_50_graph}
-	\centering
-	\small
-	\text{OpenSubtitles}
-	\endminipage\hfill
-	\minipage{1\textwidth}
-	\includegraphics[width=\linewidth]{img/reddit_bigram_top_50_graph}
-	\centering
-	\small
-	\text{Reddit}
-	\endminipage\hfill
-	\caption{N-Gram graphs for the 50 most used bigrams in the OpenSubtitles (upper) and Reddit (lower) datasets. Each node in the graphs represents a bigram, the edges between them show that either the first word of the first bigram matches the second word of the other bigram or the last word of the first bigram equals the last word of the second bigram. The size of each node is relative to its occurrence frequency, which means, that larger nodes occur more frequent than smaller ones.}
-	\label{data:ngram:graph_top_50}
 \end{figure}
 
