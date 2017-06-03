@@ -406,9 +406,21 @@ As said in the last Chapter, we are now going to analyze the language diversity 
 
 We cannot see a tendency when visualizing the absolute occurrence frequencies of the top 10 uni-, bi-gram and sentences (see Figure~\ref{FIGURE_ABSOLUTE}). For this reason, we started to do the same analysis, but this time with relative values instead of absolute (see Figure~\ref{FIGURE_PERC}). Here we can see the same pattern emerging again as in the last chapter.
 
-\paragraph{OpenSubtitles} The plot for the OpenSubtitles (see Figure~\ref{ABC}) shows the same patterns as with the distributions seen before. Throughout the course of the training, it looks like that the diversity of the language model wobbles up and down. Our assumption for this flattering development is the same as with the distributions, we think that the noisey training datasets might be responsible for that. But, if we take a close look at the numbers, we see that the peaks are getting smaller and smaller. For example, the share of the top 10 sentences and words for the 2.0M model is about $2\%$ to $3\%$ lower than with the 1.0M model. The difference, when looking at the numbers for the bi-grams is much smaller, only about $0.02\%$. Nevertheless, in total, we can see a tendency that the model starts to use a more diverse language model as longer as the training goes.
+\paragraph{OpenSubtitles} The plot for the OpenSubtitles (see Figure~\ref{results:language_model:diversity:opensubtitles}) shows the same patterns as with the distributions seen before. Throughout the course of the training, it looks like that the diversity of the language model wobbles up and down. Our assumption for this flattering development is the same as with the distributions, we think that the noisey training datasets might be responsible for that. But, if we take a close look at the numbers, we see that the peaks are getting smaller and smaller. For example, the share of the top 10 sentences and words for the 2.0M model is about $2\%$ to $3\%$ lower than with the 1.0M model. The difference, when looking at the numbers for the bi-grams is much smaller, only about $0.02\%$. Nevertheless, in total, we can see a tendency that the model starts to use a more diverse language model as longer as the training goes.
 
-\paragraph{Reddit} The plot for the Reddit model (see Figure~\ref{ABC}) reveals, that the language model gets more diverse throughout the course of the training until the minimum is reached when using the 2.0M model. From this point on, it starts to become less and less diverse for the rest of the training. This coincides with our opinion, that the model is best when using the 2.0M snapshot. Our assumption for this behaviour is, that we are running into problems due to the fact, that between the snapshots 1.5M and 2.0M we are starting the second epoch over the training dataset. This could lead to some kind of overfitting effect, which worsens the results and diversity of the language used by the model.
+\begin{figure}[H]
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/diversity_perc_plot.png}
+	\caption{BLUB}
+	\label{results:language_model:diversity:opensubtitles}
+\end{figure} 
+
+\paragraph{Reddit} The plot for the Reddit model (see Figure~\ref{results:language_model:diversity:reddit}) reveals, that the language model gets more diverse throughout the course of the training until the minimum is reached when using the 2.0M model. From this point on, it starts to become less and less diverse for the rest of the training. This coincides with our opinion, that the model is best when using the 2.0M snapshot. Our assumption for this behaviour is, that we are running into problems due to the fact, that between the snapshots 1.5M and 2.0M we are starting the second epoch over the training dataset. This could lead to some kind of overfitting effect, which worsens the results and diversity of the language used by the model.
+
+\begin{figure}[H]
+	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/diversity_perc_plot.png}
+	\caption{BLUB}
+	\label{results:language_model:diversity:reddit}
+\end{figure} 
 
 \subsection{Results}
 Our analysis has shown, that the models do indeed produce a large amount of generic sentences, but this problem weakens over the time of the training, especially for the OpenSubtitles model. The second problem we could identify is, that iterating over the same dataset multiple times, does not seem to be advisable. Using a regularization technique, such as Dropout, would probably help in the case of a small dataset.
