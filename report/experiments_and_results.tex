@@ -402,8 +402,56 @@ The behavior is the same for the uni-gram distributions, which is the reason we 
 \end{figure}
 
 \subsection{Language Diversity}
-As said in the last Chapter, we are now going to analyze the language diversity of the outputs the two models produce over the different snapshots. For this purpose, we are analyzing the how large the share of the top 10 uni-, bi-gram and sentences is within the generated responses. The results can be seen in the Table~\ref{TABLE}.
+As said in the last Chapter, we are now going to analyze the language diversity of the outputs the two models produce over the different snapshots. For this purpose, we are analyzing the how large the share of the top 10 uni-, bi-gram and sentences is within the generated responses. The results can be seen in the Table~\ref{results:top_10_frequency:reddit} for Reddit and \ref{results:top_10_frequency:OpenSubtitle} for OpenSubtitle. \todo{Zwischen den beiden Corpora gibt es eine besindere Auffälligkeit, die Anzahl benutzter Wörter ist beim reddit viel höher. (wtf *3?? han zahle kontrolliert, aber isch strange).}
 
+\todo{wir könnten schreiben, dass die absoluten Zahlen keine Tendenz anzeigen (das sehen wir schon in der Tabelle), die Werte nehmen absolut gesehen nicht ab, es ist für uns kein Muster erkennbar. Deshalb haben wir Tabelle mit dem prozentualen Anteil ergänzt. Die Werte sind nun nicht mehr ganz so chaotisch, dies hängt damit zusammen, dass eben auch die Anzahl verwendeter uni-gramme und bi-gramme pro Snapshot sich verändert. Dies ist ein Indiz dafür, dass die Sätze länger werden und somit semantisch anspruchsvoller?!
+
+Um diese Enwicklung pro Modell besser zu sehen und auch die Korrelation innerhalb eines Modells zwischen uni-gramm/bi-Gramm und sentence, haben wir die prozentuale Werte geplotet?!}
+\todo{weiss nicht wohin damit, aber wollen wir noch erklären, was es bedeuted, wenn die Kurce sinkt? also interpretiert z.B.:Die Werte sind so zu interpretieren, dass wenn die Werte sinken bedeutet dies, dass der Anteil der Top 10 Sätze/uni-gramm/bi-gram an der Gesamtmenge sinkt, was wir als positive Entwicklung werten, weil vielfältiger? Würde nur die Satzkurve sinken, nicht aber die Bi-Gramm Kurve, dann würde es eben auf Stufe bi-gramm nicht vielfältiger werden. Da wir aber auf allen 3 Stufen diese Tendenz sehen, wird es auf allen 3 Stufen vielfältiger?}
+
+\begin{table}[H]
+	\centering
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{llllllllll}
+			\toprule
+			& Words &&&Bi-Gramm&&&Sentences&&\\
+			Snapshot & Top Count & All Count& Top freq. \%&  Top Count& All Count& Top freq. \%&  Top Count& All Count& Top freq. \%\\
+			\midrule
+			0.5M & 2,712,157	 & 4,484,679	 & 60.48\%	&2,096,681	&4,483,620	&46.76\%	&86,408	&249,984	&34.57\%\\
+			1.0M & 2,576,291	 & 4,294,209	 & 60.00\%	&1,941,620	&4,290,818	&45.25\%	&71,050	&249,984	&28.42\%\\
+			1.5M & 1,918,226	 & 3,668,416	 & 52.29\%	&1,256,740	&3,663,402	&34.31\%	&46,590	&249,984	&18.64\%\\
+			2.0M & 2,507,930	 & 4,577,892	 & 54.78\%	&1,665,799	&4,567,229	&36.47\%	&29,544	&249,984	&11.82\%\\
+			2.5M & 1,623,645	 & 3,148,834	 & 51.56\%	&1,045,565	&3,134,900	&33.35\%	&73,475	&249,984	&29.39\%\\
+			3.0M & 2,108,447	 & 3,614,679	 & 69.38\%	&1,449,193	&3,599,584	&40.26\%	&82,797	&249,984	&33.12\%\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Top 10 Uni-Gramms, Bi-Gramms and Sentences summed up their frequency and calculated their percentage propotion per Reddit snapshot.}
+	\label{results:top_10_frequency:reddit}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{llllllllll}
+			\toprule
+			& Words &&&Bi-Gramm&&&Sentences&&\\
+			Snapshot & Top Count & All Count& Top freq. \%&  Top Count& All Count& Top freq. \%&  Top Count& All Count& Top freq. \%\\
+			\midrule
+			0.5M & 516,756	 & 1,035,956	& 49.88\%	&306,757	&1,033,319	&29.69\%	&102,770	&249,984	&41.11\%\\
+			1.0M & 639,494	 & 860,951		& 74.28\%	&504,946	&858,145	&58.84\%	&188,748	&249,984	&75.50\%\\
+			1.5M & 624,243	 & 1,249,230	& 49.97\%	&378,566	&1,233,467	&30.70\%	&108,312	&249,984	&43.33\%\\
+			2.0M & 589,721	 & 814,101		& 72.44\%	&475,120	&807,087	&58.87\%	&181,585	&249,984	&72.64\%\\
+			2.5M & 651,779	 & 1,131,640	& 57.60\%	&395,060	&1,117,436	&35.35\%	&92,273		&249,984	&36.91\%\\
+			3.0M & 991,879	 & 1,470,695	& 40.10\%	&718,034	&1,459,490	&49.20\%	&105,245	&249,984	&42.10\%\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Top 10 Uni-Gramms, Bi-Gramms and Sentences summed up their frequency and calculated their percentage propotion per Reddit snapshot.}
+	\label{results:top_10_frequency:OpenSubtitle}
+\end{table}
+
+\todo{Absatz könnte man dan streichen }
 We cannot see a tendency when visualizing the absolute occurrence frequencies of the top 10 uni-, bi-gram and sentences (see Figure~\ref{FIGURE_ABSOLUTE}). For this reason, we started to do the same analysis, but this time with relative values instead of absolute (see Figure~\ref{FIGURE_PERC}). Here we can see the same pattern emerging again as in the last chapter.
 
 \paragraph{OpenSubtitles} The plot for the OpenSubtitles (see Figure~\ref{results:language_model:diversity:opensubtitles}) shows the same patterns as with the distributions seen before. Throughout the course of the training, it looks like that the diversity of the language model wobbles up and down. Our assumption for this flattering development is the same as with the distributions, we think that the noisey training datasets might be responsible for that. But, if we take a close look at the numbers, we see that the peaks are getting smaller and smaller. For example, the share of the top 10 sentences and words for the 2.0M model is about $2\%$ to $3\%$ lower than with the 1.0M model. The difference, when looking at the numbers for the bi-grams is much smaller, only about $0.02\%$. Nevertheless, in total, we can see a tendency that the model starts to use a more diverse language model as longer as the training goes.
