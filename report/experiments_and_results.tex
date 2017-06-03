@@ -32,7 +32,47 @@ First, let us start by analyzing the evolution of the models with regard to the 
 \label{results:performance_on_test_datasets}
 After we have seen that the training process looks fine, we are going to asses the performance of these models on our test datasets. Here we use the same metrics as within the training, namely the cross-entropy loss and perplexity values. We have evaluated each model on the respective test dataset for each checkpoint we have created while training (see Chapter~\ref{methods:training}).
 
-\paragraph{Surprising Results} The results on the test set are quite the opposite of the results from the training process (see Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}), where both of the models are getting worse over time. We did not expect that, but nevertheless, we are going to analyze the problem.\todo{Maybe some more clarification on what analyse means?} The results of the OpenSubtitles model seem to vary across the different checkpoints, with the best result having a perplexity of $71.07$ and a loss of $6.15$ and coming from the evaluation with the first checkpoint.\todo{Values for reddit model in text} The best result of the Reddit model is also achieved on the first checkpoint, with all other checkpoints having a worse perplexity.
+\paragraph{Surprising Results} The results on the test set are quite the opposite of the results from the training process (see Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}), because both of the models are getting worse over time. The results of the OpenSubtitles model (see Table~\ref{results:test_metrics:opensubtitles}) seem to vary across the different checkpoints, with the best result having a perplexity of $71.07$ and a loss of $6.15$ and coming from the evaluation with the first checkpoint. The best result of the Reddit model (see Table~\ref{results:test_metrics:reddit}) is also achieved on the first checkpoint with a perplexity of $169.14$, with all other checkpoints having a worse perplexity.
+\\
+\begin{table}[H]
+	\centering
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{l|cc}
+			\toprule
+			Snapshot & Test Loss & Test Perplexity\\
+			\midrule
+			0.5M & $6.1513$ & $71.0779$\\
+			1.0M & $6.5314$ & $92.5000$\\
+			1.5M & $7.3942$ & $168.2207$\\
+			2.0M & $6.2134$ & $74.2035$\\
+			2.5M & $6.3627$ & $82.2949$\\
+			3.0M & $6.4647$ & $88.3205$\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Loss and perplexity values for each snapshot of the OpenSubtitles model when evaluating them against the test dataset.}
+	\label{results:test_metrics:opensubtitles}
+\end{table}
+
+\begin{table}[H]
+	\centering
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{l|cc}
+			\toprule
+			Snapshot & Test Loss & Test Perplexity\\
+			\midrule
+			0.5M & $7.4021$ & $169.1432$\\
+			1.0M & $7.5477$ & $187.1090$\\
+			1.5M & $7.5794$ & $191.2557$\\
+			2.0M & $7.6288$ & $197.9190$\\
+			2.5M & $7.6661$ & $203.1056$\\
+			3.0M & $7.7885$ & $221.0843$\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Loss and perplexity values for each snapshot of the Reddit model when evaluating them against the test dataset.}
+	\label{results:test_metrics:reddit}
+\end{table}
 
 This result stands in contradiction to what we have expected. Instead of the loss values going up, we would have expected it to go down in the same way as it did on the training and validation datasets. We assume, that this has to do with the cross-entropy loss and hence the perplexity being not the best fit metrics to evaluate such models, especially in a conversational context where the variety of correct answers can be immensely high. For this reason, we proposed a third performance metric, namely the usage of Sent2Vec~\cite{Pgj:2017} embeddings, to measure the similarity between the expected and generated responses. Before we are going to do this analysis, we want to take a look at different samples from both models to show that they indeed improved over time, even thought the test metrics tell a different story.
 
@@ -69,6 +109,8 @@ This result stands in contradiction to what we have expected. Instead of the los
 	\caption{The loss and perplexity by running the six different snapshots against the test dataset using the Reddit model.}
 	\label{result:test_performance:reddit}
 \end{figure}
+
+\todo{fix scaling of axis}
 
 \paragraph{Is Progress Achieved?} As the results of evaluating the models on the test dataset has shown, it seems that the models did not make an meaningful progress throughout the training. Even worse, it looks like the models have become worse over time. For this reason, we decided that we would like to evaluate the model by hand and see if the generated responses improve when using the different six snapshots of the models. We opted for four different input sentences, that means two for each model, and generated responses for each of the snapshots. The results can be seen in the Table~\ref{results:example_output:reddit} for the Reddit model and Table~\ref{results:example_output:opensubtitles} for the OpenSubtitles model.
 
@@ -403,8 +445,7 @@ The behavior is the same for the uni-gram distributions, which is the reason we 
 \end{figure}
 
 \subsection{Language Diversity}
-\subsection{Language Diversity}
-As said in the last Chapter, we are now going to analyze the language diversity of the outputs the two models produce over the different snapshots. For this purpose, we are analyzing the how large the share of the top 10 uni-, bi-gram and sentences is within the entirety of the generated responses when using the respective test datasets for the models. The results can be seen in the Table~\ref{results:top_10_frequency:reddit} for Reddit and \ref{results:top_10_frequency:OpenSubtitle} for OpenSubtitles. 
+As said in the last Chapter, we are now going to analyze the language diversity of the outputs the two models produce over the different snapshots. For this purpose, we are analyzing the how large the share of the top 10 uni-, bi-gram and sentences is within the entirety of the generated responses when using the respective test datasets for the models. The results can be seen in the Table~\ref{results:top_10_frequency:reddit} for Reddit and \ref{results:top_10_frequency:OpenSubtitles} for OpenSubtitles. 
 
 In the Tables, one can see three different categories: Uni-Grams, Bi-Grams and Sentences. For each of these categories, we have summed up the occurrence frequencies of the top 10 most occuring instances for the respective category. These sums can be seen in the \emph{Top Count} columns. The columns named \emph{All Count} contain the total amount of all instances for each category per snapshot. The share of the \emph{Top Count} value from the \emph{All Count} value can be seen in the \emph{Top Freq.} column for each category and snapshot.
 
