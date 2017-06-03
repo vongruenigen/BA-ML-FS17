@@ -765,8 +765,6 @@ The responses of the Reddit model to the statement that it has a bad opinion are
 
 Sadly, we were not able to find a similar response when using the OpenSubtitles model.
 
-\paragraph{Fazit}\todo{Fazit!}
-
 \subsection{Neural Conversational Model}
 \label{results:comparison:ncm}
 In this section, we are going to compare the results from the paper ``Neural Conversation Model'' (NCM) with the results from our models. To compare the responses, we are going to use utterances from the paper and show all the responses from all OpenSubtitles snapshots, but only the (subjectively) best response from the Reddit model, as the NCM model was trained on the OpenSubtitles dataset. The responses can be seen in the Tables~\ref{results:example8_output:Neural_Conversational_Model_compared} to~\ref{results:example14_output:Neural_Conversational_Model_compared}. The categories where the input utterances came from in the paper are noted in the table descriptions.
@@ -979,9 +977,12 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 	\label{results:example14_output:Neural_Conversational_Model_compared}
 \end{table}
 
-\paragraph{Fazit}
-Im Vergleich zu Cleverbot schneidet unser Modell gleichgut oder besser ab (subjektiv), Test war schwer für Cleverbot weil die Aussagen anhand der responses unseres Modells ausgewählt haben. 
-Beim Vergleich mit den verschiednen NCM Utterance Aussagentypen scheint es so, dass unsere Modelle für einfachere Fragen etwa gleichgut funbktioniert und für komplexere Fragen aber die Sprachvielfalt vermutlich noch fehlt. (und gröösse Modell)
+\subsection{Results}
+In conclusion, our model is not as bad as it seemed when looking at the problems with the metrics and the generic responses coming from an undiversified language model.
+
+In comparison to the CleverBot, our model had several responses which were clearly superior to its. But there were also cases where the CleverBot was better. This has probably to do with the fact that the CleverBot works by fuzzily searching already existing conversations. This means, that if a conversation about a certain topic does not exist, the CleverBot has no possibility to meaningful answer. Our model instead has the ability to ``understand'' what is said and hence can at least try to answer. Such an example would be the mathematical question ``How much is 1 added to 2?'', where the CleverBot simply answered ``I don't know'', whereas our model started to respond with numbers, even though the result was not correct.
+
+When comparing our models to the NCM model, it quickly becomes clear what the main problem is: The size of the model. For easy to understand utterances, the responses of our models are almost or as good as the responses from the NCM model. But if the utterances get more complicated, especially when it comes to philosophical or morality questions, our model starts to become worse than the NCM model. This is, as said, not a real surprise, because our model is only half the size of the NCM model. Nevertheless, we conclude that our model is not superior, but in some regards of equal quality as the NCM model.
 
 \section{Beam-Search}
 \label{results:beam_search}
