@@ -29,6 +29,7 @@ First, let us start by analyzing the evolution of the models with regard to the 
 \paragraph{The Training Seems Successful} From the looks of the plots, it looks like the training went fine for both models, as both of them have degrading loss and perplexity. We also saw differences in how the models have evolved over the time span of the training, especially the dips in the Reddit model, but we cannot conclude anything from this right now. After we have analyzed the training process, we are now focusing on the performance of the models on the test datasets.
 
 \section{Performance on Test Datasets}
+\label{results:performance_on_test_datasets}
 After we have seen that the training process looks fine, we are going to asses the performance of these models on our test datasets. Here we use the same metrics as within the training, namely the cross-entropy loss and perplexity values. We have evaluated each model on the respective test dataset for each checkpoint we have created while training (see Chapter~\ref{methods:training}).
 
 \paragraph{Surprising Results} The results on the test set are quite the opposite of the results from the training process (see Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}), where both of the models are getting worse over time. We did not expect that, but nevertheless, we are going to analyze the problem.\todo{Maybe some more clarification on what analyse means?} The results of the OpenSubtitles model seem to vary across the different checkpoints, with the best result having a perplexity of $71.07$ and a loss of $6.15$ and coming from the evaluation with the first checkpoint.\todo{Values for reddit model in text} The best result of the Reddit model is also achieved on the first checkpoint, with all other checkpoints having a worse perplexity.
@@ -402,12 +403,36 @@ The behavior is the same for the uni-gram distributions, which is the reason we 
 \end{figure}
 
 \subsection{Language Diversity}
-As said in the last Chapter, we are now going to analyze the language diversity of the outputs the two models produce over the different snapshots. For this purpose, we are analyzing the how large the share of the top 10 uni-, bi-gram and sentences is within the generated responses. The results can be seen in the Table~\ref{results:top_10_frequency:reddit} for Reddit and \ref{results:top_10_frequency:OpenSubtitle} for OpenSubtitle. \todo{Zwischen den beiden Corpora gibt es eine besindere Auffälligkeit, die Anzahl benutzter Wörter ist beim reddit viel höher. (wtf *3?? han zahle kontrolliert, aber isch strange).}
+\subsection{Language Diversity}
+As said in the last Chapter, we are now going to analyze the language diversity of the outputs the two models produce over the different snapshots. For this purpose, we are analyzing the how large the share of the top 10 uni-, bi-gram and sentences is within the entirety of the generated responses when using the respective test datasets for the models. The results can be seen in the Table~\ref{results:top_10_frequency:reddit} for Reddit and \ref{results:top_10_frequency:OpenSubtitle} for OpenSubtitles. 
 
-\todo{wir könnten schreiben, dass die absoluten Zahlen keine Tendenz anzeigen (das sehen wir schon in der Tabelle), die Werte nehmen absolut gesehen nicht ab, es ist für uns kein Muster erkennbar. Deshalb haben wir Tabelle mit dem prozentualen Anteil ergänzt. Die Werte sind nun nicht mehr ganz so chaotisch, dies hängt damit zusammen, dass eben auch die Anzahl verwendeter uni-gramme und bi-gramme pro Snapshot sich verändert. Dies ist ein Indiz dafür, dass die Sätze länger werden und somit semantisch anspruchsvoller?!
+In the Tables, one can see three different categories: Uni-Grams, Bi-Grams and Sentences. For each of these categories, we have summed up the occurrence frequencies of the top 10 most occuring instances for the respective category. These sums can be seen in the \emph{Top Count} columns. The columns named \emph{All Count} contain the total amount of all instances for each category per snapshot. The share of the \emph{Top Count} value from the \emph{All Count} value can be seen in the \emph{Top Freq.} column for each category and snapshot.
 
-Um diese Enwicklung pro Modell besser zu sehen und auch die Korrelation innerhalb eines Modells zwischen uni-gramm/bi-Gramm und sentence, haben wir die prozentuale Werte geplotet?!}
-\todo{weiss nicht wohin damit, aber wollen wir noch erklären, was es bedeuted, wenn die Kurce sinkt? also interpretiert z.B.:Die Werte sind so zu interpretieren, dass wenn die Werte sinken bedeutet dies, dass der Anteil der Top 10 Sätze/uni-gramm/bi-gram an der Gesamtmenge sinkt, was wir als positive Entwicklung werten, weil vielfältiger? Würde nur die Satzkurve sinken, nicht aber die Bi-Gramm Kurve, dann würde es eben auf Stufe bi-gramm nicht vielfältiger werden. Da wir aber auf allen 3 Stufen diese Tendenz sehen, wird es auf allen 3 Stufen vielfältiger?}
+The first thing which is noticeable when comparing the values from the two tables is that the Reddit outputs seem to be composed of much more uni- and bi-grams. This can be seen when comparing the \emph{Top Count} values from both tables. This signifies that the outputs of the Reddit model are of greater length on average than the outputs of the OpenSubtitles model because the number of sentences stays the same for both. This might be one of the reasons why the results from the Sent2Vec analysis (see Chapter~\ref{results:performance_on_test_datasets}) are much better for the Reddit than the OpenSubtitles model.
+
+At first, we tried to see a tendency on how language diversity develops when using the absolute values from the \emph{Top Count} columns, but we could not. This is the reason why we added the relative values from the \emph{Top Freq.} columns. The problem with using the absolute values is, that the number used uni- and bi-grams changes between the snapshots. However, when we start using the relative values we can compare the different snapshots to each other by means of diversity of the outputs. 
+
+\begin{table}[H]
+	\centering
+	\begin{adjustbox}{max width=\textwidth}
+		\begin{tabular}{llllllllll}
+			\toprule
+			& Words &&&Bi-Gramm&&&Sentences&&\\
+			Snapshot & Top Count & All Count& Top freq. \%&  Top Count& All Count& Top freq. \%&  Top Count& All Count& Top freq. \%\\
+			\midrule
+			0.5M & 516,756	 & 1,035,956	& 49.88\%	&306,757	&1,033,319	&29.69\%	&102,770	&249,984	&41.11\%\\
+			1.0M & 639,494	 & 860,951		& 74.28\%	&504,946	&858,145	&58.84\%	&188,748	&249,984	&75.50\%\\
+			1.5M & 624,243	 & 1,249,230	& 49.97\%	&378,566	&1,233,467	&30.70\%	&108,312	&249,984	&43.33\%\\
+			2.0M & 589,721	 & 814,101		& 72.44\%	&475,120	&807,087	&58.87\%	&181,585	&249,984	&72.64\%\\
+			2.5M & 651,779	 & 1,131,640	& 57.60\%	&395,060	&1,117,436	&35.35\%	&92,273		&249,984	&36.91\%\\
+			3.0M & 991,879	 & 1,470,695	& 40.10\%	&718,034	&1,459,490	&49.20\%	&105,245	&249,984	&42.10\%\\
+			\bottomrule
+		\end{tabular}
+	\end{adjustbox}
+	\caption{Top 10 Uni-Gramms, Bi-Gramms and Sentences summed up their frequency and calculated their percentage propotion per Reddit snapshot.}
+	\label{results:top_10_frequency:OpenSubtitles}
+\end{table}
+\todo{rework captions!}
 
 \begin{table}[H]
 	\centering
@@ -429,30 +454,11 @@ Um diese Enwicklung pro Modell besser zu sehen und auch die Korrelation innerhal
 	\caption{Top 10 Uni-Gramms, Bi-Gramms and Sentences summed up their frequency and calculated their percentage propotion per Reddit snapshot.}
 	\label{results:top_10_frequency:reddit}
 \end{table}
+\todo{rework captions!}
 
-\begin{table}[H]
-	\centering
-	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{llllllllll}
-			\toprule
-			& Words &&&Bi-Gramm&&&Sentences&&\\
-			Snapshot & Top Count & All Count& Top freq. \%&  Top Count& All Count& Top freq. \%&  Top Count& All Count& Top freq. \%\\
-			\midrule
-			0.5M & 516,756	 & 1,035,956	& 49.88\%	&306,757	&1,033,319	&29.69\%	&102,770	&249,984	&41.11\%\\
-			1.0M & 639,494	 & 860,951		& 74.28\%	&504,946	&858,145	&58.84\%	&188,748	&249,984	&75.50\%\\
-			1.5M & 624,243	 & 1,249,230	& 49.97\%	&378,566	&1,233,467	&30.70\%	&108,312	&249,984	&43.33\%\\
-			2.0M & 589,721	 & 814,101		& 72.44\%	&475,120	&807,087	&58.87\%	&181,585	&249,984	&72.64\%\\
-			2.5M & 651,779	 & 1,131,640	& 57.60\%	&395,060	&1,117,436	&35.35\%	&92,273		&249,984	&36.91\%\\
-			3.0M & 991,879	 & 1,470,695	& 40.10\%	&718,034	&1,459,490	&49.20\%	&105,245	&249,984	&42.10\%\\
-			\bottomrule
-		\end{tabular}
-	\end{adjustbox}
-	\caption{Top 10 Uni-Gramms, Bi-Gramms and Sentences summed up their frequency and calculated their percentage propotion per Reddit snapshot.}
-	\label{results:top_10_frequency:OpenSubtitle}
-\end{table}
+We plot the \emph{Top Freq.} values for all the categories per model and snapshot to better see the development of the values for the different categories and possible correlation between them. The resulting visualizations can be seen in Figures~\ref{results:language_model:diversity:opensubtitles} and~\ref{results:language_model:diversity:reddit}. The plots can be interpreted in the way that decreasing values mean that the share of the top 10 most occuring instances per category take up a smaller share of the whole number of instances of this category. We interpret this as an increase in language diversity, which is positive.
 
-\todo{Absatz könnte man dan streichen }
-We cannot see a tendency when visualizing the absolute occurrence frequencies of the top 10 uni-, bi-gram and sentences (see Figure~\ref{FIGURE_ABSOLUTE}). For this reason, we started to do the same analysis, but this time with relative values instead of absolute (see Figure~\ref{FIGURE_PERC}). Here we can see the same pattern emerging again as in the last chapter.
+From the mentioned plots, we see several peculiarities, which we are going to discuss per model below.
 
 \paragraph{OpenSubtitles} The plot for the OpenSubtitles (see Figure~\ref{results:language_model:diversity:opensubtitles}) shows the same patterns as with the distributions seen before. Throughout the course of the training, it looks like that the diversity of the language model wobbles up and down. Our assumption for this flattering development is the same as with the distributions, we think that the noisey training datasets might be responsible for that. But, if we take a close look at the numbers, we see that the peaks are getting smaller and smaller. For example, the share of the top 10 sentences and words for the 2.0M model is about $2\%$ to $3\%$ lower than with the 1.0M model. The difference, when looking at the numbers for the bi-grams is much smaller, only about $0.02\%$. Nevertheless, in total, we can see a tendency that the model starts to use a more diverse language model as longer as the training goes.
 
@@ -471,30 +477,13 @@ We cannot see a tendency when visualizing the absolute occurrence frequencies of
 \end{figure}\todo{Caption!}
 
 \subsection{Results}
-Our analysis has shown, that the models do indeed produce a large amount of generic sentences, but this problem weakens over the time of the training, especially for the OpenSubtitles model. The second problem we could identify is, that iterating over the same dataset multiple times, does not seem to be advisable. Using a regularization technique, such as Dropout, would probably help in the case of a small dataset.
+Our analysis has shown, that the distributions of uni- and bi-grams have a tendency to fit the expected distributions better the longer the training goes. However, there were some peculiarities, which we have found interesting and we wanted to analyze with regard to language diversity.
 
-%Wegen generischen Sätze, wollten wir sparchmodell analysieren
-%zuerst haben wir Verteilungen der Bi-Gramme und Uni-Gramme verglichen mit gleichen bi/unigrammen Verteilung aus dem ganzen set. Nähert sich an, wird aber eher rechtslastig, auffällig, wenig genutzte bi/unigramme werden vernachlässigt.
-%Anschliessend Sprachvielfalt analysiert, damit konnten wir unseren beim testen bemerkten Lernfortschritt im Opensubtitle MOdell erstmals mit zahlen unterlegen. Wobei, die Sprachvielfalt eher auf Stufe Satz/Wort sich verbesserte, auf Stufe bigramm sehen wir diese entwicklung nocht nicht??? Und es zeigt sich, dass der Anteil der generischen Antworten tendenziell sinkt.
-%Bei Reddit konnten wir ebenfalls unseren visuellenen Eindruck bestätigen, das Modell 2.0M war für uns das Beste, und dies wird durch die Grafik \ref{label} bestätigt. Sobald mehrmals mit gleichen Daten trainiert wird, werden resultate subjektiv schlechter, dies bestätigt auch unsere Grafik, dass ab diesem Punkt die Sätze wieder einfältiger werden.
-%Wir konnten die Ursache für die genereischen Sätze zwar nicht herausfinden, jedoch konnten wir aufzeigen, dass sich die Vielfält mit fortlaufendem Training langsam aber stetig verbessert.
-%
-%Die Reddit Kurve \ref{} hingegen sinkt kontinuierlich bis Snapshot 1.5M /2.0 und steigt dann langsam wieder an. Dies deckt sich exakt mit unserem Subjektiven Gefühl, mit welchen Snapshots wir die besten responses erhalten. Zusätzlich deckt es sich mit der Anzahl, wie oft wir mit den gleichen Daten trainieren. Kurz nach dem 2. Durchlauf, beginnt die Kurve zu steigen, was ja bedeuted, dass der Anteil der Top 10 Artefakte an der Gesamtmenge zuniemt. Das Modell verliert seine Vielfalt.
-%Wichtig, die einzige Konstante ist die maximale Anzahl Sätze. Somit ist klar, dass wenn die Anzahl benutzter Bi-Gramme/Uni-Gramme steigt, längere Sätze gebildet werden. Diese müssen aber nicht unbedingt besser sein, da es einfach x-mal das gleiche Bi-Gramm/Uni-Gramm sein könnte, ist es aber eben nicht, wie wir an Kurven erkennen.
-%
-%Wir möchten herausfinden, ob mit Fortlaufendem Training die Sprachvielfalt der responses zunimmt. Für diese Auswertung berücksichtigen wir die top 10 Uni-Gramm, Bi-Gramme und Sätze pro Snapshot und Modell (siehe Anhang \ref{}) und zählen deren Häufigkeit. Die Resultate können Sie aus der Tabelle \ref{} entnehmen, wir haben die Tabelle noch mit der maximalen Anzahl Uni-Gramme, Bi-Gramme und Sätze pro Snapshot ergänzt. Anhand er absoluten Zahlen kann man keine Tendenz angeben, deshalb haben wir den Prozentualen Anteil der Top 10 Artefakte an der Gesamtmenge pro Snapshot berechnet. Diese Werte befinden sich in den Spalten Prozentual.
-%Um die Entwicklung zwischen den Snapshot besser zu erkennen, erstellten wir mit den relativen Werten ein Diagramm pro Corpus. Die Kurve ist so zu interpretieren, dass wenn die Werte sinken bedeutet dies, dass der Anteil der Top 10 Artefakte an der Gesamtmenge sinkt. Wir sehen dabei deutliche Unterschiede pro Corpus.
-%\paragraph{OpenSubtitles}Die OpenSubtitle Kurve \ref{} zeigt insgesamt eine leichte Verbesserung jedoch mit lokalen Verschlechterungen. Die Spitze beim Snapshot 2.0M ist bei den Sätzen und Wörtern um 2-3 \% tiefer, als diejenige bei 1.0M. Bei den Bi-Grams ist der Unterschied eher klein mit 0.02 \%. Die Ursache für diese Zackenkurve(?) vermuten wir in den Daten. Diese sind wie bereits erwähtn noisy. In der Tendenz sehen wir jedoch ein Gefälle.
-%
-%\paragraph{Reddit} Die Reddit Kurve \ref{} hingegen sinkt kontinuierlich bis Snapshot 1.5M /2.0 und steigt dann langsam wieder an. Dies deckt sich exakt mit unserem Subjektiven Gefühl, mit welchen Snapshots wir die besten responses erhalten. Zusätzlich deckt es sich mit der Anzahl, wie oft wir mit den gleichen Daten trainieren. Kurz nach dem 2. Durchlauf, beginnt die Kurve zu steigen, was ja bedeuted, dass der Anteil der Top 10 Artefakte an der Gesamtmenge zuniemt. Das Modell verliert seine Vielfalt.
-%Wichtig, die einzige Konstante ist die maximale Anzahl Sätze. Somit ist klar, dass wenn die Anzahl benutzter Bi-Gramme/Uni-Gramme steigt, längere Sätze gebildet werden. Diese müssen aber nicht unbedingt besser sein, da es einfach x-mal das gleiche Bi-Gramm/Uni-Gramm sein könnte, ist es aber eben nicht, wie wir an Kurven erkennen.
-%
-%\paragraph{Fazit}
-%Wegen generischen Sätze, wollten wir sparchmodell analysieren
-%zuerst haben wir Verteilungen der Bi-Gramme und Uni-Gramme verglichen mit gleichen bi/unigrammen Verteilung aus dem ganzen set. Nähert sich an, wird aber eher rechtslastig, auffällig, wenig genutzte bi/unigramme werden vernachlässigt.
-%Anschliessend Sprachvielfalt analysiert, damit konnten wir unseren beim testen bemerkten Lernfortschritt im Opensubtitle MOdell erstmals mit zahlen unterlegen. Wobei, die Sprachvielfalt eher auf Stufe Satz/Wort sich verbesserte, auf Stufe bigramm sehen wir diese entwicklung nocht nicht??? Und es zeigt sich, dass der Anteil der generischen Antworten tendenziell sinkt.
-%Bei Reddit konnten wir ebenfalls unseren visuellenen Eindruck bestätigen, das Modell 2.0M war für uns das Beste, und dies wird durch die Grafik \ref{label} bestätigt. Sobald mehrmals mit gleichen Daten trainiert wird, werden resultate subjektiv schlechter, dies bestätigt auch unsere Grafik, dass ab diesem Punkt die Sätze wieder einfältiger werden.
-%Wir konnten die Ursache für die genereischen Sätze zwar nicht herausfinden, jedoch konnten wir aufzeigen, dass sich die Vielfält mit fortlaufendem Training langsam aber stetig verbessert.
+This analysis has shown that the development of the language diversity stands in direct relationship with the development of the mentioned uni- and bi-gram distributions. We were also able to substantiate our subjective feeling, that the OpenSubtitles model becomes better over time, as the language diversity increases, though the process works slowly. Additional, we could also show that our opinion, that the Reddit model has the best performance when using the 1.5M or 2.0M snapshot, by showing that these two snapshots have indeed the greatest variety in the used language mesured by our statistics.
+
+The last problem we could identify is, that iterating over the same dataset multiple times, does not seem to be advisable, as the Reddit model becomes worse after the snapshot 2.0M. This is especially apparent when looking at the results of the 3.0M snapshot. Using a regularization technique, such as Dropout~\cite{Nitish:2014}, would probably help when using a small dataset which is iterated multiple times.
+
+With this, we conclude the quantitative analysis of the language model and now start to do the human evaluation by comparing our model to others.
 
 \section{Comparison with Other Models}
 As the next part, we want to compare the results of our model with two others we use as a reference: The CleverBot\footnote{http://www.cleverbot.com/} chatbot and the results from the paper ``Neural Conversational Model''~\cite{Vinyals:2015}, whose model architecture serves as the base of our model.\todo{name differences?} We test the quality of the responses from our models when confronted with utterances of different type and difficulty. We do this in the hope that we can reveal where the strengths and weaknesses of our models lie.
