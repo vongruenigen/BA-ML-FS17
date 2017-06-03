@@ -410,17 +410,17 @@ We cannot see a tendency when visualizing the absolute occurrence frequencies of
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/diversity_perc_plot.png}
-	\caption{BLUB}
+	\caption{Development how much percentage of all uni-, bi-grams and sentences are covered by the top 10 most used of each category.}
 	\label{results:language_model:diversity:opensubtitles}
-\end{figure} 
+\end{figure}\todo{Caption!}
 
 \paragraph{Reddit} The plot for the Reddit model (see Figure~\ref{results:language_model:diversity:reddit}) reveals, that the language model gets more diverse throughout the course of the training until the minimum is reached when using the 2.0M model. From this point on, it starts to become less and less diverse for the rest of the training. This coincides with our opinion, that the model is best when using the 2.0M snapshot. Our assumption for this behaviour is, that we are running into problems due to the fact, that between the snapshots 1.5M and 2.0M we are starting the second epoch over the training dataset. This could lead to some kind of overfitting effect, which worsens the results and diversity of the language used by the model.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/diversity_perc_plot.png}
-	\caption{BLUB}
+	\caption{Development how much percentage of all uni-, bi-grams and sentences are covered by the top 10 most used of each category.}
 	\label{results:language_model:diversity:reddit}
-\end{figure} 
+\end{figure}\todo{Caption!}
 
 \subsection{Results}
 Our analysis has shown, that the models do indeed produce a large amount of generic sentences, but this problem weakens over the time of the training, especially for the OpenSubtitles model. The second problem we could identify is, that iterating over the same dataset multiple times, does not seem to be advisable. Using a regularization technique, such as Dropout, would probably help in the case of a small dataset.
