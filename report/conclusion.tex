@@ -25,8 +25,23 @@ As the last analysis, we took a quick look into the beam-search implementation, 
 In summary, we see this thesis as a success, even though the results were worse than we initially expected. It gave us the possibility to dive into a complete new and previously unknown topic in the area of machine learning. We learned to know a vast amount of new theories, research areas and architectures, while simultaneously allowing us to implement a system to solve a really interesting taks. We learned a lot about new the most recent innovations in the field of chatbots and dialog systems and would liked to have much more time for this thesis.
 
 \chapter{Future Work}
-Weiter trainieren
-grösserer Corpus
-granularerer snapshots
-Output (grösse hiddenstate) Grösse verdoppeln zum inputlayer? (gelesen irgendwoe, sprachvarianz findet im encoder stat)
-Bidirektional?
+
+To finish our theses, we would like to give several leads how the developed system and models could be extended in a future work:
+
+\begin{itemize}
+  \item The first, obvious change we would have liked to make is to extend the time period used for training. Such models need a lot of time to be trained and as our analysis and also our impression has shown, it would be advisable to train the mentioned models for a longer period than only three weeks. We cannot say anything about what the most appropriate time period would be. This is especially true for the OpenSubtitles model as we were only able to process a little more than half of the training dataset. For the Reddit model, the size of the dataset would obviously have to be extended in order that such a long training makes sense.
+  
+  \item The second, maybe obvious point, is to grow the size of the model itself. This is not easily possible, as we already used the largest size possible so that the model still fit on a single GPU. However, the implementation of the models could be extended to support multi-GPU use-cases. This would require a major redesign of the implementation of the models, as the computional graph would have to be split across the multiple GPUs. This is possible in TensorFlow, via the \texttt{tf.device} API\footnote{https://www.tensorflow.org/api_docs/python/tf/device}, which allows for running the computations across multiple different devices (i.e. GPUs, CPUs). Such a split was already done by other people, for example in one of the original sequence-to-sequence learning papers by Sutskever et al \cite{Sutskever:2014}.
+
+  \item We had to fix the size of our computational graph to use 30 time steps for the encoder and decoder each. This is due to the fact, that we had to use an old TensorFLow API (see Chapter~\ref{software_system:development_history}) because we were running into huge problems when first developing our system. Another, also obvious change, would be to use the dynamic RNN API\footnote{https://www.tensorflow.org/api_docs/python/tf/nn/dynamic_rnn} from the most recent TensorFlow version to implement the models.
+  
+  \item Another point is to try different RNN cells instead of LSTM. For example, Gate Recurrent Units \cite{Chung:2014} or even Convolutional LSTM \cite{Xingjian:2015} cells could be used. Another idea is to try other versions of LSTM cells, for example by using peephole connections.
+
+  \item We located the problem, that our model often generates generic responses. This could be tackled by using dedicated loss function which trains the models for language variety, such the loss function found in the paper by Li et al. \cite{Li:2016}.
+
+  \item One of the main issues we had were the metrics to asses the performance of such conversational models. We are currently not aware of any other popular metrics used in the field, besides the cross-entropy loss and the perplexity. However, it would be certainly possible and a really interesting research topic to develop new metrics, such as we tried with our Sent2Vec metric.
+
+  \item Another interessting point would be the possiblity to formulate the sequence-to-sequence learning problem as a beam optimization problem as Wiseman et al. \cite{Wiseman:2016} did.
+
+  \item A point which we have not covered at all in this thesis is context between the utterances within a conversation. This is a pretty hard problem, as the models would have to store the context somehow between the utterances.\todo{Find some papers!}
+\end{itemize}
