@@ -5,7 +5,7 @@ As the first part, we are going to analyze how the training went and take a look
 
 The next part is then dedicated to comparing our models with the results from the paper of Vinyals and Le~\cite{Vinyals:2015} and with the CleverBot chatbot.
 
-The subjects of the last part are analysis related beam-search and the soft-attention mechanism.\todo{Evtl. diesen umschreiben/ergänzen}
+The subjects of the last part are analysis related beam-search, the soft-attention mechanism and the clustering of thought vectors.
 
 \section{How Did The Training Go?}
 First, let us start by analyzing the evolution of the models with regard to the available performance metrics throughout the time period of the training. Below, in Figures~\ref{results:learning_process:metrics:opensubtitles} and~\ref{results:learning_process:metrics:reddit}, one can see the development of the cross-entropy loss and perplexity values on the training datasets for the two different models.
@@ -18,7 +18,7 @@ First, let us start by analyzing the evolution of the models with regard to the 
 	\label{results:learning_process:metrics:opensubtitles}
 \end{figure}
 
-\paragraph{Reddit} The learning process of the Reddit model looks find, but it also has a peculiarity, namely the dips in the training loss and perplexity. These dips occur about every $300,000$ to $400,000$ batches. They are also present in the development of the validation loss and perplexity, but are not as apparent as in the training metrics. We cannot explain this behaviour currently. We assume that this comes from the fact...\todo{Maybe we should be able?!} The variance however is much smaller than with the OpenSubtitles model, which strengthens our argument, that a well-structured dataset helps a lot when training such systems as it confuses the model much less.\todo{maybe rewrite this sentence somehow}
+\paragraph{Reddit} The learning process of the Reddit model looks find, but it also has a peculiarity, namely the dips in the training loss and perplexity. These dips occur about every $300,000$ to $400,000$ batches. They are also present in the development of the validation loss and perplexity, but are not as apparent as in the training metrics. We cannot explain this behaviour currently. We assume that this comes from the fact...\todo{Maybe we should be able?!} However, the variance is much smaller than with the OpenSubtitles model, which strengthens our argument, that well-structured datasets helps a lot when training such systems as helps to avoid confusion due to perplexing samples.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/reddit/train_metrics.png}
@@ -299,7 +299,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 	\label{results:sent2vec:reddit:top_n_results_table}
 \end{table}
 
-As seen in the tables above, the filtering of the most used responses does not help a lot when it comes to the Sent2Vec evaluation. We currently cannot say if this problem is just apparent in our use-case or if it this problem is inherent to the metric itself. To get a definitive conclusion, we would have to investigate into using this metric also for other models. \todo{Maybe one more sentence? Maybe say that metric should be applied to ther models (e.g. Google Paper) to see if we are really that bad or if it is inheritent to the metrics itself}
+As seen in the tables above, the filtering of the most used responses does not help a lot when it comes to the Sent2Vec evaluation. We currently cannot say if this problem is just apparent in our use-case or if it this problem is inherent to the metric itself. To come to a definitive conclusion, we would have to investigate into using this metric for other models.
 
 \paragraph{Mixed Feelings about Performance Metrics} As seen in this chapter, the performance metrics used to evaluate the models tell us a mixed story about the resulting models. On one hand, we see that the training went fine and the learning process run as expected. However, when we then test these trained models against the test datasets with the different metrics, it looks like the performance got worse and worse over the time of the training. This is not true in our subjective opinion after ``talking'' to both models for a prolonged period of time. We think the biggest problem for the evaluation are the generic responses both models seem to generate much more than actual answers. To find the cause of this generic responses, we will now try to analyze the language model which both models have learned while training and try to establish a connection between the language model in the datasets and the ones produced by the models.
 
@@ -486,7 +486,7 @@ The last problem we could identify is, that iterating over the same dataset mult
 With this, we conclude the quantitative analysis of the language model and now start to do the human evaluation by comparing our model to others.
 
 \section{Comparison with Other Models}
-As the next part, we want to compare the results of our model with two others we use as a reference: The CleverBot\footnote{http://www.cleverbot.com/} chatbot and the results from the paper ``Neural Conversational Model''~\cite{Vinyals:2015}, whose model architecture serves as the base of our model.\todo{name differences?} We test the quality of the responses from our models when confronted with utterances of different type and difficulty. We do this in the hope that we can reveal where the strengths and weaknesses of our models lie.
+As the next part, we want to compare the results of our model with two others we use as a reference: The CleverBot\footnote{http://www.cleverbot.com/} chatbot and the results from the paper ``Neural Conversational Model''~\cite{Vinyals:2015}, whose model architecture serves as the base of our model (see Chapter~\ref{methods:architecture}). We test the quality of the responses from our models when confronted with utterances of different types and difficulties. We do this in the hope that we can reveal where the strengths and weaknesses of our models lie.
 
 \subsection{Cleverbot}
 \label{results:comparison:cleverbot}
