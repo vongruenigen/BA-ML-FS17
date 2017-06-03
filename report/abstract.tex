@@ -1,5 +1,15 @@
-\chapter*{Zusammenfassung}
+\chapter*{Abstract}
+Das Ziel dieser Arbeit war ein Nachbau des Dialogsystems aus dem Paper \cite{}, inspiriert durch Beispiele maschineller Antworten wie: Human: "what is the purpose of being intelligent?" Machine: "to find out what it is .". Die Bedingungen für den Nachbaue waren ein wenig erschwert, da wir nu auf einer GPU die Berechnungen durchführten.
 
+Während dem Nachbau mussten wir einige technische Herausforderungen meistern, bis wir dann endlich ein funktionsfähiges Modell hatten. Die Modelle wurden schlussendlich mit Tensorflow und Seq2seq2 umgesetzt. Wir trainierten anschliessen über 3 Wochen lang zwei Modelle mit unterschiedlichen Trainingsdate. Ein Modell trainierten wir mit OpenSubtitles welche gesprochene Sprache beinhaltet und Eines mit Reddit welcher geschriebener Sprache enthält. 
+
+Anschliesssend untersuchten wir zuerst "quantitativ"? (oder so hast du das genannt) die Entwicklung der Modelle. Während die Trainings und Validierungsmetriken mit fortlaufendem Training besser wurden, wurden diejenigen der Testdaten eher schlechter, oder blieben gleich. Die ernüchternden Resultate waren insofern eine überraschung, da wir beim interagieren durchaus eine Verbesserung verspürten. Aufgrund dieses missmatch untersuchten wir die Vielfalt der Sprache. Diese Ergebnisse deckten sich mit unserem Subjektiven Empfinden.
+
+Am Ende der Arbeit vergleichen wir Anhand einiger ausgesuchter Beispiele unsere replies mit denjenigen von Cleverbot. Zusätzlich entnahmen wir Dialoge aus dem paper \cites{} und verglichen diese mit unseren. Dabei kann unser Modell durchaus mithalten, hätte aber vermutlich in einem breit angelegten Test wenig Chance. Vor allem bei komplexeren Aussagen, scheint unser Modell schwierigkeiten zu haben. Als Ursache vermuten wir einerseits die Grösse des Modells und die Dauer des Trainings. Insgesamt sehen wir den Nachbau aber als Erfolg Aussagen wie: Human: "What are you?" Machine: "i m a bot .",(komma hier, keine ahnug) waren doch überraschend.
+
+
+
+\chapter*{Abstract}
 In der vorliegenden Arbeit werden die Möglichkeiten von Crossdomain Sentiment-Analyse mithilfe von Convolutional Neural Networks untersucht. Dabei ist das Ziel zu eruieren, inwiefern sich ein einzelner Sentiment-Klassifizierer auf verschiedenen Domänen verhält und ob es Sinn macht, Datensätze mehrerer Domänen in Kombination zu verwenden.
 
 Als Erstes wird analysiert wie stark der Einfluss unterschiedlicher Word-Embeddings und Distant-Phasen auf einen Sentiment-Klassifizierer im Generellen ist und ob ein Zusammenhang zwischen den einzelnen Domänen und der besten Kombination an Word-Embeddings und Distant-Phasen existiert. Die Resultate zeigen, dass nicht anhand eines generellen Schemas entschieden werden kann welches die optimale Wahl ist. Dies muss im Einzelfall analysiert werden.
@@ -10,9 +20,7 @@ Im nächsten Teil wird untersucht, ob es sich lohnt, Daten aus unterschiedlichen
 
 Zuletzt wird untersucht, wie die Performanz eines generalistisch ausgelegten Sentiment-Klassifiziers auf einzelnen Domänen ist. Dafür wurden mehrere dieser Klassifizierer auf sogenannten \quotes{Ablation} Datensätzen trainiert. Dabei kann festgestellt werden, dass die Performanz eines generalistischen Sentiment-Klassifiziers auf einzelnen Domänen nicht bedeutend schlechter ist und für gewisse Anwendungsfälle durchaus eine Option darstellt.
 
-\clearpage
 
-\chapter*{Abstract}
 
 In the following work we are going to investigate the potential of crossdomain sentiment-classification using convolutional neural networks. The main point of this research is to explore the topic of combining data from multiple sources to train such sentiment-classifiers.
 
