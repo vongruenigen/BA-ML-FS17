@@ -1,16 +1,14 @@
 \chapter*{Abstract}
-Das Ziel dieser Arbeit war ein Nachbau des Dialogsystems aus dem Paper \cite{}, inspiriert durch Beispiele maschineller Antworten wie: Human: "what is the purpose of being intelligent?" Machine: "to find out what it is .". Die Bedingungen für den Nachbaue waren ein wenig erschwert, da wir nu auf einer GPU die Berechnungen durchführten.
-
-Während dem Nachbau mussten wir einige technische Herausforderungen meistern, bis wir dann endlich ein funktionsfähiges Modell hatten. Die Modelle wurden schlussendlich mit Tensorflow und Seq2seq2 umgesetzt. Wir trainierten anschliessen über 3 Wochen lang zwei Modelle mit unterschiedlichen Trainingsdate. Ein Modell trainierten wir mit OpenSubtitles welche gesprochene Sprache beinhaltet und Eines mit Reddit welcher geschriebener Sprache enthält. 
-
-Anschliesssend untersuchten wir zuerst "quantitativ"? (oder so hast du das genannt) die Entwicklung der Modelle. Während die Trainings und Validierungsmetriken mit fortlaufendem Training besser wurden, wurden diejenigen der Testdaten eher schlechter, oder blieben gleich. Die ernüchternden Resultate waren insofern eine überraschung, da wir beim interagieren durchaus eine Verbesserung verspürten. Aufgrund dieses missmatch untersuchten wir die Vielfalt der Sprache. Diese Ergebnisse deckten sich mit unserem Subjektiven Empfinden.
-
-Am Ende der Arbeit vergleichen wir Anhand einiger ausgesuchter Beispiele unsere replies mit denjenigen von Cleverbot. Zusätzlich entnahmen wir Dialoge aus dem paper \cites{} und verglichen diese mit unseren. Dabei kann unser Modell durchaus mithalten, hätte aber vermutlich in einem breit angelegten Test wenig Chance. Vor allem bei komplexeren Aussagen, scheint unser Modell schwierigkeiten zu haben. Als Ursache vermuten wir einerseits die Grösse des Modells und die Dauer des Trainings. Insgesamt sehen wir den Nachbau aber als Erfolg Aussagen wie: Human: "What are you?" Machine: "i m a bot .",(komma hier, keine ahnug) waren doch überraschend.
-
 In the following thesis we are going to investigate into building a end-to-end conversational dialog system based on a sequence-to-sequence learning and recurrent neural networks. We use an already built system as the reference architecture. The main topic of the research is to investigate if it is possible to use model, which can be trained on a single GPU, and still exhibit similar performance as much larger models.
 
-The first part is dedicated
+The first parts are dedicated to the development of the software system and the datasets and methods used to conduct the experiments.
 
 The analysis of the resulting models is done under several aspects. First, we are going to look into the learning process and try to distinguish differences between using two different datasets for the training. It is shown that the structure and linguistic nature of different datasets has a clear impact on the learning process of such models. Evaluations to asses the performance follow afterwards, which includes tests with a newly proposed metric based on the Sent2Vec library.
 
-The previous analysis reveals several problems our models exhibit. One of the biggest is that such models tend to generate generic responses which leads to deteriorating results. To find an explanation for this behavior we are going to investigate into the way these models We then go on and analyze the problem of generic responses. This analysis shows that 
+The previous analysis reveals several problems our models exhibit. One of the biggest is that such models tend to generate generic responses which leads to deteriorating results. This does not match with our subjective impression that the model indeed become better over time. To find an explanation for this behavior we investigating into the way the language used by this models evolves over time. This analysis shows that language variety increases with training time and the problem with generic responses decrease. We also show that it is not advisable to use small datasets for multiple epochs of the training without any other regularization methods.
+
+A comparison with two other systems, namely the CleverBot and the results from the paper, then follows. This comparison shows that our models can keep up with others as long as the complexity of the dialogs do not get too complicated. The assumed reasons for the inferior results are the smaller size of our models as well as the shorter training time in comparison with other systems.
+
+For the last part, we do an analysis of several technical specifics. This includes short analyzes of using a beam-search decoder, the aid the soft-attention mechanism provides to the models and the clustering of thought vectors. 
+
+We see this thesis and the resulting models as a success, even though the results are not as good as we expected. We were able to provide multiple interesting results, such as the response ``i m a bot'' to the question ``what are you ?''.
