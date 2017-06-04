@@ -74,7 +74,7 @@ After we have seen that the training process looks fine, we are going to asses t
 	\label{results:test_metrics:reddit}
 \end{table}
 
-This result stands in contradiction to what we have expected. Instead of the loss values going up, we would have expected it to go down in the same way as it did on the training and validation datasets. We assume, that this has to do with the cross-entropy loss and hence the perplexity being not the best fit metrics to evaluate such models, especially in a conversational context where the variety of correct answers can be immensely high. For this reason, we proposed a third performance metric, namely the usage of Sent2Vec~\cite{Pgj:2017} embeddings, to measure the similarity between the expected and generated responses. Before we are going to do this analysis, we want to take a look at different samples from both models to show that they indeed improved over time, even thought the results of the test metrics tell a different story.
+This result stands in contradiction to what we have expected. Instead of the loss values going up, we would have expected it to go down in the same way as it did on the training and validation datasets. We assume, that this has to do with the cross-entropy loss and hence the perplexity being not the best fit metrics to evaluate such models, especially in a conversational context where the variety of correct answers can be immensely high. What we cannot explain is, why the values on the validation set are getting better over time. For this reason, we proposed a third performance metric, namely the usage of Sent2Vec~\cite{Pgj:2017} embeddings, to measure the similarity between the expected and generated responses. Before we are going to do this analysis, we want to take a look at different samples from both models to show that they indeed improved over time, even thought the results of the test metrics tell a different story.
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -112,7 +112,7 @@ This result stands in contradiction to what we have expected. Instead of the los
 
 \todo{fix scaling of axis}
 
-\paragraph{Is Progress Achieved?} As the results of evaluating the models on the test dataset has shown, it seems that the models did not make an meaningful progress throughout the training. Even worse, it looks like the models have become worse over time. For this reason, we decided that we would like to evaluate the model by hand and see if the generated responses improve when using the different six snapshots of the models. We opted for four different input utterances, that means two for each model, and generated responses for each of the snapshots. The results can be seen in the Table~\ref{results:example_output:reddit} for the Reddit model and Table~\ref{results:example_output:opensubtitles} for the OpenSubtitles model.
+\paragraph{Is Progress Achieved?} As the results of evaluating the models on the test dataset has shown, it seems that the models did not make an meaningful progress throughout the training. Even worse, it looks like the models have become worse over time. For this reason, we decided that we would like to evaluate the model by hand and see if the generated responses improve when using the different six snapshots of the models. We opted for four different input utterances, two for each model, and generated responses for each of the snapshots. The results can be seen in the Table~\ref{results:example_output:reddit} for the Reddit model and Table~\ref{results:example_output:opensubtitles} for the OpenSubtitles model.
 
 \begin{table}[H]
 	\centering
@@ -176,7 +176,7 @@ This result stands in contradiction to what we have expected. Instead of the los
 
 As seen in the examples above, there has indeed been an improvement in the answers, what stands in contradiction to the development of the performance of the models on the test datasets. Our reasonable suspicion from this is, again, that the cross-entropy loss and perplexity are not fit to asses if the responses are meaningful. As we have already described in Chapter~\ref{fundamentals:sent2vec_test}, we were aware of this fact; that is why we decided to use yet another metric, namely Sent2Vec embeddings, which we are going to use in the next section.
 
-\paragraph{Sent2Vec Analysis} As described in Chapter~\ref{fundamentals:sent2vec_test}, we use Sent2Vec embeddings for measuring the semantic similarity between the generated and expected responses on the test datasets. For this purpose, we have used the pretrained models available on the GitHub page of the project\footnote{https://github.com/epfml/sent2vec}. We have decided, that we use both the \emph{Twitter} and \emph{Wikipedia} models for the assessment. The results can be seen in the Figures~\ref{results:sent2vec:opensubtitles:results} and~\ref{results:sent2vec:reddit:results}. What can be seen directly is that both the Reddit and OpenSubtitles models perform better on the pretrained Wikipedia model in comparison to the pretrained Twitter model. This probably has to do with the fact that ``compressed'' language used when writing tweets (e.g. ``w/o'' instead of ``without'') and with the coverage of the vocabulary. In conclusion, the results of this analysis are dependent on the Sent2Vec model, as expected. However, both results are pretty bad, with the Reddit results being much better than the OpenSubtitles, about twice as good (see Tables~\ref{results:sent2vec:opensubtitles:results_table} and~\ref{results:sent2vec:reddit:results_table}). The OpenSubtitles model starts with an average similarity of $0.167$ for the first snapshot and climbs up to $0.204$ for the last snapshot. The Reddit model starts with an average value of $0.336$ for the first snapshot and increases to $0.359$ for the last snapshot. This means, that the responses of the Reddit model match the expected responses much better from a semantic perspective as the responses of the OpenSubtitles model do. In summary, the results of both models are bad, as the maximum achievable similarity is $1.0$.
+\paragraph{Sent2Vec Analysis} As described in Chapter~\ref{fundamentals:sent2vec_test}, we use Sent2Vec embeddings for measuring the semantic similarity between the generated and expected responses on the test datasets. For this purpose, we have used the pretrained embeddings available on the GitHub page of the project\footnote{https://github.com/epfml/sent2vec}. We have decided, that we use both the \emph{Twitter} and \emph{Wikipedia} embeddings for the assessment. The results can be seen in the Figures~\ref{results:sent2vec:opensubtitles:results} and~\ref{results:sent2vec:reddit:results}. What can be seen directly is that both the Reddit and OpenSubtitles models perform better on the pretrained Wikipedia model in comparison to the pretrained Twitter model. This probably has to do with the fact that ``compressed'' language used when writing tweets (e.g. ``w/o'' instead of ``without''). In conclusion, the results of this analysis are dependent on the Sent2Vec model, as expected. However, both results are pretty bad, with the results from the Reddit model being much better than the OpenSubtitles, about twice as good (see Tables~\ref{results:sent2vec:opensubtitles:results_table} and~\ref{results:sent2vec:reddit:results_table}). The OpenSubtitles model starts with an average similarity of $0.167$ for the first snapshot and climbs up to $0.204$ for the last snapshot. The Reddit model starts with an average value of $0.336$ for the first snapshot and increases to $0.359$ for the last snapshot. This means that the responses of the Reddit model match the expected responses much better from a semantic perspective as the responses of the OpenSubtitles model do. In summary, the results of both models are bad, as the maximum achievable similarity is $1.0$.
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -191,7 +191,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 	\small
 	\text{Twitter}
 	\endminipage\hfill
-	\caption{Results of the evaluating with Sent2Vec on the outputs of the OpenSubtitles model when using the test dataset. The ticks on the x-axis show the different snapshots and the y-axis the average semantic similarity for each snapshot.}
+	\caption{Results of the evaluation with Sent2Vec on the outputs of the OpenSubtitles model when using the test dataset. The ticks on the x-axis show the different snapshots and the y-axis the average semantic similarity for each snapshot.}
 	\label{results:sent2vec:opensubtitles:results}
 \end{figure}
 
@@ -211,7 +211,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{The average similarities when using the Sent2Vec metric on the expected and generated responses from the OpenSubtitles model.}
+	\caption{The average similarities when using the Sent2Vec metric on the expected and generated responses from the OpenSubtitles model per snapshot.}
 	\label{results:sent2vec:opensubtitles:results_table}
 \end{table}
 
@@ -247,11 +247,11 @@ As seen in the examples above, there has indeed been an improvement in the answe
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{The average similarities when using the Sent2Vec metric on the expected and generated responses from the Reddit model.}
+	\caption{The average similarities when using the Sent2Vec metric on the expected and generated responses from the Reddit model per snapshot.}
 	\label{results:sent2vec:reddit:results_table}
 \end{table}
 
-\paragraph{Generic Response are a Problem} One potential reason for the bad results when using the Sent2Vec metric is that we witnessed both models generating generic responses a lot of the time (e.g. ``i don t know''). Our first idea to analyze this was to see what kind of sentences the models produce with the inputs of the test datasets. We did an analysis on the generated responses and quickly noticed that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).\todo{name percentages of tables}
+\paragraph{Generic Response are a Problem} One potential reason for the poor results when using the Sent2Vec metric is that we witnessed both models generating generic responses a lot of the time (e.g. ``i don t know'', ``i m not sure what you re saying''). Our first idea to analyze this is to see what kind of sentences the models produce with the inputs of the test datasets. We did an analysis on the generated responses and quickly noticed that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).\todo{name percentages of tables}
 \\
 \begin{table}[H]
 	\centering
@@ -299,7 +299,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 	\label{results:test_performance:reddit_sample_outputs}
 \end{table}\todo{Prozent von Ouptuts als spalte pro satz}\todo{make tables the same width!}
 
-\paragraph{Does Filtering of Generic Responses Help?} As seen in the both tables above, there are certain responses which are generated a lot of time and are pretty generic and meaningless in most contexts. Because of that, we think it would be a good idea to evaluate the models under the Sent2Vec metric one more time, but this time with the top $n$ generic sentences filtered out. We do this in the hope that the generic sentences are the cause of the small average similarities. The results of the analysis with the top $n$ sentences filtered out can be found in Table~\ref{results:sent2vec:opensubtitles:top_n_results_table} and~\ref{results:sent2vec:reddit:top_n_results_table}. For this analysis, we only use the Wikipedia model as it has shown a better performance for both of our models before.
+\paragraph{Does Filtering of Generic Responses Help?} As seen in the both tables above, there are certain responses which are generated a lot of time and are pretty generic and meaningless in most contexts. Because of that, we think it would be a good idea to evaluate the models under the Sent2Vec metric one more time, but this time with the top $n$ most generated responses filtered out. We do this in the hope that the generic sentences are the cause of the small average similarities. The results of the analysis with the top $n$ most generated responses filtered out can be found in Table~\ref{results:sent2vec:opensubtitles:top_n_results_table} and~\ref{results:sent2vec:reddit:top_n_results_table}. For this analysis, we only use the Wikipedia model as it has shown a better performance for both of our models before.
 \\
 \begin{table}[H]
 	\centering
@@ -347,7 +347,7 @@ As seen in the tables above, the filtering of the most used responses does not h
 
 \section{Development of Language Model}
 \label{results:development_language_model}
-As said at the end of the previous chapter, in this chapter we are going to investigate into the language models the trained models produce and try to find a substantiation for our claim, that the models generate generic responses much more than.
+As said at the end of the previous chapter, in this chapter we are going to investigate into the language models the trained models produce and try to find a reason for the generic responses.
 
 \subsection{Uni- and Bi-gram Distributions over Time}
 As the first step, we are going to compare the uni- and bigram distributions of the training datasets with the distributions produced when evaluating the models with the test datasets. For this purpose we generated unigram and bigram statistics using \texttt{nltk} over the training datasets and outputs generated by the models.
@@ -356,7 +356,7 @@ As the first step, we are going to compare the uni- and bigram distributions of 
 
 We cannot give a full explanation for this behaviour, but we assume that this has to do with the rather noisey dataset we are using for the OpenSubtitles model. This probably leads to the model being confused, rejecting what it has already learned and trying to fit to the new samples seen. Because of the fact that we cannot explain this behaviour, we are going to analyze the development of the diversity of the uni-/bi-gram and sentences over the course of the training.
 
-The behaviour is the same for the uni-gram distributions, which is the reason we put these visualizations in the Appendix~\ref{appendix:unigram_distributions}.
+The behaviour of the uni-gram distributions is the same, which is the reason we put these visualizations in the Appendix~\ref{appendix:unigram_distributions}.
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -395,13 +395,13 @@ The behaviour is the same for the uni-gram distributions, which is the reason we
 	\small
 	\text{Snapshot 3.0M}
 	\endminipage\hfill
-	\caption{Comparison of the distributions of the top 100 most used bigrams for the responses of the OpenSubtitles models (orange) when using the test dataset and the distribution within the training data (blue). The distributions are compared for each snapshot available.}
+	\caption{Comparison of the distributions of the top 250 most used bi-grams for the responses of the OpenSubtitles models (orange) when using the test dataset and the distribution within the training dataset (blue). The distributions are compared for each snapshot available.}
 	\label{results:bigram:distributions:opensubtitles}
 \end{figure}
 
-\paragraph{Reddit} The distributions for the Reddit model reveal an interesting development (see Figure~\ref{results:bigram:distributions:reddit}). In the beginning, same as with the OpenSubtitles, the distributions are evenly spread. However, as the training goes on, the distributions start to better fit the expected distributions more and more, until it reaches the greatest overlap when using the snapshot 2.0M. From this point on, the distributions start to diverge again. This coincides with our opinion, that the Reddit model is best when using the snapshot 2.0M. This probably has to do with the fact that we are doing more than two epochs over the full dataset. From the snapshot 2.0M on, the model itself starts to become worse, as the diversity and quality of the responses starts to decline. We are going to analyze that assumption below.
+\paragraph{Reddit} The distributions for the Reddit model reveal an interesting development (see Figure~\ref{results:bigram:distributions:reddit}). In the beginning, same as with the OpenSubtitles, the distributions are evenly spread. However, as the training goes on, the distributions start to better fit the expected distributions more and more, until it reaches the greatest overlap when using the 1.5M and 2.0M snapshots. From this point on, the distributions start to drift apart again. This coincides with our opinion, that the Reddit model is best when using the snapshot 2.0M. This probably has to do with the fact that we are doing more than two epochs over the full dataset. From the snapshot 2.0M on, the model itself starts to become worse, as the diversity and quality of the responses starts to decline. We are going to analyze this assumption below.
 
-The behavior is the same for the uni-gram distributions, which is the reason we put these visualizations in the Appendix~\ref{APPENDIX UNIGRAM REDDIT}.
+The behavior of uni-gram distributions is the same, which is the reason we put these visualizations in the Appendix~\ref{appendix:unigram_distributions}.
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -440,14 +440,15 @@ The behavior is the same for the uni-gram distributions, which is the reason we 
 	\small
 	\text{Snapshot 3.0M}
 	\endminipage\hfill
-	\caption{Comparison of the distributions of the top 100 most used bi-grams for the responses of the Reddit models (orange) when using the test dataset and the distribution within the training data (blue). The distributions are compared for each snapshot available.}
+	\caption{Comparison of the distributions of the top 250 most used bi-grams for the responses of the Reddit models (orange) when using the test dataset and the distribution within the training dataset (blue). The distributions are compared for each snapshot available.}
 	\label{results:bigram:distributions:reddit}
 \end{figure}
 
 \subsection{Language Diversity}
-As said in the last Chapter, we are now going to analyze the language diversity of the outputs the two models produce over the different snapshots. For this purpose, we are analyzing the how large the share of the top 10 uni-, bi-gram and sentences is within the entirety of the generated responses when using the respective test datasets for the models. The results can be seen in the Table~\ref{results:top_10_frequency:reddit} for Reddit and \ref{results:top_10_frequency:OpenSubtitles} for OpenSubtitles. 
+As said in the last Chapter, we are now going to analyze the language diversity of the outputs the two models produce over the different snapshots. For this purpose, we are analyzing the how large the share of the top 10 uni-, bi-gram and sentences is within the entirety of the generated responses when using the respective test datasets. The results can be seen in the Table~\ref{results:top_10_frequency:reddit} for Reddit and \ref{results:top_10_frequency:OpenSubtitles} for OpenSubtitles. 
 
 In the Tables, one can see three different categories: Uni-Grams, Bi-Grams and Sentences. For each of these categories, we have summed up the occurrence frequencies of the top 10 most occuring instances for the respective category. These sums can be seen in the \emph{Top Count} columns. The columns named \emph{All Count} contain the total amount of all instances for each category per snapshot. The share of the \emph{Top Count} value from the \emph{All Count} value can be seen in the \emph{Top Freq.} column for each category and snapshot.
+\todo{add more telling column names to the tables}
 
 The first thing which is noticeable when comparing the values from the two tables is that the Reddit outputs seem to be composed of much more uni- and bi-grams. This can be seen when comparing the \emph{Top Count} values from both tables. This signifies that the outputs of the Reddit model are of greater length on average than the outputs of the OpenSubtitles model because the number of sentences stays the same for both. This might be one of the reasons why the results from the Sent2Vec analysis (see Chapter~\ref{results:performance_on_test_datasets}) are much better for the Reddit than the OpenSubtitles model.
 
@@ -497,32 +498,32 @@ At first, we tried to see a tendency on how language diversity develops when usi
 \end{table}
 \todo{rework captions!}
 
-We plot the \emph{Top Freq.} values for all the categories per model and snapshot to better see the development of the values for the different categories and possible correlation between them. The resulting visualizations can be seen in Figures~\ref{results:language_model:diversity:opensubtitles} and~\ref{results:language_model:diversity:reddit}. The plots can be interpreted in the way that decreasing values mean that the share of the top 10 most occuring instances per category take up a smaller share of the whole number of instances of this category. We interpret this as an increase in language diversity, which is positive.
+We plot the \emph{Top Freq.} values for all the categories per model and snapshot to better see the development of the values for the different categories and possible correlations between them. The resulting visualizations can be seen in Figures~\ref{results:language_model:diversity:opensubtitles} and~\ref{results:language_model:diversity:reddit}. The plots can be interpreted in the way that decreasing values mean that the share of the top 10 most occuring instances per category take up a smaller share of the whole number of instances of this category. We interpret this as an increase in language diversity, which is positive.
 
 From the mentioned plots, we see several peculiarities, which we are going to discuss per model below.
 
-\paragraph{OpenSubtitles} The plot for the OpenSubtitles (see Figure~\ref{results:language_model:diversity:opensubtitles}) shows the same patterns as with the distributions seen before. Throughout the course of the training, it looks like that the diversity of the language model wobbles up and down. Our assumption for this flattering development is the same as with the distributions, we think that the noisey training datasets might be responsible for that. But, if we take a close look at the numbers, we see that the peaks are getting smaller and smaller. For example, the share of the top 10 sentences and words for the 2.0M model is about $2\%$ to $3\%$ lower than with the 1.0M model. The difference, when looking at the numbers for the bi-grams is much smaller, only about $0.02\%$. Nevertheless, in total, we can see a tendency that the model starts to use a more diverse language model as longer as the training goes.
+\paragraph{OpenSubtitles} The plot for the OpenSubtitles (see Figure~\ref{results:language_model:diversity:opensubtitles}) shows the same patterns as with the distributions seen before. Throughout the course of the training, it looks like that the diversity of the language model wobbles up and down. Our assumption for this flattering development is the same as with the distributions, we think that the noisey training datasets might be responsible for that. But, if we take a close look at the numbers, we see that the peaks are getting smaller and smaller. For example, the share of the top 10 sentences and words for the 2.0M snapshot is about $2\%$ to $3\%$ lower than with the 1.0M model. The difference, when looking at the numbers for the bi-grams is much smaller, only about $0.02\%$. Nevertheless, in total, we can see a tendency that the model starts to use a more diverse language model as longer as the training goes.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/diversity_perc_plot.png}
-	\caption{Development how much percentage of all uni-, bi-grams and sentences are covered by the top 10 most used of each category.}
+	\caption{Development of how much percentage of all uni-, bi-grams and sentences are covered by the top 10 most used instances of each category for the OpenSubtitles model.}
 	\label{results:language_model:diversity:opensubtitles}
-\end{figure}\todo{Caption!}
+\end{figure}
 
-\paragraph{Reddit} The plot for the Reddit model (see Figure~\ref{results:language_model:diversity:reddit}) reveals, that the language model gets more diverse throughout the course of the training until the minimum is reached when using the 2.0M model. From this point on, it starts to become less and less diverse for the rest of the training. This coincides with our opinion, that the model is best when using the 2.0M snapshot. Our assumption for this behaviour is, that we are running into problems due to the fact, that between the snapshots 1.5M and 2.0M we are starting the second epoch over the training dataset. This could lead to some kind of overfitting effect, which worsens the results and diversity of the language used by the model.
+\paragraph{Reddit} The plot for the Reddit model (see Figure~\ref{results:language_model:diversity:reddit}) reveals that the language model gets more diverse throughout the course of the training until the maximum (minimum in the plot) is reached when using the 2.0M snapshot. From this point on, it starts to become less and less diverse for the rest of the training. This coincides with our opinion, that the model is best when using the 2.0M snapshot. Our assumption for this behaviour is, that we are running into problems due to the fact, that between the snapshots 1.5M and 2.0M we are within the second epoch over the training dataset. This could lead to some kind of overfitting effect, which worsens the results and diversity of the language used by the model.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/reddit/diversity_perc_plot.png}
-	\caption{Development how much percentage of all uni-, bi-grams and sentences are covered by the top 10 most used of each category.}
+	\caption{Development of how much percentage of all uni-, bi-grams and sentences are covered by the top 10 most used instances of each category for the Reddit model.}
 	\label{results:language_model:diversity:reddit}
-\end{figure}\todo{Caption!}
+\end{figure}
 
 \subsection{Results}
-Our analysis has shown, that the distributions of uni- and bi-grams have a tendency to fit the expected distributions better the longer the training goes. However, there were some peculiarities, which we have found interesting and we wanted to analyze with regard to language diversity.
+Our analysis has shown that the distributions of uni- and bi-grams have a tendency to fit the expected distributions better the longer the training goes. However, there were some peculiarities, which we have found interesting and we wanted to analyze with regard to language diversity.
 
-This analysis has shown that the development of the language diversity stands in direct relationship with the development of the mentioned uni- and bi-gram distributions. We were also able to substantiate our subjective feeling, that the OpenSubtitles model becomes better over time, as the language diversity increases, though the process works slowly. Additional, we could also show that our opinion, that the Reddit model has the best performance when using the 1.5M or 2.0M snapshot, by showing that these two snapshots have indeed the greatest variety in the used language mesured by our statistics.
+This analysis has shown that the development of the language diversity stands in direct relationship with the development of the mentioned uni- and bi-gram distributions. We were also able to substantiate our subjective feeling, that the OpenSubtitles model becomes better over time, as the language diversity increases, though the process works slowly. Additionaly, we could also show that our opinion that the Reddit model has the best performance when using the 1.5M or 2.0M snapshot, by showing that these two snapshots have indeed the greatest variety in the used language mesured by our statistics.
 
-The last problem we could identify is, that iterating over the same dataset multiple times, does not seem to be advisable, as the Reddit model becomes worse after the snapshot 2.0M. This is especially apparent when looking at the results of the 3.0M snapshot. Using a regularization technique, such as Dropout~\cite{Nitish:2014}, would probably help when using a small dataset which is iterated multiple times.
+The last problem we could identify is, that iterating over the same dataset multiple times, does not seem to be advisable, as the Reddit model becomes worse after the snapshot 2.0M. This is especially apparent when looking at the results of the 3.0M snapshot. Using a regularization technique, such as Dropout~\cite{Nitish:2014} would probably help when using a small dataset which is iterated multiple times.
 
 With this, we conclude the quantitative analysis of the language model and now start to do the human evaluation by comparing our model to others.
 
@@ -552,7 +553,7 @@ We start with the comparison with the CleverBot. Keep in mind, that the CleverBo
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-\caption{Responses from the OpenSubtitles model for each snapshot, compared to the CleverBot response. The input utterance is ``How are you?''.}
+\caption{Responses from the OpenSubtitles model per snapshot compared to the CleverBot response. The input utterance is ``How are you?''.}
 \label{results:example1_output:OpenSubtitle_compared}
 
 \end{table}
@@ -573,13 +574,13 @@ We start with the comparison with the CleverBot. Keep in mind, that the CleverBo
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{sponses from the Reddit model for each snapshot, compared to the CleverBot response. The input utterance is ``Hi there, i m john!''.}
+	\caption{Responses from the Reddit model per snapshot compared to the CleverBot response. The input utterance is ``Hi there, i m john!''.}
 	\label{results:example1_output:Reddit_compared}
 \end{table}
 
 \paragraph{Closed Question} As next, we are trying to see which responses are produced when using a closed question as the utterance. The results can be seen in the Tables~\ref{results:example2_output:OpenSubtitle_compared} and~\ref{results:example2_output:Reddit_compared}. With this type of utterance, we would like to evaluate if the models understand a closed question and can respond appropriately.
 
-From the looks it seems that our models can respond to closed questions appropriately, as both of them gave appropriate answers. The CleverBot has problems with this question, probably because it does not understand how the concepts of flying and birds are related.
+From the looks it seems that our models can respond to closed questions appropriately, as both of them give useful answers. The CleverBot has problems with this question, probably because it does not understand how the concepts of flying and birds are related.
 \\
 \begin{table}[H]
 	\centering
@@ -598,7 +599,7 @@ From the looks it seems that our models can respond to closed questions appropri
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Responses to a contextual question from the OpenSubtitles models and the CleverBot response.}
+	\caption{Responses to a contextual question from the OpenSubtitles model per snapshot and the CleverBot response.}
 	\label{results:example2_output:OpenSubtitle_compared}
 \end{table}
 \begin{table}[H]
@@ -618,14 +619,14 @@ From the looks it seems that our models can respond to closed questions appropri
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Responses to a closed question from the Reddit models and the CleverBot response.}
+	\caption{Responses to a closed question from the Reddit model per snapshot and the CleverBot response.}
 	\label{results:example2_output:Reddit_compared}
 \end{table}
 
 \paragraph{Knowledge Question}
 The next kind of utterance are knowledge questions. With this kind of questions we would like to evaluate if the models have knowledge about the world. The results can be seen in the Tables~\ref{results:example3_output:OpenSubtitle_compared} and~\ref{results:example3_output:Reddit_compared}.
 
-The responses to the question about the color of the sky have an interesting development. Until the snapshot 2.0M, the responses were not appropriate and did not have any meaningful content\footnote{The response ``the jews'' comes from the fact, that in the beginning of the OpenSubtitles dataset, there are a lot of conversations related to movies about Nazism.}. However, from the snapshot 2.0M on the model answered in a correct way, even though it one time replied with red as the answer, which is obviously wrong. But it also had it right two times, whereas the last response from the 3.0M seems to be the best. The answer of the CleverBot to this question is quite meaningless and has absolutely nothing to do with the provided question.
+The responses to the question about the color of the sky have an interesting development. Until the snapshot 2.0M, the responses were not appropriate and did not have any meaningful content\footnote{The response ``the jews'' comes from the fact, that in the beginning of the OpenSubtitles dataset, there are a lot of conversations related to movies about Nazism.}. However, from the snapshot 2.0M on the model answers in a correct way, even though it one time replies with red as the answer, which is obviously wrong. But it also has it right two times, whereas the last response from the 3.0M seems to be the best5. The answer of the CleverBot to this question is quite meaningless and has absolutely nothing to do with the provided question.
 
 The response to the question where the Reddit model lives was answered in a satisfying way, maybe except for the response of the 2.0M snapshot. It clearly understands the context of the question, as it always answers with a location-related answer. The CleverBot answers this question completely correct.
 
@@ -646,7 +647,7 @@ The response to the question where the Reddit model lives was answered in a sati
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Responses to a knowledge question with the OpenSubtitles models and the CleverBot response.}
+	\caption{Responses to a knowledge question with the OpenSubtitles model per snapshot and the CleverBot response.}
 	\label{results:example3_output:OpenSubtitle_compared}
 \end{table}
 \begin{table}[H]
@@ -666,14 +667,14 @@ The response to the question where the Reddit model lives was answered in a sati
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Responses to a knowledge question from the Reddit models and the CleverBot response.}
+	\caption{Responses to a knowledge question from the Reddit model per snapshot and the CleverBot response.}
 	\label{results:example3_output:Reddit_compared}
 \end{table}
 
 \paragraph{Contextual Question} 
 With the next question, we want to try to evaluate if the models are capable of using contextual informations to build an appropriate response. The results can be seen in the Tables~\ref{results:example4_output:OpenSubtitle_compared} and~\ref{results:example4_output:Reddit_compared}.
 
-As visible below, the OpenSubtitles models has big problems with this kind of utterances, as all the responses are not fitting. The only response that is close to being useful is the one of the 2.5M model, where it at least includes the right color in the response. The response of the CleverBot is in this case also not of relevance.
+As visible below, the OpenSubtitles model has big problems with this kind of utterances, as all the responses are not fitting. The only response that is close to being useful is the one of the 2.5M model, where it at least includes the right color in the response. The response of the CleverBot is in this case also not of relevance.
 
 The responses of the Reddit model are more fitting to the question, but they are also pretty bad in comparison to what we have expected. At least it tries to formulate responses where the two colors of the question are comprised. The answer of the CleverBot is again useless, this time even more in comparison with the response given when using the question from the OpenSubtitles model.
 \\
@@ -694,7 +695,7 @@ The responses of the Reddit model are more fitting to the question, but they are
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Responses to a contextual question from the OpenSubtitles models and the CleverBot response.}
+	\caption{Responses to a contextual question from the OpenSubtitles model per snapshot and the CleverBot response.}
 	\label{results:example4_output:OpenSubtitle_compared}
 \end{table}
 \begin{table}[H]
@@ -715,16 +716,16 @@ The responses of the Reddit model are more fitting to the question, but they are
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Responses to a contextual question from the Reddit models and the CleverBot response.}
+	\caption{Responses to a contextual question from the Reddit model per snapshot and the CleverBot response.}
 	\label{results:example4_output:Reddit_compared}
 \end{table}
 
 \paragraph{Specific Question}
 The next questions are more specific, we are going to ask the OpenSubtitles model a simple mathematical question and the Reddit models a question about the TV series ``Game of Thrones''. The results can be seen in the Tables~\ref{results:example5_output:OpenSubtitle_compared} and~\ref{results:example5_output:Reddit_compared}.
 
-The responses of the OpenSubtitles in the beginning are quite clear, it does not know the answer or does not understand the question at all. However, the later snapshots (i.e. from 2.0M on), it seems to understand that it has to answer with a number. Sadly, the correct results is not in the generated responses. The CleverBot also does not understand how to answer such a question.
+The responses of the OpenSubtitles model are quite clear in the beginning, it does not know the answer or does not understand the question at all. However, the later snapshots (i.e. from 2.0M on), it seems to understand that it has to answer with a number. Sadly, the correct results is not in the generated responses. The CleverBot also does not understand how to answer such a question.
 
-The Reddit model has an interesting twist in its responses. In the beginning, it starts by responding with generic responses which do not seem to have anything to do with the series itself. However, the funny response\footnote{``Hodor'' is a character in the ``Game of Thrones'' series who is only capable of saying its own name. In case of danger he starts yelling its name over and over several time throughout the series.} at the end indicates that it understands the question at least to some degree, even though the response does not contain any actual information about the series. The CleverBot response is a mysterious to us, as we cannot remember any scene from the series where a ``Dani'' plays a major role.
+The Reddit model has an interesting twist in its responses. In the beginning, it starts by responding with generic responses which do not seem to have anything to do with the series itself. However, the funny response\footnote{``Hodor'' is a character in the ``Game of Thrones'' series who is only capable of saying its own name. In case of danger he starts yelling its name over and over several times throughout the series.} at the end (i.e. ``hodor, hodor, ...'') indicates that it understands the question at least to some degree, even though the response does not contain any actual information about the series. The CleverBot response is a mysterious to us, as we cannot remember any scene from the series where a ``Dani'' plays a major role.
 \\
 \begin{table}[H]
 	\centering
@@ -743,7 +744,7 @@ The Reddit model has an interesting twist in its responses. In the beginning, it
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Responses to a mathematical question from the OpenSubtitles models and the CleverBot response.}
+	\caption{Responses to a mathematical question from the OpenSubtitles model per snapshot and the CleverBot response.}
 	\label{results:example5_output:OpenSubtitle_compared}
 \end{table}
 \begin{table}[H]
@@ -766,16 +767,16 @@ The Reddit model has an interesting twist in its responses. In the beginning, it
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Responses to a question about a TV series from the Reddit models and the CleverBot response.}
+	\caption{Responses to a question about a TV series from the Reddit model per snapshot and the CleverBot response.}
 	\label{results:example5_output:Reddit_compared}
 \end{table}
 
 \paragraph{Answers to Statements}
 Until now, we have only asked questions to our models. We would now like to see how the responses are if we input a statement instead of a question. The results can be seen in the Tables~\ref{results:example6_output:OpenSubtitle_compared} and~\ref{results:example6_output:Reddit_compared}.
 
-The responses of the OpenSubtitles model are useful from the snapshot 2.0M and forward. Especially the answer for the snapshot 2.0M is interesting, as this seems to indicate that the model has some kind of empathy for the other person in the dialog, as it say ``i m sorry''. The response of the CleverBot signifies that it understands the statement to some degree, but does not know what to answer.
+The responses of the OpenSubtitles model are useful from the snapshot 2.0M on and forward. Especially the answer for the snapshot 2.0M is interesting, as this seems to indicate that the model has some kind of empathy for the other person in the dialog, as it say ``i m sorry''. The response of the CleverBot signifies that it understands the statement to some degree, but does not know what to answer.
 
-The responses of the Reddit model to the statement that it has a bad opinion are pretty bad across the board, with the response from the 1.5M model being the only one which is useful. The response of the CleverBot is a pretty speedy answer in this case.
+The responses of the Reddit model to the statement that it has a bad opinion are pretty poor across the board, with the response from the 1.5M model being the only one which is useful. The response of the CleverBot is a pretty speedy answer in this case.
 \\
 \begin{table}[H]
 	\centering
@@ -794,7 +795,7 @@ The responses of the Reddit model to the statement that it has a bad opinion are
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Responses to a statement from the OpenSubtitles models and the CleverBot response.}
+	\caption{Responses to a statement from the OpenSubtitles model per snapshot and the CleverBot response.}
 	\label{results:example6_output:OpenSubtitle_compared}
 \end{table}
 \begin{table}[H]
@@ -814,11 +815,11 @@ The responses of the Reddit model to the statement that it has a bad opinion are
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Responses to a statement from the Reddit models and the CleverBot response.}
+	\caption{Responses to a statement from the Reddit model per snapshot and the CleverBot response.}
 	\label{results:example6_output:Reddit_compared}
 \end{table}
 
-\paragraph{Self-Concept} At the end, we have an interesting answer from the Reddit model to the question ``What are you?''. The responses can be seen in Table~\ref{results:example7_output:Reddit_compared}. All snapshots produce bad responses, apart from the last, which answered that it is a bot. This is an interesting answer because it shows that the model seems to have some kind of self-concept. We cannot explain that, as the model was trained on comments from Reddit discussion about movies and series. Nevertheless, it is an interesting answer to see.
+\paragraph{Self-Concept} At the end, we have an interesting answer from the Reddit model to the question ``What are you?''. The responses can be seen in Table~\ref{results:example7_output:Reddit_compared}. All snapshots produce bad responses, apart from the last, where it answered that it is a bot. This is an interesting answer because it shows that the model seems to have some kind of self-concept. We cannot explain that, as the model was trained on comments from Reddit discussion about movies and series. Nevertheless, it is an interesting answer to see.
 
 \begin{table}[H]
 	\centering
@@ -845,7 +846,7 @@ Sadly, we were not able to find a similar response when using the OpenSubtitles 
 
 \subsection{Neural Conversational Model}
 \label{results:comparison:ncm}
-In this section, we are going to compare the results from the paper ``Neural Conversation Model'' (NCM) with the results from our models. To compare the responses, we are going to use utterances from the paper and show all the responses from all OpenSubtitles snapshots, but only the (subjectively) best response from the Reddit model, as the NCM model was trained on the OpenSubtitles dataset. The responses can be seen in the Tables~\ref{results:example8_output:Neural_Conversational_Model_compared} to~\ref{results:example14_output:Neural_Conversational_Model_compared}. The categories where the input utterances came from in the paper are noted in the table descriptions.
+In this section, we are going to compare the results from the paper ``Neural Conversation Model'' (NCM) with the resulting responses from our models. To compare the responses, we are going to use utterances from the paper and show all the responses from all OpenSubtitles snapshots, but only the (subjectively) best response from the Reddit model, as the NCM model was trained on the OpenSubtitles dataset. The responses can be seen in the Tables~\ref{results:example8_output:Neural_Conversational_Model_compared} to~\ref{results:example14_output:Neural_Conversational_Model_compared}. The categories where the input utterances came from in the paper are noted in the table descriptions.
 
 We are only showing a part of the dialogs which were evaluated. All others can be found in Appendix~\ref{apendix:results:compared_with_NCM}.
 \\
@@ -871,7 +872,7 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what year were you born ?'' from the ``Basic'' category in the paper.}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what year were you born ?'' from the ``Basic''.}
 	\label{results:example8_output:Neural_Conversational_Model_compared}
 \end{table}
 
@@ -897,7 +898,7 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``why are we here ?'' from the ``Basic'' category in the paper.}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``why are we here ?'' from the ``Basic'' category.}
 	\label{results:example9_output:Neural_Conversational_Model_compared}
 \end{table}
 \begin{table}[H]
@@ -922,7 +923,7 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``are you a leader or a follower ?'' from the ``General Knowledge Q\&A'' category in the paper.}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``are you a leader or a follower ?'' from the ``General Knowledge Q\&A'' category.}
 	\label{results:example10_output:Neural_Conversational_Model_compared}
 \end{table}
 \begin{table}[H]
@@ -947,7 +948,7 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``how much is ten minus two ?'' from the ``General Knowledge Q\&A'' category in the paper.}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``how much is ten minus two ?'' from the ``General Knowledge Q\&A'' category.}
 	\label{results:example11_output:Neural_Conversational_Model_compared}
 \end{table}
 \begin{table}[H]
@@ -974,7 +975,7 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what is the color of a yellow car ?'' from the ``General Knowledge Q\&A'' category in the paper.}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what is the color of a yellow car ?'' from the ``General Knowledge Q\&A'' category.}
 	\label{results:example12_output:Neural_Conversational_Model_compared}
 \end{table}
 \begin{table}[H]
@@ -1000,7 +1001,7 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what is the purpose of existence ?'' from the ``Philosophical Q\&A'' category in the paper.}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what is the purpose of existence ?'' from the ``Philosophical Q\&A'' category.}
 	\label{results:example13_output:Neural_Conversational_Model_compared}
 \end{table}
 
@@ -1023,7 +1024,7 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what is the purpose of being intelligent?'' from the ``Philosophical Q\&A'' category in the paper.}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what is the purpose of being intelligent?'' from the ``Philosophical Q\&A'' category.}
 	\label{results:example20_output:OpenSubtitle}
 \end{table}
 
@@ -1051,26 +1052,26 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what are the things that i do to be immoral?'' from the ``Morality'' category in the paper.}
+	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what are the things that i do to be immoral?'' from the ``Morality'' category.}
 	\label{results:example14_output:Neural_Conversational_Model_compared}
 \end{table}
 
 \subsection{Results}
 In conclusion, our model is not as bad as it seemed when looking at the problems with the metrics and the generic responses coming from an undiversified language model.
 
-In comparison to the CleverBot, our model had several responses which were clearly superior to its. But there were also cases where the CleverBot was better. This has probably to do with the fact that the CleverBot works by fuzzily searching already existing conversations. This means, that if a conversation about a certain topic does not exist, the CleverBot has no possibility to meaningful answer. Our model instead has the ability to ``understand'' what is said and hence can at least try to answer. Such an example would be the mathematical question ``How much is 1 added to 2?'', where the CleverBot simply answered ``I don't know'', whereas our model started to respond with numbers, even though the result was not correct.
+In comparison to the CleverBot, our model had several responses which were clearly superior. But there were also cases where the CleverBot was better. This has probably to do with the fact that the CleverBot works by fuzzily searching already witnessed conversations. This means, that if a conversation about a certain topic does not exist, the CleverBot has no possibility to meaningful answer. Our model instead has the ability to ``understand'' what is said and hence can at least try to answer. Such an example would be the mathematical question ``How much is 1 added to 2?'', where the CleverBot simply answered ``I don't know'', whereas our model started to respond with numbers, even though the result was not correct.
 
 When comparing our models to the NCM model, it quickly becomes clear what the main problem is: The size of the model. For easy to understand utterances, the responses of our models are almost or as good as the responses from the NCM model. But if the utterances get more complicated, especially when it comes to philosophical or morality questions, our model starts to become worse than the NCM model. This is, as said, not a real surprise, because our model is only half the size of the NCM model. Nevertheless, we conclude that our model is not superior, but in some regards of equal quality as the NCM model.
 
 \section{Beam-Search}
 \label{results:beam_search}
-There are always some bad replies in the examples seen above. To fix this, we would like to use a simple beam-search implementation as described in Chapter~\ref{fundamentals:decoding_approaches} to see if that helps to fix this problem. We will evaluate this for three different examples, and judge in a subjective if the responses generated by the beam-search decoder are superior to the responses of the greedy decoder. This analysis is only done with the OpenSubtitle 3.0M model and a beam-width of $200$.
+There are always some bad replies in the examples seen above. To fix this, we would like to use our simple beam-search implementation as described in Chapter~\ref{fundamentals:decoding_approaches} to see if that helps to fix this problem. We will evaluate this for three different examples, and judge in a subjective if the responses generated by the beam-search decoder are superior to the responses of the greedy decoder. This analysis is only done with the OpenSubtitle 3.0M model and a beam-width of $200$.
 
-We only list the subjectively best responses here. All other responses can be found in Appendix~\ref{apendix:results:Beam-search-200:OpenSubtitle}.
+We only list the subjectively best responses here. All other responses can be found in Appendix~\ref{apendix:results:Beam-search-200:OpenSubtitle}. This has to do with the fact, that the subjectively best answer is usually not the best answer found when looking at the log-probability scores.
 
 \paragraph{``what year were you born?''} The responses of the greedy decoder to this question can be found in the Table~\ref{results:example8_output:Neural_Conversational_Model_compared}. The original answers of the OpenSubtitles model were all pretty bad, and it seemed that it did not fully understand the question.
 
-However, when using the beam-search decoder, there are several useful responses, such as ``1991'', ``last year'' or ``five years ago''. This responses are much better than what the greedy decoder initially produced. However, they are not the highest ranked response and hence are not returned by the model if we only take a look at the best response.
+However, when using the beam-search decoder, there are several useful responses, such as ``1991'', ``last year'' or ``five years ago''. These responses are much better than what the greedy decoder initially produced. However, they are not the highest ranked response and hence are not returned by the model if we only take a look at the best response.
 
 \paragraph{``i wear a blue jeans. what color do my jeans have?''} The second question was also answered pretty poorly. The results of the greedy decoder can be found in Table~\ref{results:example4_output:OpenSubtitle_compared}. The best response came from the 2.5M model ans was ``i got a blue blue'', which, at least, contains the searched color.
 
@@ -1080,11 +1081,11 @@ When using beam-search, better responses can be found and include ``blue'' and `
 
 When using beam-search, several interesting responses were produced fitting for such a philosophical question. The fitting answers are ``well, it s complicated'', ``you can t know'' and ``well , it s nothing.''
 
-\paragraph{Beam-Search Helps} The responses got much more diverse when using the beam-search decoder. The problem is to choose which of the 200 generated responses are the best. Usually, the sum of the logarithmic probabilities at each step in the beam is used. However, this does not lead to the answers we selected as ``best'' from above. We are not completely sure if this is due to a problem in the implementation or the beam-search or if it is simply not working as expected because the model was trained with a greedy decoder, which might not be able to simply adapt to using a beam-search decoder. Nevertheless, the implementation gave us a lot of insight into the inner workings of the model and we were able to find better responses than with the greedy decoder, even thought we had to select them by hand.
+\paragraph{Beam-Search Helps} The responses got much more diverse when using the beam-search decoder. The problem is to choose which of the 200 generated responses are the best. Usually, the sum of the logarithmic probabilities at each step in the beam is used. However, this does not lead to the answers we selected as ``best'' from above. We are not completely sure if this is due to a problem in the implementation or the beam-search or if it is simply not working as expected because the model was trained with a greedy decoder, which might not be able to simply adapt to be used in a beam-search setting. Nevertheless, the implementation gave us a lot of insight into the inner workings of the model and we were able to find better responses than with the greedy decoder, even thought we had to select them by hand.
 
 \section{Thought Vectors for Input Sequences} After the encoder has processed the whole input sequences, it pass the thought vector forward to the decoder to construct the output sequence (see Chapter~\ref{fundamentals:seq2seq}). It is the only direct connection the encoder and decoder have in such a model, which means, that the encoder has to ``encode'' all the information into this thought vector before passing it to the decoder. The thought vector hence represents an embedding of the input sequence in an $n$ dimensional vector space, where $n$ stands for the size of the thought vector. If we project them down to two dimension via PCA, sentences with similar meanings should be clustered together. That would show that the models have a semantic understanding of the contents of these sentences.
 
-To analyze the embeddings, we collected them for 15 different sample sentences and created thought vectors for them. We did this with both models and projected the vectors via PCA into two dimensional space, the results of this projection can be see in Figure~\ref{results:thougth_vectors:embeddings:opensubtitles} and~\ref{results:thougth_vectors:embeddings:reddit} below.
+To analyze the embeddings, we collect them for 15 different sample sentences and create thought vectors for them. We do this with both models and project the vectors via PCA into two dimensional space, the results of this projection can be see in Figure~\ref{results:thougth_vectors:embeddings:opensubtitles} and~\ref{results:thougth_vectors:embeddings:reddit} below.
 
 \begin{figure}[!tb]
 	\centering
@@ -1102,7 +1103,7 @@ To analyze the embeddings, we collected them for 15 different sample sentences a
 
 Both of the models seem to have no problems understanding clear, direct sentences where the intent is clear (e.g. ``I have no interest in your opinion on movies, your taste is bad!''). This can be seen because similar sentences are clustered together in the projected space. However, when it comes to curses and questions regarding the gender, the OpenSubtitles model starts to struggle, which can be seen by taking a look at the respective points in the projected space. The questions regarding the gender or the curses are scattered throughout the space, even though they should have been embedded closely to each other. The Reddit model seems to have less problems with this, as the embeddings for these sentences are much closer together. But what is interesting to see is that the Reddit model embeds the sentences with curses close to the sentences regarding the gender.
 
-In general, it looks like our models have an understanding of these different sentences as most of them are clustered together if they contain similar content.
+In general, it looks like our models have an understanding of these different sentences as most of them are clustered together if they contain similar content. From this, we conclude that our models have an understanding of the meaning of utterances, at least to some degree.
 
 \section{Soft-Attention}
 \label{results:soft_attention}
@@ -1112,7 +1113,7 @@ We do this analysis with both the OpenSubtitles 3.0M and the Reddit 2.0M models.
 
 \paragraph{Attention Visualizations} The visualizations of the attention weights can be seen in Figures~\ref{results:attention:example3:opensubtitles-3M} and~\ref{results:attention:example3:reddit}. There are more visualizations of the same kind in Appendix~\ref{appendix:soft_attention}.
 
-As one can see, the generated attention weights do not show a significant alignment with important words from the input utterance. For example when looking at the input utterance ``anna is 18 years old. how old is she?'' (Figure~\ref{results:attention:example3:reddit}), one would expect that the decoder would place a large attention weight on the thought vector when the actual age of the person was processed. However, this is not the case.
+As one can see, the generated attention weights do not show a significant alignment with important words from the input utterance. For example when looking at the input utterance ``anna is 18 years old. how old is she?'' (Figure~\ref{results:attention:example3:reddit}), one would expect that the decoder would place a large attention weight on the thought vector when the actual age of the person was processed. However, this is not the case, for none of the output words.
 
 \begin{figure}[H]
 	\centering
@@ -1130,5 +1131,5 @@ The second example, where attention does not seem to work or help, can be found 
 	\label{results:attention:example3:opensubtitles-3M}
 \end{figure}
 
-From this quick analysis, we can reaffirm that the soft-attention mechanism does indeed not help a lot when it comes to conversational models, as Vinyals and Le also noticed.
+From this quick analysis, we can reaffirm that the soft-attention mechanism does not seem to help a lot when it comes to conversational models, as Vinyals and Le also noticed.
 
