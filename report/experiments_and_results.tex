@@ -18,7 +18,7 @@ First, let us start by analyzing the evolution of the models with regard to the 
 	\label{results:learning_process:metrics:opensubtitles}
 \end{figure}
 
-\paragraph{Reddit} The learning process of the Reddit model looks find, but it also has a peculiarity, namely the dips in the training loss and perplexity. These dips occur about every $300,000$ to $400,000$ batches. They are also present in the development of the validation loss and perplexity, but are not as apparent as in the metrics on the training dataset. We cannot explain this behavior currently. We assume that this is caused by the structure of the training dataset. For example,  However, the variance is much smaller than with the OpenSubtitles model, which strengthens our argument that well-structured datasets helps a lot when training such systems as helps to avoid confusion due to perplexing samples.
+\paragraph{Reddit} The learning process of the Reddit model looks fine, but it also has a peculiarity, namely the dips in the training loss and perplexity. These dips occur about every $300,000$ to $400,000$ batches. They are also present in the development of the validation loss and perplexity, but are not as apparent as in the metrics on the training dataset. We cannot explain this behavior currently. We assume that this is caused by the structure of the training dataset. For example,  However, the variance is much smaller than with the OpenSubtitles model, which strengthens our argument that well-structured datasets helps a lot when training such systems as helps to avoid confusion due to perplexing samples.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/reddit/train_metrics.png}
@@ -26,13 +26,13 @@ First, let us start by analyzing the evolution of the models with regard to the 
 	\label{results:learning_process:metrics:reddit}
 \end{figure} 
 
-\paragraph{The Training Seems Successful} From the looks of the plots, it looks like the training went fine for both models, as both of them exhibit degrading loss and perplexity values. We also see differences in how the models have evolved over the time span of the training, especially the dips in the Reddit model, but we cannot conclude anything from this right now. After we have analyzed the training process, we are now focusing on the performance of the models on the test datasets.
+\paragraph{The Training Seems Successful} From the looks of the plots\todo{erster Teil ersetzen mit: Due to the plots...}, it looks like the training went fine for both models, as both of them exhibit degrading loss and perplexity values. We also see differences in how the models have evolved over the time span of the training, especially the dips in the Reddit model, but we cannot conclude anything from this right now. After we have analyzed the training process, we are now focusing on the performance of the models on the test datasets.
 
 \section{Performance on Test Datasets}
 \label{results:performance_on_test_datasets}
-After we have seen that the training process looks fine, we are going to asses the performance of these models on our test datasets. Here we use the same metrics as within the training, namely the cross-entropy loss and perplexity values. We have evaluated each model on the respective test dataset for each of the six snapshots we have created while training (see Chapter~\ref{methods:training}).
+After we have seen that the training process looks fine, we are going to asses the performance of these models on our test datasets. Here we use the same metrics as within the training, namely the cross-entropy loss and perplexity values. We have \todo{klingt für mich falsch, Zeitform?}evaluated each model on the respective test dataset for each of the six snapshots we have created while training (see Chapter~\ref{methods:training}).
 
-\paragraph{Surprising Results} The results on the test dataset are quite the opposite of the results from the training process (see Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}), because the performance for both of the models is getting worse over time. The results of the OpenSubtitles model (see Table~\ref{results:test_metrics:opensubtitles}) vary across the different checkpoints, with the best result having a perplexity of $71.07$ and a loss of $6.15$ and coming from the evaluation with the first checkpoint. The best result of the Reddit model (see Table~\ref{results:test_metrics:reddit}) is also achieved on the first snapshot with a perplexity of $169.14$, with all other snapshots having a worse perplexity.
+\paragraph{Surprising Results} The results on the test dataset are quite the opposite of the results from the training process (see Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}), \todo{because streichen?}because the performance for both of the models is getting worse over time. The results of the OpenSubtitles model (see Table~\ref{results:test_metrics:opensubtitles}) vary across the different checkpoints, with the best result having a perplexity of $71.07$ and a loss of $6.15$ and coming from the evaluation with the first checkpoint. The best result of the Reddit model (see Table~\ref{results:test_metrics:reddit}) is also achieved on the first snapshot with a perplexity of $169.14$, with all other snapshots having a worse perplexity.
 \\
 \begin{table}[H]
 	\centering
@@ -108,11 +108,11 @@ This result stands in contradiction to what we have expected. Instead of the los
 	\endminipage\hfill
 	\caption{The loss and perplexity when evaluating the six different snapshots with the test dataset using the Reddit model.}
 	\label{result:test_performance:reddit}
-\end{figure}
+\end{figure}\todo{text unter den Bilderm könnten wir auch nur "loss and perplexity" und "loss" schreibe. Ich überlege gerade ob es diese Bilder überhaupt braucht und wenn ja, ob wir eine Grafik für beide Modelle pro Metrik machen wollen? Die Grafiken wirken jetzt etwas leer.}
 
 \todo{fix scaling of axis}
 
-\paragraph{Is Progress Achieved?} As the results of evaluating the models on the test dataset has shown, it seems that the models did not make an meaningful progress throughout the training. Even worse, it looks like the models have become worse over time. For this reason, we decided that we would like to evaluate the model by hand and see if the generated responses improve when using the different six snapshots of the models. We opted for four different input utterances, two for each model, and generated responses for each of the snapshots. The results can be seen in the Table~\ref{results:example_output:reddit} for the Reddit model and Table~\ref{results:example_output:opensubtitles} for the OpenSubtitles model.
+\paragraph{Is Progress Achieved?} As the results of evaluating the models on the test dataset has shown, it seems that the models did not make an meaningful progress throughout the training. Even worse, it looks like the models have become worse over time. For this reason, we decided that we would like to evaluate the model by hand and see if the generated responses improve when using the different six snapshots of the models. We opted for\todo{for überflüssig? oder braucht opted ein for? Bedeuted ja wählen wie choose, welches auch kein for benötigt?} four different input utterances, two for each model, and generated responses for each of the snapshots. The results can be seen in the Table~\ref{results:example_output:reddit} for the Reddit model and Table~\ref{results:example_output:opensubtitles} for the OpenSubtitles model.
 
 \begin{table}[H]
 	\centering
@@ -140,7 +140,7 @@ This result stands in contradiction to what we have expected. Instead of the los
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Two exemplary dialogs with the Reddit model with one response per snapshot.}
+	\caption{Two exemplary dialogs with the Reddit model, one response per snapshot.}
 	\label{results:example_output:reddit}
 \end{table}
 \todo{Format so that all look the same, probably by using tabularx and an X column}
@@ -170,13 +170,13 @@ This result stands in contradiction to what we have expected. Instead of the los
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
-	\caption{Two exemplary dialogs with the OpenSubtitles model with one response per snapshot.}
+	\caption{Two exemplary dialogs with the OpenSubtitles model, one response per snapshot.}
 	\label{results:example_output:opensubtitles}
 \end{table}
 
 As seen in the examples above, there has indeed been an improvement in the answers, what stands in contradiction to the development of the performance of the models on the test datasets. Our reasonable suspicion from this is, again, that the cross-entropy loss and perplexity are not fit to asses if the responses are meaningful. As we have already described in Chapter~\ref{fundamentals:sent2vec_test}, we were aware of this fact; that is why we decided to use yet another metric, namely Sent2Vec embeddings, which we are going to use in the next section.
 
-\paragraph{Sent2Vec Analysis} As described in Chapter~\ref{fundamentals:sent2vec_test}, we use Sent2Vec embeddings for measuring the semantic similarity between the generated and expected responses on the test datasets. For this purpose, we have used the pretrained embeddings available on the GitHub page of the project\footnote{https://github.com/epfml/sent2vec}. We have decided, that we use both the \emph{Twitter} and \emph{Wikipedia} embeddings for the assessment. The results can be seen in the Figures~\ref{results:sent2vec:opensubtitles:results} and~\ref{results:sent2vec:reddit:results}. What can be seen directly is that both the Reddit and OpenSubtitles models perform better on the pretrained Wikipedia model in comparison to the pretrained Twitter model. This probably has to do with the fact that ``compressed'' language used when writing tweets (e.g. ``w/o'' instead of ``without''). In conclusion, the results of this analysis are dependent on the Sent2Vec model, as expected. However, both results are pretty bad, with the results from the Reddit model being much better than the OpenSubtitles, about twice as good (see Tables~\ref{results:sent2vec:opensubtitles:results_table} and~\ref{results:sent2vec:reddit:results_table}). The OpenSubtitles model starts with an average similarity of $0.167$ for the first snapshot and climbs up to $0.204$ for the last snapshot. The Reddit model starts with an average value of $0.336$ for the first snapshot and increases to $0.359$ for the last snapshot. This means that the responses of the Reddit model match the expected responses much better from a semantic perspective as the responses of the OpenSubtitles model do. In summary, the results of both models are bad, as the maximum achievable similarity is $1.0$.
+\paragraph{Sent2Vec Analysis} As described in Chapter~\ref{fundamentals:sent2vec_test}, we use Sent2Vec embeddings for measuring the semantic similarity between the generated and expected responses on the test datasets. For this purpose, we have used the pretrained embeddings available on the GitHub page of the project\footnote{https://github.com/epfml/sent2vec}. We have decided, that we use both the \emph{Twitter} and \emph{Wikipedia} embeddings for the assessment. The results can be seen in the Figures~\ref{results:sent2vec:opensubtitles:results} and~\ref{results:sent2vec:reddit:results}. What can be seen directly is that both the Reddit and OpenSubtitles models perform better on the pretrained \todo{nur beim ersten Mal emph?}Wikipedia model in comparison to the pretrained Twitter model. This probably has to do with the fact that ``compressed'' language used when writing tweets (e.g. ``w/o'' instead of ``without''). In conclusion, the results of this analysis are dependent on the Sent2Vec model, as expected. However, both results are pretty bad, with the results from the Reddit model being much better than the OpenSubtitles, about twice as good (see Tables~\ref{results:sent2vec:opensubtitles:results_table} and~\ref{results:sent2vec:reddit:results_table}). The OpenSubtitles model starts with an average similarity of $0.167$ for the first snapshot and climbs up to $0.204$ for the last snapshot. The Reddit model starts with an average value of $0.336$ for the first snapshot and increases to $0.359$ for the last snapshot. This means that the responses of the Reddit model match the expected responses much better from a semantic perspective as the responses of the OpenSubtitles model do. \todo{The Reasen for this eye-catching difference is perhaps due to the difference between spoken language and written language?}In summary, the results of both models are bad, as the maximum achievable similarity is $1.0$.
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -251,53 +251,64 @@ As seen in the examples above, there has indeed been an improvement in the answe
 	\label{results:sent2vec:reddit:results_table}
 \end{table}
 
-\paragraph{Generic Response are a Problem} One potential reason for the poor results when using the Sent2Vec metric is that we witnessed both models generating generic responses a lot of the time (e.g. ``i don t know'', ``i m not sure what you re saying''). Our first idea to analyze this is to see what kind of sentences the models produce with the inputs of the test datasets. We did an analysis on the generated responses and quickly noticed that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).\todo{name percentages of tables}
+\paragraph{Generic Response are a Problem} One potential reason for the poor results when using the Sent2Vec metric is that we witnessed both models generating generic responses a lot of the time (e.g. ``i don t know'', ``i m not sure what you re saying''). Our first idea to analyze this is to see what kind of sentences the models produce with the inputs of the test datasets. We did an analysis on the generated responses and quickly noticed that there are a few sentences, which the models predict a lot of time (see Tables~\ref{results:test_performance:opensubtitles_sample_outputs} and~\ref{results:test_performance:reddit_sample_outputs}).
+\todo{As can be seen in the column \emph{Percentage}, the proportion varies per dataset. With OpenSubtitles, 45.77\% of all replies will be one of the top 10 most frequent sentences, and for Reddit this share is slightly lower with 33.02\%.}
 \\
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabular}{lcc}
 			\toprule
-			Sentence & Occurrence Frequency\\ \midrule
-			\texttt{i m not gon na let you go} & 41853\\
-			\texttt{i m not sure i can trust you} & 21263\\
-			\texttt{i m not gon na say anything} & 9163\\
-			\texttt{i m not gon na let that happen} & 7426\\
-			\texttt{i m sorry} & 7235\\
-			\texttt{you re not gon na believe this} & 7068\\
-			\texttt{you re not gon na believe me} & 6878\\
-			\texttt{i m not gon na hurt} you & 4829\\
-			\texttt{i m not a fan} & 4468\\
-			\texttt{i m not sure} & 4215\\
+			Sentence & Occurrence Frequency & Percentage \\ \midrule
+			\texttt{i m not gon na let you go} & 41853 & 16.74\%\\
+			\texttt{i m not sure i can trust you} & 21263 & 8.51\%\\
+			\texttt{i m not gon na say anything} & 9163 & 3.67\%\\
+			\texttt{i m not gon na let that happen} & 7426 & 2.97\%\\
+			\texttt{i m sorry} & 7235 & 2.89\\
+			\texttt{you re not gon na believe this} & 7068 & 2.83\%\\
+			\texttt{you re not gon na believe me} & 6878 & 2.75\%\\
+			\texttt{i m not gon na hurt} you & 4829 & 1.93\%\\
+			\texttt{i m not a fan} & 4468 & 1.79\%\\
+			\texttt{i m not sure} & 4215 & 1.69\%\\
+			\midrule
+			Summed up & 114408 & 45.77\%\\
+			\midrule
+			\midrule
+			Total Amount Sentences & 249984 & 100.00\%\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
 	\caption{Top 10 most generated responses with respective occurence frequencies when using the last OpenSubtitles snapshot and the test dataset.}
 	\label{results:test_performance:opensubtitles_sample_outputs}
-\end{table}\todo{Prozent von Ouptuts als spalte pro satz}\todo{make tables the same width!}
+\end{table}\todo{make tables the same width!}
 
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabular}{lcc}
 			\toprule
-			Sentence & Occurrence Frequency\\ \midrule
-			\texttt{i m not sure if i m being sarcastic or not .} & 17486\\
-			\texttt{i think it s a bit of a stretch .} & 13058\\
-			\texttt{i m not sure if you re being sarcastic or not .} & 11647\\
-			\texttt{i m not sure if i m a <unknown> or not .} & 8307\\
-			\texttt{i m not sure if you re joking or not .} & 7932\\
-			\texttt{i was thinking the same thing .} & 7579\\
-			\texttt{<unknown>} & 6210\\
-			\texttt{i m not sure if i m going to watch this or not .} & 4257\\
-			\specialcell{\texttt{i m not sure if i m a fan of the show , but i m}\\\texttt{pretty sure that s a <unknown> .}} & 3232\\
-			\texttt{i m not sure if i m going to watch it or not .} & 3079\\
+			Sentence & Occurrence Frequency & Percentage\\ \midrule
+			\texttt{i m not sure if i m being sarcastic or not .} & 17486 & 7.00\%\\
+			\texttt{i think it s a bit of a stretch .} & 13058 & 5.22\%\\
+			\texttt{i m not sure if you re being sarcastic or not .} & 11647 & 4.66\%\\
+			\texttt{i m not sure if i m a <unknown> or not .} & 8307 & 3.32\%\\
+			\texttt{i m not sure if you re joking or not .} & 7932 & 3.17\%\\
+			\texttt{i was thinking the same thing .} & 7579 & 3.03\%\\
+			\texttt{<unknown>} & 6210 & 2.48\%\\
+			\texttt{i m not sure if i m going to watch this or not .} & 4257 & 1.70\%\\
+			\specialcell{\texttt{i m not sure if i m a fan of the show , but i m}\\\texttt{pretty sure that s a <unknown> .}} & 3232 & 1.29\%\\
+			\texttt{i m not sure if i m going to watch it or not .} & 3079 & 1.23\%\\
+			\midrule
+			Summed up & 82797 & 33.02\%\\
+			\midrule
+			\midrule
+			Total Amount Sentences & 249984 & 100.00\%\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
 	\caption{Top 10 most generated sentences with respective occurence frequencies when using the last Reddit snapshot and the test dataset.}
 	\label{results:test_performance:reddit_sample_outputs}
-\end{table}\todo{Prozent von Ouptuts als spalte pro satz}\todo{make tables the same width!}
+\end{table}\todo{make tables the same width!}
 
 \paragraph{Does Filtering of Generic Responses Help?} As seen in the both tables above, there are certain responses which are generated a lot of time and are pretty generic and meaningless in most contexts. Because of that, we think it would be a good idea to evaluate the models under the Sent2Vec metric one more time, but this time with the top $n$ most generated responses filtered out. We do this in the hope that the generic sentences are the cause of the small average similarities. The results of the analysis with the top $n$ most generated responses filtered out can be found in Table~\ref{results:sent2vec:opensubtitles:top_n_results_table} and~\ref{results:sent2vec:reddit:top_n_results_table}. For this analysis, we only use the Wikipedia model as it has shown a better performance for both of our models before.
 \\
@@ -341,7 +352,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 	\label{results:sent2vec:reddit:top_n_results_table}
 \end{table}
 
-As seen in the tables above, the filtering of the most used responses does not help a lot when it comes to the Sent2Vec evaluation. We currently cannot say if this problem is just apparent in our use-case or if it this problem is inherent to the metric itself. To come to a definitive conclusion, we would have to investigate into using this metric for other models.
+\todo{Satz beginnt genau gleich wie der letzte Absatz. Man könnte auch einfach schreiben: As seen (above), the filtering of the ..... (mit filtering sollte im Kontext klar sein was wir meinen)}As seen in the tables above, the filtering of the most used responses does not help a lot when it comes to the Sent2Vec evaluation. We currently cannot say if this problem is just apparent in our use-case or if it this problem is inherent to the metric itself. To come to a definitive conclusion, we would have to investigate into using this metric for other models.
 
 \paragraph{Mixed Feelings about Performance Metrics} As seen in this chapter, the performance metrics we use to evaluate the models tell us a mixed story about the resulting models. On one hand, we see that the training went fine and the learning process run as expected. However, when we then test these trained models against the test datasets with the different metrics, it looks like the performance got worse and worse over the time of the training. This is not true in our subjective opinion after ``talking'' to both models for a prolonged period of time. We think the biggest problem for the evaluation are the generic responses both models seem to generate much more than actual answers. To find the cause of this generic responses, we will now try to analyze the language model which both models have learned while training and try to establish a connection between the language model in the datasets and the ones produced by the models.
 
@@ -350,13 +361,13 @@ As seen in the tables above, the filtering of the most used responses does not h
 As said at the end of the previous chapter, in this chapter we are going to investigate into the language models the trained models produce and try to find a reason for the generic responses.
 
 \subsection{Uni- and Bi-gram Distributions over Time}
-As the first step, we are going to compare the uni- and bigram distributions of the training datasets with the distributions produced when evaluating the models with the test datasets. For this purpose we generated unigram and bigram statistics using \texttt{nltk} over the training datasets and outputs generated by the models.
+As the first step, we are going to compare the uni- and bigram distributions of the training datasets with the distributions produced when evaluating the models with the test datasets. For this purpose we \todo{klingt für mich falsch, we have generated?}generated unigram and bigram statistics using \texttt{nltk} over the training datasets and outputs\todo{komma? keine ahnung im englisch} generated by the models.
 
-\paragraph{OpenSubtitles} The OpenSubtitles has the most evenly spread distributions when using the first snapshot (i.e. 0.5M). We see a pattern when we look at all distributions of the OpenSubtitles model. In the beginning, it starts with a pretty evenly spread distribution of uni- and bi-grams. As the training goes on, this distributions shift to a more right-leaned when looking at the distributions for the snapshot 1.0M. The distributions then switch back to be more evelny distributed again. This pattern repeats until the end, with one snapshot being evenly distributed whereas the next is then more right-leaned again.
+\paragraph{OpenSubtitles} The OpenSubtitles has the most evenly spread distributions \todo{Referenz Figure? (see Figure~\ref{results:bigram:distributions:opensubtitles})} when using the first snapshot (i.e. 0.5M). We see a pattern when we look at all distributions of the OpenSubtitles model. In the beginning, it starts with a pretty evenly spread distribution of uni- and bi-grams. As the training goes on, this distributions shift to a more right-leaned when looking at the distributions for the snapshot 1.0M. The distributions then switch back to be more evelny distributed again. This pattern repeats until the end, with one snapshot being evenly distributed whereas the next is then more right-leaned again.
 
 We cannot give a full explanation for this behaviour, but we assume that this has to do with the rather noisey dataset we are using for the OpenSubtitles model. This probably leads to the model being confused, rejecting what it has already learned and trying to fit to the new samples seen. Because of the fact that we cannot explain this behaviour, we are going to analyze the development of the diversity of the uni-/bi-gram and sentences over the course of the training.
 
-The behaviour of the uni-gram distributions is the same, which is the reason we put these visualizations in the Appendix~\ref{appendix:unigram_distributions}.
+The behaviour of the uni-gram distributions is the \todo{same ersetzen mit very similar?}same, which is the reason we put these visualizations in the Appendix~\ref{appendix:unigram_distributions}.
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -401,7 +412,7 @@ The behaviour of the uni-gram distributions is the same, which is the reason we 
 
 \paragraph{Reddit} The distributions for the Reddit model reveal an interesting development (see Figure~\ref{results:bigram:distributions:reddit}). In the beginning, same as with the OpenSubtitles, the distributions are evenly spread. However, as the training goes on, the distributions start to better fit the expected distributions more and more, until it reaches the greatest overlap when using the 1.5M and 2.0M snapshots. From this point on, the distributions start to drift apart again. This coincides with our opinion, that the Reddit model is best when using the snapshot 2.0M. This probably has to do with the fact that we are doing more than two epochs over the full dataset. From the snapshot 2.0M on, the model itself starts to become worse, as the diversity and quality of the responses starts to decline. We are going to analyze this assumption below.
 
-The behavior of uni-gram distributions is the same, which is the reason we put these visualizations in the Appendix~\ref{appendix:unigram_distributions}.
+The behavior of uni-gram distributions is the \todo{same ersetzen mit very similar? Wir könnten uns auch überlegen anstelle pro Modell diesen Satz, einmal am Ende für beide Modell.}same, which is the reason we put these visualizations in the Appendix~\ref{appendix:unigram_distributions}.
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -445,7 +456,7 @@ The behavior of uni-gram distributions is the same, which is the reason we put t
 \end{figure}
 
 \subsection{Language Diversity}
-As said in the last Chapter, we are now going to analyze the language diversity of the outputs the two models produce over the different snapshots. For this purpose, we are analyzing the how large the share of the top 10 uni-, bi-gram and sentences is within the entirety of the generated responses when using the respective test datasets. The results can be seen in the Table~\ref{results:top_10_frequency:reddit} for Reddit and \ref{results:top_10_frequency:OpenSubtitles} for OpenSubtitles. 
+As said in the last Chapter, we are now going to analyze the language diversity of the outputs the two models produce over the different snapshots. For this purpose, we are analyzing how large the share of the top 10 uni-, bi-gram and sentences is within the entirety of the generated responses when using the respective test datasets. The results can be seen in the Table~\ref{results:top_10_frequency:reddit} for Reddit and \ref{results:top_10_frequency:OpenSubtitles} for OpenSubtitles. 
 
 In the Tables, one can see three different categories: Uni-Grams, Bi-Grams and Sentences. For each of these categories, we have summed up the occurrence frequencies of the top 10 most occuring instances for the respective category. These sums can be seen in the \emph{Top Count} columns. The columns named \emph{All Count} contain the total amount of all instances for each category per snapshot. The share of the \emph{Top Count} value from the \emph{All Count} value can be seen in the \emph{Top Freq.} column for each category and snapshot.
 \todo{add more telling column names to the tables}
@@ -474,7 +485,7 @@ At first, we tried to see a tendency on how language diversity develops when usi
 	\caption{Top 10 Uni-Gramms, Bi-Gramms and Sentences summed up their frequency and calculated their percentage propotion per Reddit snapshot.}
 	\label{results:top_10_frequency:OpenSubtitles}
 \end{table}
-\todo{rework captions!}
+\todo{rework captions! Dirk: Es ist halt schon sehr kurz und bündig, aber eigentlich vollständig?}
 
 \begin{table}[H]
 	\centering
@@ -502,7 +513,7 @@ We plot the \emph{Top Freq.} values for all the categories per model and snapsho
 
 From the mentioned plots, we see several peculiarities, which we are going to discuss per model below.
 
-\paragraph{OpenSubtitles} The plot for the OpenSubtitles (see Figure~\ref{results:language_model:diversity:opensubtitles}) shows the same patterns as with the distributions seen before. Throughout the course of the training, it looks like that the diversity of the language model wobbles up and down. Our assumption for this flattering development is the same as with the distributions, we think that the noisey training datasets might be responsible for that. But, if we take a close look at the numbers, we see that the peaks are getting smaller and smaller. For example, the share of the top 10 sentences and words for the 2.0M snapshot is about $2\%$ to $3\%$ lower than with the 1.0M model. The difference, when looking at the numbers for the bi-grams is much smaller, only about $0.02\%$. Nevertheless, in total, we can see a tendency that the model starts to use a more diverse language model as longer as the training goes.
+\paragraph{OpenSubtitles} The plot for the OpenSubtitles (see Figure~\ref{results:language_model:diversity:opensubtitles}) shows the same patterns as with the distributions seen before. Throughout the course of the training, it looks like that the diversity of the language model wobbles up and down. Our assumption for this flattering development is the same as with the distributions, we think that the noisey training datasets might be responsible for that \todo{Hier könnte man auch nochmals erwähnen, dass das noiey vermutlich von der gesprochenen Sprache kommt}. But, if we take a close look at the numbers, we see that the peaks are getting smaller and smaller. For example, the share of the top 10 sentences and words for the 2.0M snapshot is about $2\%$ to $3\%$ lower than with the 1.0M model. The difference, when looking at the numbers for the bi-grams is much smaller, only about $0.02\%$. Nevertheless, in total, we can see a tendency that the model starts to use a more diverse language model as longer as the training goes.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/diversity_perc_plot.png}
@@ -521,7 +532,7 @@ From the mentioned plots, we see several peculiarities, which we are going to di
 \subsection{Results}
 Our analysis has shown that the distributions of uni- and bi-grams have a tendency to fit the expected distributions better the longer the training goes. However, there were some peculiarities, which we have found interesting and we wanted to analyze with regard to language diversity.
 
-This analysis has shown that the development of the language diversity stands in direct relationship with the development of the mentioned uni- and bi-gram distributions. We were also able to substantiate our subjective feeling, that the OpenSubtitles model becomes better over time, as the language diversity increases, though the process works slowly. Additionaly, we could also show that our opinion that the Reddit model has the best performance when using the 1.5M or 2.0M snapshot, by showing that these two snapshots have indeed the greatest variety in the used language mesured by our statistics.
+This analysis has shown that the development of the language diversity stands in direct relationship with the development of the mentioned uni- and bi-gram distributions. We were also able to substantiate our subjective feeling, that the OpenSubtitles model becomes better over time, as the language diversity increases, though the process works slowly. Additionaly, we could also show that our opinion that the Reddit model has the best performance when using the 1.5M or 2.0M snapshot, by showing that these two snapshots have indeed the greatest variety in the used language mesured by our statistics. \todo{wir könnten hier halt noch sagen, dass wir zwar den Grund für die generischen Sätze nicht abschliessend erklären können, jedoch dass der Anteil der Häufigsten abnimmt.}
 
 The last problem we could identify is, that iterating over the same dataset multiple times, does not seem to be advisable, as the Reddit model becomes worse after the snapshot 2.0M. This is especially apparent when looking at the results of the 3.0M snapshot. Using a regularization technique, such as Dropout~\cite{Nitish:2014} would probably help when using a small dataset which is iterated multiple times.
 
@@ -892,7 +903,7 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 			3.0M:	& \texttt{we re here}\\
 			\midrule
 			Reddit\\
-			2.5M:	& \texttt{because we re here .}\\
+			1.5M:	& \texttt{because we are nt .}\\
 			\midrule
 			NCM:	& \texttt{i ’m not sure .}\\
 			\bottomrule
@@ -942,7 +953,7 @@ We are only showing a part of the dialogs which were evaluated. All others can b
 			3.0M:	& \texttt{ten}\\
 			\midrule
 			Reddit\\
-			2.5M:	& \texttt{i m not sure what you re talking about .}\\
+			2.0M:	& \texttt{i m not sure how much i m going to get downvoted to hell .}\\
 			\midrule
 			NCM:	& \texttt{seventy - two .}\\
 			\bottomrule
