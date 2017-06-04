@@ -208,10 +208,11 @@ Figure~\ref{fig:data:reddit:vocab:analyze} shows what percentage of the words in
 	\small
 	\text{OpenSubtitles 25k}
 	\endminipage
-	\caption{Plots (y-logarithmic) showing the percentage of words missing per utterance for specific vocabulary sizes.}
+	\caption{Semi-logarithmic plot showing the percentage of words missing per utterance for specific vocabulary sizes.}
 	\label{fig:data:reddit:vocab:analyze}
 \end{figure}
-\todo{Wollen wir darauf eingehen, weshalb log plot?}
+
+Another thing worth mentioning are the special tokens in each of these vocabularies. There are three of them in total: \texttt{<unknown>}, \texttt{<pad>} and \texttt{<eos>}. The first one is used in case there is word in a sample which is not covered by the vocabulary. In this case, instead of the missing word, the \texttt{<unknown>} token is fed to the model. The \texttt{<eos>} token is appended at the end of each sentence and the \texttt{<pad>} token is used to pad the sequences to the required length.
 
 \section{Splitting the Datasets}
 \label{data:split_corpus}
