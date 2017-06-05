@@ -208,7 +208,7 @@ Figure~\ref{fig:data:reddit:vocab:analyze} shows what percentage of the words in
 	\small
 	\text{OpenSubtitles 25k}
 	\endminipage
-	\caption{Semi-logarithmic plot showing the percentage of words missing per utterance for specific vocabulary sizes.}
+	\caption{Semi-logarithmic histogram showing the percentage of words missing per utterance for specific vocabulary sizes.}
 	\label{fig:data:reddit:vocab:analyze}
 \end{figure}
 
@@ -216,7 +216,7 @@ Another thing worth mentioning are the special tokens in each of these vocabular
 
 \section{Splitting the Datasets}
 \label{data:split_corpus}
-The generated datasets have to be split in order to obtain a train, validation, and test datasets. The table \ref{tbl:data:split:corpus} shows how proportions in which the datasets were split. We split in a way, that we always process two utterances at one to ensure that there is no overlap between the training and the other datasets. The splitting is also done randomly, to ensure that we do not run into problems due to the fact that the utterances may be sorted in any unknown way.
+The generated datasets have to be split in order to obtain a train, validation, and test datasets. The table \ref{tbl:data:split:corpus} shows proportions in which the datasets were split. We split in a way, that we always process two utterances at one to ensure that there is no overlap between the training and the other datasets. The splitting is also done randomly, to ensure that we do not run into problems due to the fact that the utterances may be sorted in any unknown way.
 \\
 \begin{table}[H]
 	\centering
@@ -245,7 +245,7 @@ The generated datasets have to be split in order to obtain a train, validation, 
 
 \section{Time-Lag Analysis OpenSubtitles}
 \label{data:opensubtitles:time_lag_analysis}
-While searching through the OpenSubtitles dataset, we discovered that there are several pairs of utterances which don't make a lot of sense (e.g. (``I love cupcake'', ``Hello, how are you?'')) under the viewpoint of conversational modeling. We quickly realized that this useless pairs of utterances occur because of the way we preprocess the raw corpus: In order to get a sample, we take the first utterance and combine it with the utterance on the next line in the preprocessed corpus. The problem occurs when the timestamps signify a large time difference between the first and second utterance. This is understandable, as all utterances are just saved in the corpus one after the other without taking timestamps (see OpenSubtitles paragraph in Chapter~\ref{data:structure_of_corpora}) into account. In order to investigate if this problem is urgent, we did an analysis to see if what proportion of utterances have a time-lag higher than a certain timespan. The results of this investigation are summarized in Figure~\ref{fig:data:analyse:timediff:opus}.
+While searching through the OpenSubtitles dataset, we discovered that there are several pairs of utterances which don't make a lot of sense (e.g. ``I love cupcake'', ``Hello, how are you?'') under the viewpoint of conversational modeling. We quickly realized that this useless pairs of utterances occur because of the way we preprocess the raw corpus: In order to get a sample, we take the first utterance and combine it with the utterance on the next line in the preprocessed corpus. The problem occurs when the timestamps signify a large time difference between the first and second utterance. This is understandable, as all utterances are just saved in the corpus one after the other without taking timestamps (see OpenSubtitles paragraph in Chapter~\ref{data:structure_of_corpora}) into account. In order to investigate if this problem is urgent, we did an analysis to see if what proportion of utterances have a time-lag higher than a certain timespan. The results of this investigation are summarized in Figure~\ref{fig:data:analyse:timediff:opus}.
 
 \begin{figure}[H]
 	\centering
@@ -263,13 +263,13 @@ As this analysis has shown, most utterances lie so close to one another that thi
 We also do an n-gram analysis of the used corpora. For this purpose, we generated uni- and bigrams for both the OpenSubtitles and Reddit corpora. We do this so that we can compare the n-grams of the outputs produced by our models after they have been trained with the n-grams obtained when analyzing the preprocessed corpora. This enables us to find correlations between the n-grams produced by this analysis and n-grams extracted from the outputs of the trained models. The results of analyzing the preprocessed datasets are visualized in the figures~\ref{data:ngram:freq_top_30} and \ref{data:ngram:graph_top_50}.
  
 \begin{figure}[H]
-	\minipage{0.5\textwidth}
+	\minipage{1.0\textwidth}
 	\includegraphics[width=\linewidth]{img/opensubtitles_bigram_top_30_freq}
 	\centering
 	\small
 	\text{OpenSubtitles}
 	\endminipage\hfill
-	\minipage{0.5\textwidth}
+	\minipage{1.0\textwidth}
 	\includegraphics[width=\linewidth]{img/reddit_bigram_top_30_freq}
 	\centering
 	\small
@@ -277,5 +277,5 @@ We also do an n-gram analysis of the used corpora. For this purpose, we generate
 	\endminipage\hfill
 	\caption{Occurrence frequencies of the 30 most used bigrams in the OpenSubtitles~(left) and Reddit (right) datasets.}
 	\label{data:ngram:freq_top_30}
-\end{figure}
+\end{figure}\todo{ich habe hier minipage von 0.5 auf 1.0 erhöht. Stephan meinte man können die y-achse sonst nicht entiffern. Auch jetzt sind die Beschriftungen noch eher klein.}
 
