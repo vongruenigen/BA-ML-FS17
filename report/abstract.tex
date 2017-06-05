@@ -1,7 +1,7 @@
 \chapter*{Abstract}
 In the following thesis we are investigating into construction of an end-to-end conversational dialog system based on recurrent neural networks and sequence-to-sequence learning. We use an already existing system as the reference architecture. 
 
-The main topic of the research is to investigate if a downsized model, trained on a single GPU, still exhibits a comparable performance compared to the larger system. \todo{umgeschrieben, bitte kurz prüfen.}
+The main topic of the research is to investigate if a downsized model, trained on a single GPU, still exhibits a comparable performance compared to larger systems.
 
 The first chapters are dedicated to the development of the software system and the datasets and methods used to conduct the experiments.
 
@@ -11,19 +11,19 @@ The previous analysis revealed several problems our models exhibited. One of the
 
 A comparison with two other systems, namely the CleverBot and the results from the ``Neural Conversational Model'' paper, follow subsequently. This comparison shows that our models can deliver comparable results as other models, as long as the dialogs have limited complexity. The assumed reasons for the inferior results from our models are the smaller model size as well as the shorter training time, compared to other systems.
 
-Although the results do not match our expectations, we are satisfied with the work. The system is able to, at least partially, generate meaningful dialogs, such as the response ``i m a bot'' to the question ``what are you ?''.
+Although the results do not match our expectations, we are satisfied with the work. The models are able to, at least partially, generate meaningful dialogs, such as the response ``i m a bot'' to the question ``what are you ?''.
 
 \chapter*{Zusammenfassung}
-In der folgenden Arbeit untersuchen wir den Aufbau eines en-to-end Dialogsystems mit Hilfe rekurrenter neuronaler Netze und der sequence-to-sequence Lernmethode.\todo{rekurrent, tönt komisch, google meint aber das heisst so}
+In der folgenden Arbeit untersuchen wir den Aufbau eines End-To-End Dialogsystems mit Hilfe Recurrent Neural Networks und der Sequence-To-Sequence Lernmethode.
 
 Das Kernthema dieser Arbeit ist herauszufinden, ob ein kleineres Modell, welches auf einer GPU trainiert wurde, noch vergleichbar gute Ergebnisse wie ein Grösseres hervorbringen kann.
 
-Die ersten Kapitel beschreiben die Entwicklung des Softwaresystems, der Datensätze und Methoden zur Durchführung der Experimente.
+Die ersten Kapitel beschreiben die Entwicklung des Softwaresystems, die Datensätze sowie Methodik zur Durchführung der Experimente.
 
-Die Analyse der daraus resultierenden Modelle erfolgt unter mehreren Aspekten. Als Erstes analysieren wir den Lernprozess. Dabei hat sich gezeigt, dass die Struktur und der sprachliche Ursprung der Daten einen spürbaren Einfluss auf den Lernfortschritt der Modelle hat. Anschliessend evaluierten wir die Performanz unseren Modell, unter anderem mit der gerade erschienenen Metrik Sent2vec Library, um die semantische Ähnlichkeit numerisch zu testen.
+Die Analyse der daraus resultierenden Modelle erfolgt unter mehreren Aspekten. Als Erstes analysieren wir den Lernprozess. Dabei hat sich gezeigt, dass die Struktur und der sprachliche Ursprung der Daten einen spürbaren Einfluss auf den Lernprozess der Modelle hat. Anschliessend evaluieren wir die Performanz unserer Modelle, unter anderem mit einer neu vogeschlagenen Metrik basierend auf der Sent2Vec Bibliothek, um die semantische Ähnlichkeit numerisch zu messen.
 
-Die Analysen zeigten, dass unsere Modelle einige Schwierigkeiten hatte. Ein grosses Problem ist, dass solche Modelle zu generischen Antworten tendieren, welche zu einer Verschlechterung der Ergebnisse führt. Dies stimmt aber nicht mit unserem subjektiv Eindruck überein, dass die Modelle mit der Zeit besser werden. Um dieses Verhalten erklären zu können, untersuchten wir, wie sich die von den Modellen verwendete Sprach, im Laufe der Zeit entwickelt. Diese Analyse zeigte auf, dass die Sprachvielfalt mit fortlaufendem Training grösser wird und der Anteil generischen Antworten sinkt.
+Die Analysen zeigten, dass unsere Modelle einige Schwierigkeiten hatten. Ein grosses Problem ist, dass solche Modelle dazu tendieren, generische Antworten zu generieren, was zu einer Verschlechterung der Ergebnisse führt. Dies stimmt aber nicht mit unserem subjektiven Eindruck überein, dass die Modelle mit der Zeit besser werden. Um dieses Verhalten erklären zu können, untersuchen wir, wie sich die von den Modellen verwendete Sprache im Laufe der Zeit entwickelt. Diese Analyse zeigt auf, dass die Sprachvielfalt mit fortlaufendem Training grösser wird und der Anteil generischen Antworten sinkt.
 
-Anschliessend folgte ein Vergleich mit anderen Systemen, konkret mit Cleverbot und den Ergebnisse aus dem ``Neural Conversational Model'' Paper. Dabei zeigte sich, dass unser Modell vergleichbare Ergebnisse wie die anderen Modelle erbringt, sofern die Dialoge nicht komplex sind. Die Ursachen für die teilweise schlechteren Ergebnisse unserer Modelle im Vergleich mit den anderen Systemen vermuten wir in der grösse des Modells und der kürzeren Trainingszeit.
+Anschliessend folgte ein Vergleich mit anderen Systemen, konkret mit Cleverbot und den Ergebnisse aus dem Paper ``Neural Conversational Model''. Dabei zeigte sich, dass unsere Modelle vergleichbar gute Ergebnisse wie die anderen Systeme erbringen, sofern die Dialoge nicht zu komplex werden. Die Ursachen für die teilweise schlechteren Ergebnisse unserer Modelle im Vergleich mit den anderen Systemen vermuten wir in der Grösse der Modelle und der kurzen Trainingszeit.
 
-Obwohl die Ergebnisse nicht ganz unseren Erwartungen entsprachen, sind wir insgesamt zufrieden. Unser System ist in der Lage, teilweise sinnvolle Dialoge zu erzeugen, wie zum Beispiel die Antwort  `` i m a bot '' auf die Frage "What are you ?". \todo{wollen wir hier wieder von system reden? wäre schliessend zum Anfang wo wir von einem Dialogsystem reden.}
+Obwohl die Ergebnisse nicht ganz unseren Erwartungen entsprachen, sind wir insgesamt zufrieden. Unsere Modelle sind in der Lage, teilweise sinnvolle und interessante Antworten zu erzeugen, wie zum Beispiel ``i m a bot'' als Antwort auf die Frage ``what are you ?''.
