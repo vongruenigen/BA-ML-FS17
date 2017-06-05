@@ -3,6 +3,7 @@
 In this chapter, we will elaborate on how we performed the experiments, which hyperparameters where used, and how we evaluated the results of the trained models.
 
 \section{Architecture of the Sequence-To-Sequence Model}
+\label{methods:architecture}
 In the following paragraphs, we are going to describe the architecture of the model used to conduct our experiments.\todo{rework chapter introduction}
 
 \paragraph{Sequence-To-Sequence} In general, we are using the architecture of seq2seq models described in Chapter~\ref{fundamentals:seq2seq} with LSTM cells. We restrict ourselves to use only one LSTM cell for the encoder, and another cell for the decoder. This is because we wanted our cells to be as large as possible to come as close to the size of the cells used in the paper by Vinyals and Le\cite{Vinyals:2015}. However, they used two really large cells with each having a hidden state size of $4096$ hidden units and a vocabulary consisting of $100,000$ words. In the paper, they had to train their models on a large number of CPUs, because such a huge network does not fit in the memory of any currently available GPU. Since we want to train our models on a single GPU (see Chapter~\ref{sofware_system:development_history}), we had to shrink the size of our model to the largest size possible so that it still fits within the ~12GB of memory that our GPUs have (see Chapter~\ref{software_system:hardware}). The exact size of the model used in this thesis is described in ``Hyperparameters'' below.
