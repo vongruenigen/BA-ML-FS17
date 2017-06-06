@@ -2,7 +2,7 @@
 \label{chapter:fundamental}
 In this first Chapter, we lay out the fundamentals used in the rest of this thesis. At the beginning, we will introduce basic definitions such as \emph{utterance}, \emph{sample} and \emph{conversation}. We will then follow up with an introduction into machine learning using a special variant of \emph{Neural Networks} (NN), called \emph{Recurrent Neural Network} (RNN). We show the basic principles behind it and explain problems this RNNs have in practice, and how the can be solved by utilizing other forms of RNNs. We then show how RNNs can be used to build models, called \emph{Sequence-To-Sequence} (seq2seq) models \cite{Sutskever:2014}, which are capable of learning and using a language in a conversational context.
 
-The following introduction only covers a small part of the spectrum of possibilities with regard to the tasks these models can perform. We are restricting our explanations to the supervised learning use-case and ignore the unsupervised ones, even though they have a wide area of applications (e.g. dimensionality reduction, regression). A basic introduction into the principles of neural networks can be found in Appendix~\ref{fundamentals:neural_network}.\todo{label}
+The following introduction only covers a small part of the spectrum of possibilities with regard to the tasks these models can perform. We are restricting our explanations to the supervised learning use-case and ignore the unsupervised ones, even though they have a wide area of applications (e.g. dimensionality reduction, regression). A basic introduction into the principles of neural networks can be found in Appendix~\ref{fundamentals:neural_network}.
 
 \section{Definitions}
 \paragraph{Utterance} An \emph{utterance} is a single statement from one of the participants in a dialog. This means that an utterance can be either the initial statement or the response to this statement. An utterance may consist of several sentences, but they are always handled as if these sentences were uttered in one unbroken sequence by one participant without the second one interjecting.
@@ -106,7 +106,6 @@ Such a model is also called an \emph{end-to-end} model because it, being fully d
 \begin{equation}
 p(y_1,\dots,y_{T'}|x_1,\dots,x_{T}) = \prod_{t=1}^{T'} p(y_t|v,y_1,\dots,y_{t-1})
 \end{equation}
-\todo{Describe more?}
 
 Each of the terms $p(y_t|v,y_1,\dots,y_{t-1})$ in the product represents a distribution over all words of the vocabulary that is computed when applying the softmax layer at the end. What might be perplexing to the reader is that on the right hand side of the equation, the inputs $x_1,x_2,\dots,x_T$ are left out. This has to do with the fact that the decoder produces its prediction solely based on the thought vector $v$ produced by the encoder and the decoders previous predictions $y_1,\dots,y_{t-1}$ (in a formulation without soft-attention, see below).
 
@@ -147,14 +146,14 @@ We are going to describe the attention mechanism in more detail now and follow t
 
 The index $t$ stands for the current time step as almost anywhere else. The index $i$ ranges from $1$ to the number of steps we have computed in the encoder, which is equal to $t$ in our case. The vector $v$ and the matrices $W_1$ and $W_2$ contain the learnable parameters for the attention mechanism. The vector $u^t$ is of length $t$ and its entries signify, how much attention should be put on the hidden state $h_i$ of the encoder. By applying a softmax layer on the vector $u^t$, we turn it into the probability distribution $a^t$ over all hidden states $\mathbf{H}$ from the encoder. The final computation of the $d'_t$ is then done by computing the weighted sum between the weight vector $a^t$ and the respective hidden state $h_i$ from the encoder. This vector $d'_t$, also called context vector, is then concatenated together with the current hidden state of the decoder $d_t$ to become the new hidden state with which we go on predicting the next output token at time step $t+1$.
 
-The weights $W_1$ and $W_2$, as well as the values in the vector $v$, are learned while training the model. This means, that ability to be ``attentive'' is something the model has to learn and hence cannot be added after the training. This also means that choice on what the model attends is not only dependent on the current sample, but also on the task in general.
+The weights $W_1$ and $W_2$, as well as the values in the vector $v$, are learned while training the model. This means, that ability to be ``attentive'' is something the model has to learn and hence cannot be added after the training. This also means that choice on what the model attends is not only dependent on the current sample, but also on the task in general. You find an example of the attention weights, visualized with a heat map in the  Figure~\ref{fundamentals:seq2seq:attention_weights_visualization}. The attention in this example would be questionable, since the punctuation point has a very high weight.
 
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=10cm]{img/attention_heatmap_example}
 	\caption{Example on how attention can be visualized using a heatmap. The input sequence is on the x-axis and the respective response on the y-axis. Each line in the heatmap can be interpreted as the probability distribution over the thought vectors of the encoder which the decoder accesses at each decoding step.}
 	\label{fundamentals:seq2seq:attention_weights_visualization}
-\end{figure}\todo{Erklären, dass dieses Beispiel eine eher sinnlose attention aufweist?}
+\end{figure}
 
 The name \emph{soft}-attention comes from the fact, that this kind of attention mechanism is fully differentiable and hence can be simply plugged into any existing NN architecture. The other kind of of attention is the so-called \emph{hard}-attention mechanism which in contrast samples a random thought vector of the encoder and because of that, it is not fully differentiable and hence cannot simply be added to an existing system that uses back-propagation and gradient-descent without modifications.
 
