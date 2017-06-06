@@ -25,7 +25,7 @@ One of the main restrictions of vanilla NNs is the following: assume a task in w
 \end{figure}
 
 
-Before explaining how this recurrence can be used to solve the weather prediction problem, let's first show the equations used for the forward propagation in a RNN with a single cell. A single layer in an RNN is called a \emph{cell} and is basically a function which maps tuples of state and input to new tuples of a new state and an output $f\colon \mathbb{R}^n \times \mathbb{R}^m \rightarrow \mathbb{R}^n \times \mathbb{R}^m$, where $n$ signifies the size of the hidden state and $m$ the size of the output of the cell.\todo{For output and input $m$?}
+Before explaining how this recurrence can be used to solve the weather prediction problem, let's first show the equations used for the forward propagation in a RNN with a single cell. A single layer in an RNN is called a \emph{cell} and is basically a function which maps tuples of state and input to new tuples of a new state and an output $f\colon \mathbb{R}^n \times \mathbb{R}^m \rightarrow \mathbb{R}^n \times \mathbb{R}^m$, where $n$ signifies the size of the hidden state and $m$ the size of the output of the cell.
 
 The internal structure is similar to the one of NNs, except for the recurrence which we are going to elaborate on below.
 
@@ -36,7 +36,6 @@ y_t & = \varphi_y(\mathbf{w}_y \cdot \mathbf{h}_t + \mathbf{b}_y)
 \end{split}
 \label{fundamentals:rnn:forward_equation:hidden}
 \end{equation}
-\todo{Format correctly!}
 
 In the equations above, one can see different variables with different indices which we'll explain briefly:
 
@@ -128,7 +127,6 @@ The concatenated outputs $y_1,...,y_{T'}$ are the output of the model. The exact
 
 \paragraph{Soft-Attention Mechanism}
 \label{fundamentals:soft_attention}
-\todo{revisit one more time!}
 Imagine you have been asked to solve the following simple task: Read a longer text about a certain topic. At the end of the text, there are several questions regarding this text and you have to answer them. How does a human approach such a task? At least a part of the people start by reading the text through one time and then start to answer the questions. A normal human cannot remember the whole content of the text (since it is a long one), so what it does is to focus on a single question and try to find the answer by revisiting the text. This essentially means that the participant in this task \emph{focuses} their \emph{attention} on single parts of the text instead of the text as a whole. This is basically what the \emph{soft-attention} \cite{Bahdanau:2014} mechanism is all about. Let us adapt the introductory example on how this behavior could be adapted to seq2seq models and how it helps to solve tasks.
 
 As mentioned before, the main bottleneck of seq2seq models is that the encoder has to compress all the information it has processed into its thought vector. The thought vector is then passed to the decoder which tries to come up with a meaningful answer to the information stored in the thought vector. If a long text is compressed into the thought vector, this might not be an easy task to solve as the information has to be compressed too much. The attention mechanism helps by solving this issue by allowing the decoder to look at all thought vectors of the encoder at all time steps via a weighted sum. 
@@ -144,7 +142,7 @@ We are going to describe the attention mechanism in more detail now and follow t
 \end{split}
 \end{equation}
 
-The index $t$ stands for the current time step as almost anywhere else. The index $i$ ranges from $1$ to the number of steps we have computed in the encoder, which is equal to $t$ in our case. The vector $v$ and the matrices $W_1$ and $W_2$ contain the learnable parameters for the attention mechanism. The vector $u^t$ is of length $t$ and its entries signify, how much attention should be put on the hidden state $h_i$ of the encoder. By applying a softmax layer on the vector $u^t$, we turn it into the probability distribution $a^t$ over all hidden states $\mathbf{H}$ from the encoder. The final computation of the $d'_t$ is then done by computing the weighted sum between the weight vector $a^t$ and the respective hidden state $h_i$ from the encoder. This vector $d'_t$, also called context vector, is then concatenated together with the current hidden state of the decoder $d_t$ to become the new hidden state with which we go on predicting the next output token at time step $t+1$.
+The index $t$ stands for the current time step. The index $i$ ranges from $1$ to the number of steps we have computed in the encoder, which is equal to $t$ in our case. The vector $v$ and the matrices $W_1$ and $W_2$ contain the learnable parameters for the attention mechanism. The vector $u^t$ is of length $t$ and its entries signify, how much attention should be put on the hidden state $h_i$ of the encoder. By applying a softmax layer on the vector $u^t$, we turn it into the probability distribution $a^t$ over all hidden states $\mathbf{H}$ from the encoder. The final computation of the $d'_t$ is then done by computing the weighted sum between the weight vector $a^t$ and the respective hidden state $h_i$ from the encoder. This vector $d'_t$, also called context vector, is then concatenated together with the current hidden state of the decoder $d_t$ to become the new hidden state with which we go on predicting the next output token at time step $t+1$.
 
 The weights $W_1$ and $W_2$, as well as the values in the vector $v$, are learned while training the model. This means, that ability to be ``attentive'' is something the model has to learn and hence cannot be added after the training. This also means that choice on what the model attends is not only dependent on the current sample, but also on the task in general. You find an example of the attention weights, visualized with a heat map in the  Figure~\ref{fundamentals:seq2seq:attention_weights_visualization}. The attention in this example would be questionable, since the punctuation point has a very high weight.
 
@@ -184,7 +182,6 @@ In this Section, we are going to introduce the main performance metrics used in 
 \begin{equation}
 H(p, q) = -\sum_{x \in X} p(x) \log_2 q(x)
 \end{equation}
-\todo{Check one more time!}
 
 In the case of sequence-to-sequence learning, the expected probability is a one-hot encoded vector with a $1$ at the entry of the expected word at time step $t$ and $0$ everywhere else. This loss function can be used for training a seq2seq model (or any model which predicts probability distributions in a broader sense) and it can then also be used to calculate the perplexity of the model, which we are going to elaborate on below.
 
