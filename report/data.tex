@@ -144,7 +144,7 @@ Steps that are applied to both corpora are mentioned in the ``General'' paragrap
 
 \section{Vocabulary and Coverage}
 \label{data:word_coverage}
-After the datasets for both corpora have been generated, we go on with generating corpus specific vocabularies. We do this by iterating the generated dataset and extracting all words that occur there. These collected words are then ranked by their frequency of occurence and converted into vocabularies containing the $n$ most used words, where $n$ stands for the number of words chosen. We decided that we would use three different vocabulary sizes: $25'000$, $50'000$ and $100'000$. As expected, the larger the vocabularies get, the better the coverage is (see Table~\ref{tbl:data:split:corpus:analyze}).
+After the datasets for both corpora have been generated, we go on with generating corpus specific vocabularies. We do this by iterating the generated dataset and extracting all words that occur there. These collected words are then ranked by their frequency of occurence and converted into vocabularies containing the $n$ most used words, where $n$ stands for the number of words chosen. We decided that we would use three different vocabulary sizes: $25,000$, $50,000$ and $100,000$. As expected, the larger the vocabularies get, the better the coverage is (see Table~\ref{tbl:data:split:corpus:analyze}).
 \\
 \begin{table}[H]
 	\begin{adjustbox}{max width=\textwidth}
@@ -160,7 +160,8 @@ After the datasets for both corpora have been generated, we go on with generatin
 			\midrule
 			OpenSubtitles	&$25$		&$2362$	&$2096$	&$88.73\%$ &$266$	&$11.27\%$\\
 							&$50$		&$2362$	&$2116$	&$89.57\%$	&$246$	&$10.43\%$\\
-							&$100$	&$2362$	&$2127$	&$90.03\%$	&$236$	&$9.97\%$\\\\
+							&$100$	&$2362$	&$2127$	&$90.03\%$	&$236$	&$9.97\%$\\
+			\midrule
 			Reddit		&$25$		&$1717$	&$1683$	&$98.00\%$	&$34$		&$2.00\%$\\
 						&$50$		&$1717$	&$1699$	&$98.98\%$	&$17$		&$1.02\%$\\
 						&$100$	&$1717$	&$1707$	&$99.42\%$	&$10$		&$0.58\%$\\
