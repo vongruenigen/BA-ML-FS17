@@ -3,7 +3,7 @@
 The following chapter gives a tutorial on how to use the software system (see Chapter~\ref{software_system}) implemented to conduct the experiments in this thesis.
 
 \section{Download}
-The code of the software system can be downloaded by using \texttt{git}\footnote{https://git-scm.com/}. The repository is located in the publicly accessible GitHub server of the ZHAW\footnote{https://github.ch/vongrdir/BA-ML-17}.
+The code of the software system can be downloaded by using \texttt{git}\footnote{https://git-scm.com/}. The repository is located in the publicly accessible GitHub website\footnote{https://github.ch/vongrdir/BA-ML-17}.
 
 \section{Requirements}
 To use the software and all the related scripts, the following software packages must be installed:
@@ -44,9 +44,10 @@ In the following table, we explain the structure of the repository and the conte
 		\toprule
 		Name of Directory & Description\\ \midrule
 		\texttt{configs/} & In this directory, all the JSON configurations for all experiments are stored.\\
-		\texttt{report/} & All documents related to the thesis itself are stored in this directory.\\
+		\texttt{report/} & All documents related to the thesis are stored in this directory.\\
+		\texttt{misc/} & Directory for storing miscellaneous files.\\
 		\texttt{results/} & The results of all the run experiments are stored in this directory. The results themselves are stored in a directory named after the \texttt{WHAT} of the experiment. In total, the model, all collected metrics and the configuration of experiments are stored in this directories.\\
-		\texttt{scripts/} & The scripts used in this thesis are stored in this directory (see Chapter~\ref{sofware_usage:scripts}).\\
+		\texttt{scripts/} & The scripts used in this thesis are stored in this directory (see Chapter~\ref{software_usage:using_scripts}).\\
 		\texttt{source/} & The whole source code of the software system itself is located in this directory including all the components necessary to implement the system described in the Chapter~\ref{sofware_system}.\\
 		\bottomrule
 	\end{tabularx}
@@ -56,6 +57,7 @@ In the following table, we explain the structure of the repository and the conte
 
 \clearpage
 \section{Using the Scripts}
+\label{software_usage:using_scripts}
 In the following section, we are going to introduce the most important scripts necessary to use the software system for running experiments. The scripts themselves are located in the directory \texttt{scripts/}.
 
 \begin{table}[H]
@@ -65,13 +67,13 @@ In the following section, we are going to introduce the most important scripts n
 		\begin{tabular}{lp{8cm}p{8cm}}
 			\toprule
 			Name & Description\\ \midrule
-			\texttt{analyse{\_}ngram.py{\_}from{\_}corpus.py} & With this script, it is possible to analyse a corpus regarding its bigrams. This script was used to generate the n-grams in Chapter~\ref{chapter:data:ngram} and~!!REFERENZ RESULTATE!!.\\
+			\texttt{analyse{\_}ngram{\_}from{\_}corpus.py} & With this script, it is possible to analyse a corpus regarding its bigrams. This script was used to generate the n-grams in Chapter~\ref{chapter:data:ngram} and~\ref{results:development_language_model}.\\
 			\texttt{analyze{\_}timestamp{\_}problematic{\_}opensubtitles.py} & With this script, the time-lag analysis between utterances in the OpenSubtitles corpus can be done (see Chapter~\ref{data:opensubtitles:time_lag_analysis}).\\
 			\texttt{analyze{\_}word{\_}coverage.py} & This script allows to analyse the word coverage of a corpus with regard to a given vocabulary (see Chapter~\ref{data:word_coverage}).\\
 			\texttt{split{\_}corpus.py} & This script allows to split a given corpus into a training, test and validation set by proportions. The split itself is done randomly (see Chapter~\ref{data:split_corpus}).\\
 			\texttt{evaluate{\_}trained{\_}model.py} & This script allows to evaluate a trained model on a certain dataset and stores the resulting metrics of this evaluation.\\
-			\texttt{generate{\_}s2v{\_}sequence{\_}embeddings.py} & This script allows for generating Sent2Vec embeddings for the given list of sequence samples. These are then used in Chapter~!!!RFERENZ RESULTATE!! for the similarity analysis.\\
-			\texttt{get{\_}internal{\_}embeddings{\_}from{\_}samples.py} & This script allows to generate ``thought vectors'' for list of given samples. They are used in the analysis in Chapter~!!REFERENZ!!.\\
+			\texttt{generate{\_}s2v{\_}sequence{\_}embeddings.py} & This script allows for generating Sent2Vec embeddings for the given list of sequence samples. These are then used in Chapter~\ref{results:performance_on_test_datasets} for the similarity analysis.\\
+			\texttt{get{\_}internal{\_}embeddings{\_}from{\_}samples.py} & This script allows to generate thought vectors for a list of given sample texts. They are used in the analysis in Chapter~\ref{results:thought_vector_clustering}.\\
 			\texttt{preprocess{\_}opensbutitles{\_}data.py} & This script is responsible for preprocessing the raw OpenSubtitles corpus as described in Chapter~\ref{data:preprocessing}.\\
 			\texttt{preprocess{\_}reddit{\_}corpus.py} & This script is responsible for preprocessing the raw Reddit corpus and building the tree which is the finally converted into the datasets as described in Chapter~\ref{data:preprocessing}.\\
 			\texttt{talk{\_}to{\_}model.py} & This script provides a possibility to talk to trained models through the terminal. The functionality is basically the same as in the web frontend (see Chapter~\ref{sofware_usage:web_frontend}).\\
@@ -82,7 +84,7 @@ In the following section, we are going to introduce the most important scripts n
 \end{table}
 \todo{update}
 
-There are much more scripts than ones described above (e.g. for plotting, creation of vocabularies). Especially. Not all of them are necessary to conduct experiments, which is why only explain the most important.
+There are much more scripts than the ones described above (e.g. for plotting, creation of vocabularies). Not all of them are necessary to conduct experiments, which is why only explain the most important.
 
 In the following table there are exemplary calls for all scripts listed above:
 
@@ -130,7 +132,7 @@ To run experiments, one has to write a configuration file in the JSON format. Al
 			\texttt{training\_data} & \texttt{null} & Defines which dataset should be used for training the model while training.\\
 			\texttt{validation\_data} & \texttt{null} & Defines which dataset should be used for validating the model while training.\\
 			\texttt{reverse\_input} & \texttt{false} & Defines whether the input sequence should be fed to the model in reverse if set to \texttt{true}.\\
-			\texttt{use\_last\_output\_as\_input} & \texttt{false} & Defines whether the output of the last sample should be used as the input for the next sample as described in Chapter~\ref{methods}.\\
+			\texttt{use\_last\_output\_as\_input} & \texttt{false} & Defines whether the output of the last sample should be used as the input for the next sample.\\
 			\texttt{start\_training\_from\_beginning} & \texttt{false} & Defines whether the training should start from the first sample of the training dataset or not. If it is set to \texttt{true}, the training will start with the first sample the model has not already seen in previous trainings, as indicated by internal variables of the model saved when storing the model.\\
 			\texttt{show{\_}predictions\_while\_training} & \texttt{false} & Defines whether the outputs of the model should be printed to the terminal when training.\\
 			\texttt{show{\_}predictions\_while\_training\_num} & \texttt{5} & Defines how much predictions should be printed at the end of each epoch when training.\\
@@ -158,8 +160,8 @@ To run experiments, one has to write a configuration file in the JSON format. Al
 		Name & Default Value & Description\\ \midrule
 		\texttt{max{\_}input\_length} & \texttt{50} & Defines the maximum number of words to consider from the input sequence.\\
 		\texttt{max{\_}output\_length} & \texttt{50} & Defines the maximum number of words the decoder can generate before the decoding stops.\\
-		\texttt{num{\_}encoder\_layers} & \texttt{1} & Defines the number of layers used for the encoder.\\
-		\texttt{num{\_}decoder\_layers} & \texttt{1} & Defines the number of layers used for the decoder.\\
+		\texttt{num{\_}encoder\_layers} & \texttt{1} & Partially defines the number of layers to use for the encoder and decoder. This number is added to \texttt{num{\_}decoder\_layers} to get the full number of layers for the encoder and decoder.\\
+		\texttt{num{\_}decoder\_layers} & \texttt{1} & Partially defines the number of layers to use for the encoder and decoder. This number is added to \texttt{num{\_}encoder\_layers} to get the full number of layers for the encoder and decoder.\\
 		\texttt{num{\_}hidden\_units} & \texttt{1024} & Defines the size of the hidden state used in the encoder and decoder cell.\\
 		\texttt{cell{\_}type} & \texttt{LSTM} & Defines which kind of RNN cell is used for the model. Can be either \texttt{LSTM}, \texttt{GRU} or \texttt{RNN}.\\
 		\texttt{sampled{\_}softmax\_number\_of\_samples} & \texttt{512} & Defines the number of words sampled when using the sampled softmax loss function. Is disabled in case the number of words is smaller than the provided number or if the parameter is set to 0.\\
@@ -177,8 +179,7 @@ To run experiments, one has to write a configuration file in the JSON format. Al
 	\caption{Explanation of the important configuration parameters of the software system (part 2).}
 \end{table}
 
-
-The descriptions above are neither complete nor concluding. We recommend consult the source code for the exact behavior of the additional parameters. Also, there are more model related parameters which are only applicable to the models stored in the source code file \texttt{other\_models.py}, where implemented but now unused models reside.
+The descriptions above are neither complete nor concluding. We recommend consult the source code for the exact behavior of the additional parameters. Also, there are more model related parameters which are only applicable to the models stored in the source code file \texttt{other\_models.py}, where implemented, but now unused models reside.
 
 \clearpage
 
@@ -199,7 +200,7 @@ An example configuration can look as follows:
 			"num_hidden_units": 2048,
 			"hidden_state_reduction_size": 1024,
 			"num_encoder_layers": 1,
-			"num_decoder_layers": 0,
+			"num_decoder_layers": 1,
 			"training_data": "data/reddit_train.txt",
 			"validation_data": "data/reddit_valid.txt",
 			"vocabulary": "data/reddit/vocab_50k.pickle",
@@ -211,7 +212,7 @@ An example configuration can look as follows:
 			"buckets": [[30, 30]],
 			"sampled_softmax_number_of_samples": 512,
 			"word_tokenizer": "none",
-			"use_last_output_as_input": true,
+			"use_last_output_as_input": false,
 			"start_training_from_beginning": false
 		}
 		\end{lstlisting}
@@ -228,14 +229,16 @@ The results are then stored in a directory in \texttt{results/} within a subdire
 
 \section{Web Frontend}
 \label{sofware_usage:web_frontend}
-We implemented a simple web frontend for communicating with already trained models. It is implemented by using \texttt{flask}, \texttt{jQuery} and the \texttt{bootstrap} frontend framework. To us the frontende, one has to start  it using the following command:
+We implemented a simple web frontend for communicating with already trained models. It is implemented by using \texttt{flask}, \texttt{jQuery}\footnote{https://jquery.com/} and the \texttt{bootstrap}\footnote{http://getbootstrap.com/} frontend framework. To us the frontend, one has to start it using the following command from the root of the project:
 
 \texttt{\$ python scripts/web/app.py}
 
-This will start the web frontend running on \texttt{localhost} and using the port 9001. After it has been started, one has to select the model it would like to load from the models in the dropdown at the top. All models found in the \texttt{results/} directory are listed there. After the selection, a session has to be started by clicking on the \emph{Start} button. This might take a moment, as the loading of the model is a costly process. After the model has been loaded (as indicated by ...), one can start to communicate with it by sending text. Keep in mind, that the kind of output of the model (e.g. beam-search or greedy) directly depends on the configuration stored in the directory where the loaded model is located. This means, if one wants to see for example the output of all beams (in case of beam-search), one has to change the configuration value of the key \texttt{beam\_search\_only\_best} to \texttt{true} there. For a comprehensive list of all configuration values and their meaning, please see Chapter~\ref{software_usage:running_experiments} or the source code itself.
+This will start the web frontend running on \texttt{localhost} and using the port 9001. After it has been started, one has to select the model it would like to load from the models in the dropdown at the top. All models found in the \texttt{results/} directory (which can be loaded) are listed there. After the selection, a session has to be started by clicking on the \emph{Start} button. This might take a moment, as the loading of the model is a costly process. After the model has been loaded (as indicated by ...), one can start to communicate with it by sending text. Keep in mind, that the kind of output of the model (e.g. beam-search or greedy) directly depends on the configuration stored in the directory where the loaded model is located. This means, if one wants to see for example the output of all beams (in case of beam-search), one has to change the configuration value of the key \texttt{beam\_search\_only\_best} to \texttt{false} there. For a comprehensive list of all configuration values and their meaning, please see Chapter~\ref{software_usage:running_experiments} or the source code itself.
 \\
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=10cm]{img/web_frontend_inference}
 	\caption{Frontend showing the output when sending the sequence ``1 2 3 4 5'' to a model trained on the copy task (see chapter \ref{software_sytem:model_validation_checks}).}
 \end{figure}
+
+One last remark: Currently, there is still a bug when the user tries to end a running session and start a new one. The work around is to simply restart the entire web application.
