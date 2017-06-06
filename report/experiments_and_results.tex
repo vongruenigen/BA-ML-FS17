@@ -118,7 +118,7 @@ This result contradicts with our expectation. Instead increasing loss values, we
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{Do you like Joffrey from game of thrones?}\\
 			\midrule
@@ -139,7 +139,7 @@ This result contradicts with our expectation. Instead increasing loss values, we
 			2.5M:	& \texttt{the prestige}\\
 			3.0M:	& \texttt{the movie}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Two exemplary dialogs with the Reddit model, one response per snapshot.}
 	\label{results:example_output:reddit}
@@ -149,7 +149,7 @@ This result contradicts with our expectation. Instead increasing loss values, we
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{Are you a man or a woman?}\\
 			\midrule
@@ -169,7 +169,7 @@ This result contradicts with our expectation. Instead increasing loss values, we
 			2.5M:	& \texttt{i m just trying to make a good decision}\\
 			3.0M:	& \texttt{i m not a good idea}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Two exemplary dialogs with the OpenSubtitles model, one response per snapshot.}
 	\label{results:example_output:opensubtitles}
@@ -257,7 +257,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{lcc}
+		\begin{tabularx}{\textwidth}{lcc}
 			\toprule
 			Sentence & Occurrence Frequency & Percentage \\ \midrule
 			\texttt{i m not gon na let you go} & 41853 & 16.74\%\\
@@ -276,7 +276,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 			\midrule
 			Total Sentences Count & 249984 & 100.00\%\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Top 10 most generated responses with respective occurrence frequencies when using the last OpenSubtitles snapshot and the test dataset.}
 	\label{results:test_performance:opensubtitles_sample_outputs}
@@ -550,7 +550,7 @@ We start with the comparison with the CleverBot. CleverBot is a non-deterministi
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{Hi, how are you?}\\
 			\midrule
@@ -562,7 +562,7 @@ We start with the comparison with the CleverBot. CleverBot is a non-deterministi
 			3.0M:	& \texttt{good}\\
 			Cleverbot:	& \texttt{I'm good. How are you?}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 \caption{Responses from the OpenSubtitles model per snapshot compared to the CleverBot response. The input utterance is ``How are you?''.}
 \label{results:example1_output:OpenSubtitle_compared}
@@ -571,7 +571,7 @@ We start with the comparison with the CleverBot. CleverBot is a non-deterministi
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{Hi there, i m john!}\\
 			\midrule
@@ -583,7 +583,7 @@ We start with the comparison with the CleverBot. CleverBot is a non-deterministi
 			3.0M:	& \texttt{i m not .}\\
 			Cleverbot:	& \texttt{So what are you doing?}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses from the Reddit model per snapshot compared to the CleverBot response. The input utterance is ``Hi there, i m john!''.}
 	\label{results:example1_output:Reddit_compared}
@@ -596,7 +596,7 @@ Our models can respond to closed questions appropriately, as both of them provid
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{Can birds fly?}\\
 			\midrule
@@ -608,7 +608,7 @@ Our models can respond to closed questions appropriately, as both of them provid
 			3.0M:	& \texttt{sure}\\
 			Cleverbot:	& \texttt{Some say they can.}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a contextual question from the OpenSubtitles model per snapshot and the CleverBot response.}
 	\label{results:example2_output:OpenSubtitle_compared}
@@ -616,7 +616,7 @@ Our models can respond to closed questions appropriately, as both of them provid
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{Can birds fly?}\\
 			\midrule
@@ -628,7 +628,7 @@ Our models can respond to closed questions appropriately, as both of them provid
 			3.0M:	& \texttt{yes}\\
 			Cleverbot:	& \texttt{Some of them can.}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a closed question from the Reddit model per snapshot and the CleverBot response.}
 	\label{results:example2_output:Reddit_compared}
@@ -644,7 +644,7 @@ The response to the question where the Reddit model lives was answered in a sati
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{What color is the sky?}\\
 			\midrule
@@ -656,7 +656,7 @@ The response to the question where the Reddit model lives was answered in a sati
 			3.0M:	& \texttt{blue}\\
 			Cleverbot:&\texttt{*Kisses playfully*.}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a knowledge-related question with the OpenSubtitles model per snapshot and the CleverBot response.}
 	\label{results:example3_output:OpenSubtitle_compared}
@@ -664,7 +664,7 @@ The response to the question where the Reddit model lives was answered in a sati
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{In which country do you live?}\\
 			\midrule
@@ -676,7 +676,7 @@ The response to the question where the Reddit model lives was answered in a sati
 			3.0M:	& \texttt{sweden}\\
 			Cleverbot:&\texttt{The United States.}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a knowledge-related question from the Reddit model per snapshot and the CleverBot response.}
 	\label{results:example3_output:Reddit_compared}
@@ -692,7 +692,7 @@ The responses of the Reddit model are better fitting to the question, but they a
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{I wear a blue jeans. What color do my jeans have?}\\
 			\midrule
@@ -704,7 +704,7 @@ The responses of the Reddit model are better fitting to the question, but they a
 			3.0M:	& \texttt{i m not a fan}\\
 			Cleverbot:	& \texttt{You don't have any.}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a contextual question from the OpenSubtitles model per snapshot and the CleverBot response.}
 	\label{results:example4_output:OpenSubtitle_compared}
@@ -712,7 +712,7 @@ The responses of the Reddit model are better fitting to the question, but they a
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{I wear a red pullover and blue jeans. What color do my jeans have?}\\
 			\midrule
@@ -722,10 +722,9 @@ The responses of the Reddit model are better fitting to the question, but they a
 			2.0M:	& \texttt{i wear a red shirt and i wear glasses .}\\
 			2.5M:	& \texttt{i m a red blue and blue blue .}\\
 			3.0M:	& \texttt{i m a white male and i have a blue blue shirt .}\\
-			Cleverbot:	& \texttt{What is your opinion on President Obama. And don't ask me mine without saying}\\
-			& \texttt{yours first!.}\\
+			Cleverbot:	& \texttt{What is your opinion on President Obama. And don't ask me mine without saying yours first!.}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a contextual question from the Reddit model per snapshot and the CleverBot response.}
 	\label{results:example4_output:Reddit_compared}
@@ -741,7 +740,7 @@ The Reddit model has an interesting twist in its responses. In the beginning, it
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{How much is 1 added to 2?}\\
 			\midrule
@@ -753,7 +752,7 @@ The Reddit model has an interesting twist in its responses. In the beginning, it
 			3.0M:	& \texttt{2}\\
 			Cleverbot:	& \texttt{I don't know.}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a mathematical question from the OpenSubtitles model per snapshot and the CleverBot response.}
 	\label{results:example5_output:OpenSubtitle_compared}
@@ -761,7 +760,7 @@ The Reddit model has an interesting twist in its responses. In the beginning, it
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{Can you tell me something about game of thrones?}\\
 			\midrule
@@ -776,7 +775,7 @@ The Reddit model has an interesting twist in its responses. In the beginning, it
 			& \texttt{hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor hodor}\\
 			Cleverbot:	& \texttt{Dani is life.}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a question about a TV series from the Reddit model per snapshot and the CleverBot response.}
 	\label{results:example5_output:Reddit_compared}
@@ -792,7 +791,7 @@ The responses of the Reddit model to the statement that it has a bad opinion are
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{i invited her to a public reading of my work , but she never came .}\\
 			\midrule
@@ -804,7 +803,7 @@ The responses of the Reddit model to the statement that it has a bad opinion are
 			3.0M:	& \texttt{she s not a fan}\\
 			Cleverbot:	& \texttt{Who?}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a statement from the OpenSubtitles model per snapshot and the CleverBot response.}
 	\label{results:example6_output:OpenSubtitle_compared}
@@ -812,7 +811,7 @@ The responses of the Reddit model to the statement that it has a bad opinion are
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{Your film taste is bad and your opinion does not interest me!}\\
 			\midrule
@@ -824,7 +823,7 @@ The responses of the Reddit model to the statement that it has a bad opinion are
 			3.0M:	& \texttt{i m not sure if you re being sarcastic or not .}\\
 			Cleverbot:	& \texttt{And for me your opinion does not matter.}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a statement from the Reddit model per snapshot and the CleverBot response.}
 	\label{results:example6_output:Reddit_compared}
@@ -835,7 +834,7 @@ The responses of the Reddit model to the statement that it has a bad opinion are
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{What are you?}\\
 			\midrule
@@ -847,7 +846,7 @@ The responses of the Reddit model to the statement that it has a bad opinion are
 			3.0M:	& \texttt{i m a bot .}\\
 			Cleverbot:	& \texttt{A human, what are you??}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Responses to a self-concept question from the Reddit models and the CleverBot response.}
 	\label{results:example7_output:Reddit_compared}
@@ -866,7 +865,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{what year were you born ?}\\
 			\midrule
@@ -883,7 +882,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 			\midrule
 			NCM:	& \texttt{1977 .}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what year were you born ?'' from the ``Basic''.}
 	\label{results:example8_output:Neural_Conversational_Model_compared}
@@ -892,7 +891,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{why are we here ?}\\
 			\midrule
@@ -909,7 +908,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 			\midrule
 			NCM:	& \texttt{i ’m not sure .}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``why are we here ?'' from the ``Basic'' category.}
 	\label{results:example9_output:Neural_Conversational_Model_compared}
@@ -917,7 +916,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{are you a leader or a follower ?}\\
 			\midrule
@@ -934,7 +933,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 			\midrule
 			NCM:	& \texttt{i'm a leader .}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``are you a leader or a follower ?'' from the ``General Knowledge Q\&A'' category.}
 	\label{results:example10_output:Neural_Conversational_Model_compared}
@@ -942,7 +941,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{how much is ten minus two ?}\\
 			\midrule
@@ -959,7 +958,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 			\midrule
 			NCM:	& \texttt{seventy - two .}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``how much is ten minus two ?'' from the ``General Knowledge Q\&A'' category.}
 	\label{results:example11_output:Neural_Conversational_Model_compared}
@@ -967,7 +966,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{what is the color of a yellow car ?}\\
 			\midrule
@@ -980,13 +979,11 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 			3.0M:	& \texttt{it s a yellow}\\
 			\midrule
 			Reddit\\
-			2.5M:	& \texttt{the yellow yellow yellow yellow yellow yellow yellow yellow}\\
-					& \texttt{yellow yellow yellow yellow yellow yellow yellow yellow yellow}\\
-					& \texttt{yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow}\\
+			2.5M:	& \texttt{the yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow yellow}\\
 					\midrule
 			NCM:	& \texttt{yellow .}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what is the color of a yellow car ?'' from the ``General Knowledge Q\&A'' category.}
 	\label{results:example12_output:Neural_Conversational_Model_compared}
@@ -994,7 +991,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{what is the purpose of existence ?}\\
 			\midrule
@@ -1012,7 +1009,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 			\midrule
 			NCM:	& \texttt{to find out what happens when we get to the planet earth .}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what is the purpose of existence ?'' from the ``Philosophical Q\&A'' category.}
 	\label{results:example13_output:Neural_Conversational_Model_compared}
@@ -1021,7 +1018,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{what is the purpose of being intelligent?}\\
 			\midrule
@@ -1035,7 +1032,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 			\midrule
 			NCM:	& \texttt{to find out what it is .}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what is the purpose of being intelligent?'' from the ``Philosophical Q\&A'' category.}
 	\label{results:example20_output:OpenSubtitle}
@@ -1045,7 +1042,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 \begin{table}[H]
 	\centering
 	\begin{adjustbox}{max width=\textwidth}
-		\begin{tabular}{ll}
+		\begin{tabularx}{\textwidth}{lX}
 			\toprule
 			Input: 	& \texttt{what are the things that i do to be immoral?}\\
 			\midrule
@@ -1063,7 +1060,7 @@ We are only showing a part of the dialogs which were evaluated. All other can be
 			\midrule
 			NCM:	& \texttt{to find out what happens when we get to the planet earth .}\\
 			\bottomrule
-		\end{tabular}
+		\end{tabularx}
 	\end{adjustbox}
 	\caption{Comparison between the NCM model and our OpenSubtitles model when using the utterance ``what are the things that i do to be immoral?'' from the ``Morality'' category.}
 	\label{results:example14_output:Neural_Conversational_Model_compared}
