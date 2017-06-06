@@ -16,7 +16,7 @@ metric_files = argv[2:]
 metric_dict = {}
 
 def get_step_count(f):
-    file_parts = f.split('_')
+    file_parts = f.split('/')[-2].split('_')
     step_count_idx = file_parts.index('step')+1
 
     if step_count_idx == -1:
@@ -31,7 +31,7 @@ for metrics_f_name in metric_files:
     with open(metrics_f_name, 'r') as f:
         metrics = json.load(f)
 
-    step_count = get_step_count(f)
+    step_count = get_step_count(metrics_f_name)
     step_value = metrics[metric_key]
 
     metric_dict[step_count] = step_value
