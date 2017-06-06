@@ -79,7 +79,7 @@ All experiments have been conducted on the GPU-cluster the InIT (Institut für a
 
 \section{Operating System \& Software Packages}
 \label{software_system:software_packages}
-As mentioned before, all experiments have been conducted on the GPU-cluster provided by the InIT. The operating system installed on this server was Ubuntu in the version 16.04. The whole software system has been written in \texttt{python}\footnote{https://www.python.org/}, version 3.5.2 using \texttt{TensorFlow}\footnote{http://tensorflow.org} in the version 1.0. For the GPU integration, we have used the Nvidia GPU driver in conjunction with the \texttt{cuda}\footnote{https://developer.nvidia.com/cuda-toolkit} in the version 8.0. In summary, we used the following \texttt{python} packages for various different scripts and parts of the system:
+As mentioned before, all experiments have been conducted on the GPU-cluster provided by the InIT. The operating system installed on this server was Ubuntu in the version 16.04. The whole software system has been written in \texttt{python}\footnote{https://www.python.org/}, version 3.5.2 using \texttt{TensorFlow}\footnote{http://tensorflow.org} in the version 1.0.1. For the GPU integration, we have used the Nvidia GPU driver in conjunction with the \texttt{cuda}\footnote{https://developer.nvidia.com/cuda-toolkit} in the version 8.0. In summary, we used the following \texttt{python} packages for various different scripts and parts of the system:
 
 \begin{table}[H]
 	\centering
@@ -92,13 +92,18 @@ As mentioned before, all experiments have been conducted on the GPU-cluster prov
 			\texttt{flask} & 0.12 & Website\protect\footnote{http://flask.pocoo.org/}\\
 			\texttt{gensim} & 1.0.0 & \cite{Radim:2010}\\
 			\texttt{h5py} & 2.6.0 & Website\protect\footnote{http://www.h5py.org/}\\
-			\texttt{matplotlib} & 2.0.0 & \cite{Hunter:2007}\\
 			\texttt{networkx} & 1.11 & \cite{Hagberg:2008}\\
 			\texttt{nltk} & 3.2.2 & \cite{Bird:2009}\\
 			\texttt{numpy} & 1.11.3 & \cite{Walt:2011}\\
+			\texttt{matplotlib} & 2.0.0 & \cite{Hunter:2007}\\
+			\texttt{scipy} & 0.18.1 & \cite{Jones:2014}\\
+			\texttt{scikit\_learn} & 0.18.1 & \cite{Thidus:2016}\\
 			\texttt{TensorFlow} & 1.0.1 & \cite{TensorFlow:2015}\\
+			\texttt{tqdm} & 4.11.2 & Website\protect\footnote{https://github.com/noamraph/tqdm}\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
 	\caption{Python libraries used in the system.}
 \end{table}
+
+Additionaly, for generating the Sent2Vec embeddings the user needs to have access to the \texttt{fastText}~\cite{Bojanowski:2016} binary.
