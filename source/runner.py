@@ -53,7 +53,6 @@ class Runner(object):
         '''Destroys all ressources acquired by this runner.'''
         if self.__session:
             self.__session.close()
-
             self.__session = None
             self.__graph = None
             self.__model = None

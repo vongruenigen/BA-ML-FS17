@@ -73,14 +73,14 @@ $(function () {
       return;
     }
 
-    var urlCurrSelectedModel = startSessionPath.replace('<model>', encodeURI(currSeletedModel));
+    var urlCurrSelectedModel = startSessionPath.replace('<model>', encodeURIComponent(currSeletedModel));
 
     $loadingContainer.show();
 
     $.post(urlCurrSelectedModel, function () {
       $loadingContainer.hide();
       $outterContainer.show();
-      enableStartControls(false); 
+      enableStartControls(false);
     }).fail(function (err) {
       alert('Error while starting the session: ' + err.responseText);
       $loadingContainer.hide();

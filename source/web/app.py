@@ -96,6 +96,8 @@ def stop_session():
         current_runner.close()
         current_runner = None
         current_model = None
+        
+        return 'Session stopped', 200
 
 @app.route('/get_models')
 def get_models():
@@ -117,7 +119,14 @@ def get_config(result_dir):
 
     config_dict['train'] = False
     config_dict['device'] = 'cpu:0'
-    config_dict['model_path'] = result_dir
+
+    model_data_file = None
+
+    for f in os.listdir(result_dir):
+        if '.data-' in f:
+            model_data_file = path.join(result_dir, f)
+
+    config_dict['model_path'] = '.'.join(model_data_file.split('.')[:-1])
 
     return Config(config_dict)
 
@@ -134,7 +143,7 @@ def get_available_models():
         files_in_dir = os.listdir(full_path)
 
         if all(map(lambda x: x in files_in_dir, REQUIRED_RESULT_FILES)):
-            available_models.append(res_dir.strip('/'))
+            available_models.append(res_dir)
 
     return available_models
 
