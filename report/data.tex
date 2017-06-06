@@ -10,8 +10,8 @@ We are using two different datasets for the experiments. The first is the curren
 	  \begin{tabular}{llcccl}
 	    \toprule
 	    &  \specialcell{Short name}
-	    &  \specialcell{Size\\(Gb)}
-	    &  \specialcell{Lines\\(Million)}
+	    &  \specialcell{Size\\[GB]}
+	    &  \specialcell{Lines\\[Million]}
 	    &  \specialcell{Data format}
 	    &  \specialcell{Source} \\
 	    \midrule
@@ -24,8 +24,6 @@ We are using two different datasets for the experiments. The first is the curren
 	\label{data:raw:table}
 \end{table}
 \footnotetext{https://archive.org/details/2015\_reddit\_comments\_corpus}
-\todo{Einheitliche Einheiten Beschriftung bei Tabellen entweder ekcige, oder runde klammern}
-\todo{Begriff corpora/corpus verwenden?}
 
 The two datasets differ in several aspects: Since the OpenSubtitles corpus is extracted from subtitles of a large number of movies, it represents a corpora of \emph{spoken} language. In contrast, the Reddit dataset only consists of comments posted on the website and hence represents written, partially colloquial, language. These two type of language usually differ greatly in how they are used\footnote{A good comparison can be found on the website of the University of Westminister: http://www2.wmin.ac.uk/eic/learning-skills/literacy/sp\_vs\_writ\_dif.shtml}.
 
@@ -263,7 +261,7 @@ As this analysis has shown, most utterances lie so close to one another that thi
 
 \section{N-Gram Analysis}
 \label{chapter:data:ngram}
-We also do an n-gram analysis of the used corpora. For this purpose, we generated uni- and bi-grams for both the OpenSubtitles and Reddit corpora. We do this so that we can compare the n-grams of the outputs produced by our models after they have been trained with the n-grams obtained when analyzing the preprocessed corpora. This enables us to find correlations between the n-grams produced by this analysis and n-grams extracted from the outputs of the trained models. The results of analyzing the preprocessed datasets are visualized in the Figures~\ref{data:ngram:freq_top_30} and \ref{data:ngram:graph_top_50}.
+We also do an n-gram analysis of the used datasets. For this purpose, we generated uni- and bi-grams for both the OpenSubtitles and Reddit dataset. We do this so that we can compare the n-grams of the outputs produced by our models after they have been trained with the n-grams obtained when analyzing the dataset. This enables us to find correlations between the n-grams produced by this analysis and n-grams extracted from the outputs of the trained models. The results of analyzing the preprocessed datasets are visualized in the Figures~\ref{data:ngram:freq_top_30} and \ref{data:ngram:graph_top_50}.
  
 \begin{figure}[H]
 	\minipage{1.0\textwidth}
