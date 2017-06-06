@@ -1,7 +1,7 @@
 \chapter{Analysis of Results}
 We are going to analyze the resulting models after training them as specified in Chapter~\ref{methods:training}.
 
-In the first part, we are going to analyze how the training went and review the results of the metric-based evaluation (see Chapter~\ref{methods:evaluation}). Because we identified some problems with this quantitative analysis, we then show that progress was indeed achieved throughout the training and explore why the results of the evaluation are as modest as they are. This includes an analysis of the language model to determine why the models often respond with generic outputs.
+In the first part, we are going to analyze how the training went and review the results of the metric-based evaluation (see Chapter~\ref{methods:evaluation}). Because we identified some problems with this quantitative analysis, we then show with examples that progress was indeed achieved throughout the training and explore why the results of the evaluation are as modest as they are. This includes an analysis of the language model to determine why the models often respond with generic outputs.
 
 The next part is dedicated to the comparison of our models with the results from the paper of Vinyals and Le~\cite{Vinyals:2015} and with the CleverBot chatbot.
 
@@ -16,7 +16,7 @@ First, we start by analyzing the evolution of the models with regard to the avai
 	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/train_metrics.png}
 	\caption{Development of the loss and perplexity values on the training and validation datasets throughout the training of the OpenSubtitles model. One tick on the x-axis is equal to $100,000$ batches processed.}
 	\label{results:learning_process:metrics:opensubtitles}
-\end{figure}
+\end{figure}\todo{Gemäss Stephan, text viel zu klein in Abbildung}
 
 \paragraph{Reddit} The learning process of the Reddit model looks appropriate, but it also has a peculiarity, namely the dips in the training loss and perplexity. These dips occur about every $300,000$ to $400,000$ batches. They are also present in the development of the validation loss and perplexity, but are not as apparent as in the metrics on the training dataset. We currently cannot explain this behavior. We assume that this peculiarities are caused by the structure of the training dataset.\todo{Maybe explain a little bit more?} However, the variance is much smaller than with the OpenSubtitles model, which strengthens our argument that well-structured datasets are indeed favorable when training such systems as helps to avoid confusion due to perplexing samples.
 

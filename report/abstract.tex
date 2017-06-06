@@ -1,13 +1,13 @@
 \chapter*{Abstract}
 In the following thesis we investigate the construction of an end-to-end conversational dialog system based on recurrent neural networks and sequence-to-sequence learning. We use an already existing system as the reference architecture. 
 
-The main topic of the research is to investigate if a downsized model, trained on a single GPU, still exhibits a comparable performance compared to larger systems.
+The main goal of the research is to investigate if a downsized model, trained on a single GPU, still exhibits a comparable performance compared to larger systems.
 
 The first Chapters are dedicated to the development of the software system and the datasets and methods used to conduct the experiments.
 
 The analysis of the resulting models is done under several aspects. First, we look into the learning process. We show that the structure and linguistic nature of different datasets has a clear impact on the learning process of such models. Evaluations to asses the performance follow, including tests with a newly proposed metric based on the Sent2Vec library for measuring semantic similarity.
 
-The previous analysis revealed several problems our models exhibited. One of the main issues is that such models tend to generate generic responses which leads to deteriorating results. This does not match with our subjective impression that the model indeed becomes better over time. To find an explanation for this behavior we investigate how the language, used by the the models, evolves over time. This analysis shows that language variety increases with training time and the occurrence of generic responses decreases.
+Our previous analysis revealed several problems our models exhibited. One of the main issues is that such models tend to generate generic responses which lead to deteriorating results. This does not match with our subjective impression that the model indeed becomes better over time. To find an explanation for this behavior we investigate how the language, used by the the models, evolves over time. This analysis shows that language variety increases with training time and the occurrence of generic responses decreases.
 
 A comparison with two other systems, namely CleverBot and the results from a paper by Vinyals and Le on ``Neural Conversational Model''~\cite{Vinyals:2015}, follow subsequently. This comparison shows that our models can deliver models that have performance comparable to other systems, as long as the dialogs have limited complexit. We believe that reasons for the comparatively worse performance of our models include smaller model size, as well as shorter training time.
 
