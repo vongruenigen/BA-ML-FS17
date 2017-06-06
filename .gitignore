@@ -6,6 +6,10 @@ logs/*
 data/**/*
 !data/**/*.gitkeep
 
+# Misc
+misc/**/*
+!misc/**/*.gitkeep
+
 # Ignore compiled tex files
 report/*.aux
 report/*.out

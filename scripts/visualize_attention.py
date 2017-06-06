@@ -100,6 +100,7 @@ elif out_type == 'heatmap':
         ax.set_yticklabels('')
 
         ax.set_xticks(x_ticks)
+        ax.set_xticklabels(x_ticks_txt, rotation=90)
 
         ax.set_yticks(y_ticks)
         ax.set_yticklabels(y_ticks_txt, ha='right')

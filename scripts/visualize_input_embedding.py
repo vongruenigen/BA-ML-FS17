@@ -25,7 +25,7 @@ if len(argv) < 2:
 model_path = argv[0]
 input_txt = argv[1]
 
-INPUT_EMB_NAME = 'model_with_buckets/embedding_attention_seq2seq/rnn/concat_49:0'
+INPUT_EMB_NAME = 'model_with_buckets/embedding_attention_seq2seq/rnn/basic_lstm_cell_29/concat:0'
 
 if not path.isfile(input_txt):
     print('ERROR: The input-txt param has to point to a file')
@@ -70,6 +70,6 @@ plt.scatter(proj_inp[:, 0], proj_inp[:, 1])
 
 for inp_seq, x, y in zip(input_seqs, proj_inp[:, 0], proj_inp[:, 1]):
     plt.annotate(inp_seq, xy=(x, y), xytext=(0, 0),
-                 textcoords='offset points', fontsize=5)
+                 textcoords='offset points', fontsize=7)
 
 plt.show()
