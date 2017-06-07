@@ -33,7 +33,7 @@ First, we start by analyzing the evolution of the models with regard to the avai
 \label{results:performance_on_test_datasets}
 After we have seen that the training process looks fine, we are going to assess the performance of these models on our test datasets. Here we use the same metrics as during the training, namely the cross-entropy loss and perplexity. We evaluate each model on the respective test dataset for each of the six snapshots we have created during training (see Chapter~\ref{methods:training}).
 
-\paragraph{Surprising Results} The results on the test dataset (see Figures~\ref{result:test_performance:opensubtitles} and~\ref{result:test_performance:reddit}) are quite the opposite of the results of the training process, the performance for both of the models is
+\paragraph{Surprising Results} The results on the test dataset are quite the opposite of the results of the training process, the performance for both of the models is
 worsening over time. The results of the OpenSubtitles model (see Table~\ref{results:test_metrics:opensubtitles}) vary across the different snapshots, with the best result having a perplexity of $71.07$ and a loss of $6.15$ and derived from the evaluation of the first snapshot. Also, the best result of the Reddit model (see Table~\ref{results:test_metrics:reddit}) is achieved on the first snapshot with a perplexity of $169.14$, with all other snapshots having a worse perplexity.
 \\
 \begin{table}[H]
@@ -76,43 +76,7 @@ worsening over time. The results of the OpenSubtitles model (see Table~\ref{resu
 	\label{results:test_metrics:reddit}
 \end{table}
 
-This result contradicts with our expectation. Instead increasing loss values, we would have expected it to decrease in the same way as it did on the training and validation datasets. We assume, that this is related to the cross-entropy loss and hence the perplexity being not the best fit metrics to evaluate such models, especially in a conversational context where the variety of correct answers can be extensive. We have no explanation, why the values on the validation dataset are getting better over time. For this reason, we propose a third performance metric, namely the usage of Sent2Vec~\cite{Pgj:2017} embeddings, to measure the similarity between the expected and generated responses. Before we perform this analysis, we want to take a look at different samples from both models to show that they indeed improved over time, even though the results of the test metrics tell a different story.\todo{Maybe rewrite this sentence because it sounds like we are debunking the bad metrics by simply playing with the models}
-
-\begin{figure}[H]
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/test_metrics_both.png}
-	\centering
-	\small
-	\text{The loss and perplexity.}
-	\endminipage\hfill
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/opensubtitles_not_reversed/test_metrics_loss.png}
-	\centering
-	\small
-	\text{Only the loss.}
-	\endminipage\hfill
-	\caption{The loss and perplexity when evaluating the six different snapshots with the test dataset using the OpenSubtitles model.}
-	\label{result:test_performance:opensubtitles}
-\end{figure}
-
-\begin{figure}[H]
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/reddit/test_metrics_both.png}
-	\centering
-	\small
-	\text{The loss and perplexity.}
-	\endminipage\hfill
-	\minipage{0.5\textwidth}
-	\includegraphics[width=\linewidth]{img/plots/reddit/test_metrics_loss.png}
-	\centering
-	\small
-	\text{Only the loss.}
-	\endminipage\hfill
-	\caption{The loss and perplexity when evaluating the six different snapshots with the test dataset using the Reddit model.}
-	\label{result:test_performance:reddit}
-\end{figure}\todo{text unter den Bilderm könnten wir auch nur "loss and perplexity" und "loss" schreibe. Ich überlege gerade ob es diese Bilder überhaupt braucht und wenn ja, ob wir eine Grafik für beide Modelle pro Metrik machen wollen? Die Grafiken wirken jetzt etwas leer.}
-
-\todo{fix scaling of axis}
+This result contradicts with our expectation. Instead increasing loss values, we would have expected it to decrease in the same way as it did on the training and validation datasets. We assume, that this is related to the cross-entropy loss and hence the perplexity being not the best fit metrics to evaluate such models, especially in a conversational context where the variety of correct answers can be extensive. We have no explanation, why the values on the validation dataset are getting better over time. For this reason, we propose a third performance metric, namely the usage of Sent2Vec~\cite{Pgj:2017} embeddings, to measure the similarity between the expected and generated responses. Before we perform this analysis, we want to take a look at different samples from both models to show that they indeed improved over time, even though the results of the test metrics tell a different story.
 
 \paragraph{Is Progress Achieved?} As the results of evaluating the models on the test dataset has shown, it seems that the models achieve a meaningful progress during the training. However, in the performance test, it appears like the models have become poorer over the course of the training. For this reason, we decided that we would like to evaluate the model manually and find out if the generated responses improve when using the six snapshots of the models. We have chosen four different input utterances, two for each model, and generated responses for each of the snapshots. The results can be seen in the Table~\ref{results:example_output:opensubtitles} for the OpenSubtitles model and Table~\ref{results:example_output:reddit} for the Reddit model.
 
@@ -145,7 +109,6 @@ This result contradicts with our expectation. Instead increasing loss values, we
 	\caption{Two exemplary dialogs with the Reddit model, one response per snapshot.}
 	\label{results:example_output:reddit}
 \end{table}
-\todo{Format so that all look the same, probably by using tabularx and an X column}
 
 \begin{table}[H]
 	\centering
@@ -281,7 +244,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 	\end{adjustbox}
 	\caption{Top 10 most generated responses with respective occurrence frequencies when using the last OpenSubtitles snapshot and the test dataset.}
 	\label{results:test_performance:opensubtitles_sample_outputs}
-\end{table}\todo{make tables the same width!}
+\end{table}
 
 \begin{table}[H]
 	\centering
@@ -309,7 +272,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 	\end{adjustbox}
 	\caption{Top 10 most generated sentences with respective occurrence frequencies when using the last Reddit snapshot and the test dataset. The meaning of the \textless unknown\textgreater \ token is described in \ref{data:word_coverage}.}
 	\label{results:test_performance:reddit_sample_outputs}
-\end{table}\todo{make tables the same width!}
+\end{table}
 
 \paragraph{Does Filtering of Generic Responses Help?} As seen in the Tables above, there are certain responses which are generated a lot of time and are pretty generic and meaningless in most contexts. Because of that, we think it would be a good idea to evaluate the models under the Sent2Vec metric one more time, but this time with the top $n$ most generated responses filtered out. We do this expecting that the generic sentences are the cause of the small average similarities. The results of the analysis with the top $n$ most generated responses filtered out is shown in Table~\ref{results:sent2vec:opensubtitles:top_n_results_table} and~\ref{results:sent2vec:reddit:top_n_results_table}. For this analysis, we only use the \emph{Wikipedia} embeddings as it has shown a better performance for both of our models before.
 \\
