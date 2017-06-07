@@ -15,6 +15,9 @@
 		\setentrycounter[]{page}\glsnumberformat{125}}}%
 \glossentry{epoch}{\glossaryentrynumbers{\relax 
 		\setentrycounter[]{page}\glsnumberformat{125}}}\glsgroupskip
+\glsgroupheading{I}\relax \glsresetentrylist %
+\glossentry{inference}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{125}}}\glsgroupskip
 \glsgroupheading{L}\relax \glsresetentrylist %
 \glossentry{layer}{\glossaryentrynumbers{\relax 
 		\setentrycounter[]{page}\glsnumberformat{125}}}\glsgroupskip
