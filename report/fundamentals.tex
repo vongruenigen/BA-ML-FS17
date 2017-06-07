@@ -154,7 +154,7 @@ The weights $W_1$ and $W_2$, as well as the values in the vector $v$, are learne
 	\includegraphics[width=10cm]{img/attention_heatmap_example}
 	\caption{Example on how attention can be visualized using a heatmap \cite{Rush:2015}. The input sequence is on the y-axis and the respective response on the x-axis. Each column in the heat-map can be interpreted as the probability distribution over the thought vectors of the encoder which the decoder accesses at each decoding step.}
 	\label{fundamentals:seq2seq:attention_weights_visualization}
-\efnd{figure}
+\end{figure}
 
 The name \emph{soft}-attention comes from the fact, that this kind of attention mechanism is fully differentiable and hence can be simply plugged into any existing NN architecture. The other kind of attention is the so-called \emph{hard}-attention mechanism which in contrast samples a random thought vector of the encoder and because of that, it is not fully differentiable and hence cannot simply be added to an existing system that uses back-propagation and gradient-descent without modifications.
 
