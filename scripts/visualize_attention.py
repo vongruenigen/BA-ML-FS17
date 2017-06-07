@@ -76,7 +76,7 @@ elif out_type == 'heatmap':
     for i, (input_seq, output_seq, attn_weights) in enumerate(results):
         heatmap_val = np.zeros((len(output_seq), len(input_seq)))
 
-        for j in range(1, heatmap_val.shape[0]):
+        for j in range(0, heatmap_val.shape[0]):
             heatmap_val[j,:] = attn_weights[j][0,:len(input_seq)]
 
         if reverse_input:
