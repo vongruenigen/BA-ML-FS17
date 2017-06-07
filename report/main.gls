@@ -20,5 +20,8 @@
 		\setentrycounter[]{page}\glsnumberformat{125}}}\glsgroupskip
 \glsgroupheading{N}\relax \glsresetentrylist %
 \glossentry{neuron}{\glossaryentrynumbers{\relax 
+		\setentrycounter[]{page}\glsnumberformat{125}}}\glsgroupskip
+\glsgroupheading{U}\relax \glsresetentrylist %
+\glossentry{unit}{\glossaryentrynumbers{\relax 
 		\setentrycounter[]{page}\glsnumberformat{125}}}%
 \end{theglossary}\glossarypostamble
