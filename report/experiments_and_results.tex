@@ -223,7 +223,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 	\begin{adjustbox}{max width=\textwidth}
 		\begin{tabularx}{\textwidth}{lcc}
 			\toprule
-			Sentence & Occurrence Frequency & Percentage \\ \midrule
+			Sentence & Occurrence Frequency & Share of Total Count \\ \midrule
 			\texttt{i m not gon na let you go} & 41853 & 16.74\%\\
 			\texttt{i m not sure i can trust you} & 21263 & 8.51\%\\
 			\texttt{i m not gon na say anything} & 9163 & 3.67\%\\
@@ -251,7 +251,7 @@ As seen in the examples above, there has indeed been an improvement in the answe
 	\begin{adjustbox}{max width=\textwidth}
 		\begin{tabular}{lcc}
 			\toprule
-			Sentence & Occurrence Frequency & Percentage\\ \midrule
+			Sentence & Occurrence Frequency & Share of Total Count\\ \midrule
 			\texttt{i m not sure if i m being sarcastic or not .} & 17486 & 7.00\%\\
 			\texttt{i think it s a bit of a stretch .} & 13058 & 5.22\%\\
 			\texttt{i m not sure if you re being sarcastic or not .} & 11647 & 4.66\%\\
@@ -422,12 +422,11 @@ The behavior of the uni-gram distributions develops in a similar way, therefore 
 \subsection{Language Diversity}
 We now analyze the language diversity of the outputs produced by the two models over the different snapshots.  For this purpose, we are analyzing how large the share of the top 10 uni-, bi-gram and sentences within the entirety of the generated responses is when using the respective test datasets. The results can be seen in the Table~\ref{results:top_10_frequency:reddit} for Reddit and \ref{results:top_10_frequency:OpenSubtitles} for OpenSubtitles. 
 
-In the Tables, three different categories are shown: Uni-grams, bi-grams and sentences. For each of these categories, we have summed up the occurrence frequencies of the top 10 most occurring instances for the respective category. These sums can be seen in the \emph{Top Count} columns. The columns named \emph{All Count} contain the total amount of all instances for each category per snapshot. The ratio of the \emph{Top Count} value compared to the \emph{All Count} value can be seen in the \emph{Top Freq.} column for each category and snapshot.
-\todo{add more telling column names to the tables}
+In the Tables, three different categories are shown: Uni-grams, bi-grams and sentences. For each of these categories, we have summed up the occurrence frequencies of the top 10 most occurring instances for the respective category. These sums can be seen in the \emph{Top Count} columns. The columns named \emph{All Count} contain the total amount of all instances for each category per snapshot. The ratio of the \emph{Top Count} value compared to the \emph{All Count} value can be seen in the \emph{Top 10 Share} column for each category and snapshot.
 
 The first thing which is noticeable when comparing the values from the two Tables is that the Reddit outputs seem to be composed of much more uni- and bi-grams. This can be seen when comparing the \emph{Top Count} values from both Tables. This signifies that the outputs of the Reddit model are of greater length on average than the outputs of the OpenSubtitles model because the number of sentences stays the same for both. This might be one of the reasons why the results from the Sent2Vec analysis (see Chapter~\ref{results:performance_on_test_datasets}) are much better for the Reddit than the OpenSubtitles model.
 
-At first, we tried to see a tendency on how language diversity develops when using the absolute values from the \emph{Top Count} columns, but we could not. This is the reason why we added the relative values from the \emph{Top Freq.} columns. The problem with using the absolute values is, that the number used uni- and bi-grams changes between the snapshots. However, when we start using the relative values we can compare the different snapshots to each other by means of diversity of the outputs. 
+At first, we tried to see a tendency on how language diversity develops when using the absolute values from the \emph{Top Count} columns, but we could not. This is the reason why we added the relative values from the \emph{Top 10 Share} columns. The problem with using the absolute values is, that the number used uni- and bi-grams changes between the snapshots. However, when we start using the relative values we can compare the different snapshots to each other by means of diversity of the outputs. 
 
 \begin{table}[H]
 	\centering
@@ -435,7 +434,7 @@ At first, we tried to see a tendency on how language diversity develops when usi
 		\begin{tabular}{llllllllll}
 			\toprule
 			& Words &&&Bi-Gramm&&&Sentences&&\\
-			Snapshot & Top 10 Count & All Count& Top 10 freq. \%&  Top 10 Count& All Count& Top 10 freq. \%&  Top 10 Count& All Count& Top 10 freq. \%\\
+			Snapshot & Top 10 Count & All Count& Top 10 Share &  Top 10 Count& All Count& Top 10 Share &  Top 10 Count& All Count& Top 10 Share\\
 			\midrule
 			0.5M & 516,756	 & 1,035,956	& 49.88\%	&306,757	&1,033,319	&29.69\%	&102,770	&249,984	&41.11\%\\
 			1.0M & 639,494	 & 860,951		& 74.28\%	&504,946	&858,145	&58.84\%	&188,748	&249,984	&75.50\%\\
@@ -449,7 +448,6 @@ At first, we tried to see a tendency on how language diversity develops when usi
 	\caption{Top 10 uni-grams, bi-grams and sentences with summed up frequencies and computed share of the entirety of all instances for each category per OpenSubtitles snapshot.}
 	\label{results:top_10_frequency:OpenSubtitles}
 \end{table}
-\todo{rework captions! Dirk: Es ist halt schon sehr kurz und bündig, aber eigentlich vollständig?}
 
 \begin{table}[H]
 	\centering
@@ -457,7 +455,7 @@ At first, we tried to see a tendency on how language diversity develops when usi
 		\begin{tabular}{llllllllll}
 			\toprule
 			& Words &&&Bi-Gramm&&&Sentences&&\\
-			Snapshot & Top 10 Count & All Count& Top 10 freq. \%&  Top 10 Count& All Count& Top 10 freq. \%&  Top 10 Count& All Count& Top 10 freq. \%\\
+			Snapshot & Top 10 Count & All Count& Top 10 Share &  Top 10 Count& All Count& Top 10 Share &  Top 10 Count& All Count& Top 10 Share \\
 			\midrule
 			0.5M & 2,712,157	 & 4,484,679	 & 60.48\%	&2,096,681	&4,483,620	&46.76\%	&86,408	&249,984	&34.57\%\\
 			1.0M & 2,576,291	 & 4,294,209	 & 60.00\%	&1,941,620	&4,290,818	&45.25\%	&71,050	&249,984	&28.42\%\\
@@ -471,9 +469,8 @@ At first, we tried to see a tendency on how language diversity develops when usi
 	\caption{Top 10 uni-grams, bi-grams and sentences with summed up frequencies and computed share of the entirety of all instances for each category per Reddit snapshot.}
 	\label{results:top_10_frequency:reddit}
 \end{table}
-\todo{rework captions!}
 
-We plot the \emph{Top Freq.} values for all the categories per model and snapshot to visualize the development of the values for the different categories and possible correlations between them. The resulting graphics can be seen in Figures~\ref{results:language_model:diversity:opensubtitles} and~\ref{results:language_model:diversity:reddit}. The plots can be interpreted that decreasing values imply that the share of the top 10 most occurring instances per category reduce compared to the whole number of instances of this category. We interpret this as an increase in language diversity, which is positive.
+We plot the \emph{Top 10 Share} values for all the categories per model and snapshot to visualize the development of the values for the different categories and possible correlations between them. The resulting graphics can be seen in Figures~\ref{results:language_model:diversity:opensubtitles} and~\ref{results:language_model:diversity:reddit}. The plots can be interpreted that decreasing values imply that the share of the top 10 most occurring instances per category reduce compared to the whole number of instances of this category. We interpret this as an increase in language diversity, which is positive.
 
 In the mentioned plots, we observe several peculiarities, which we are going to discuss per model below.
 
