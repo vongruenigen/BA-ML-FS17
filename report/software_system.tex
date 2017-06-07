@@ -16,7 +16,7 @@ We started the development of the system by defining which requirements it has t
 The properties listed above should be fulfilled by the newly developed system in order to enable us to safely conduct experiments without the fear of lose any of the results.
 
 \section{Development of the System}
-\label{sofware_system:development_history}
+\label{software_system:development_history}
 In this Chapter, we want to give an insight on the development on the software system and shed light on some decision we have made in the process.
 
 \paragraph{Switch from Keras to TensorFlow} The first and probably also the largest decision we had to make was, if we would remain with \texttt{keras}\footnote{https://keras.io/} as our deep learning framework or if we switch to \texttt{TensorFlow}\footnote{https://www.tensorflow.org/}. We already had developed a software system for conducting experiments with \texttt{keras} in the context of our ``Projektarbeit'' in the autumn semester of 2016, even though this system was used to perform sentiment-analysis with convolutional neural networks \cite{Vongruenigen:2017}. But, from that experience, we also knew that \texttt{keras} is a pretty high-level framework with a lot of abstractions to hide the tedious details from the user. This is beneficial for getting up-and-running quickly, but we wanted to get further insight on how these models actually work and how they are implemented, especially with a computational graph, as this seems to be a pretty common technique to build such systems these days \cite{TensorFlow:2015}\cite{Theano:2016}\cite{Torch:2011}.
