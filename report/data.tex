@@ -1,8 +1,8 @@
 \chapter{Data}\label{chapter:data}
-In this Chapter, we are going to introduce the two main text corpora used in this thesis. This includes an explanation of their content and how we preprocess it in order to obtain the datasets for training our models. A basic n-gram analysis of the datasets is also prepared in for later usage in the Chapter~\ref{Results_and_Discussion}.
+In this Chapter, we introduce the two main text corpora used in this thesis. This includes an explanation of their content and how we preprocess it in order to obtain the datasets for training our models. A basic n-gram analysis of the datasets is also prepared in for later usage in the Chapter~\ref{Results_and_Discussion}.
 
 \section{Datasets}
-We are using two different corpora to build the datasets for our experiments. The first is the current version of the OpenSubtitles corpus \cite{Lison:2016} that contains subtitles from over $300,000$ movies. The second corpus contains all comments posted on the website Reddit\footnote{https://www.reddit.com/} from 2006 until 2015. Some general information can be found in Table~\ref{data:raw:table}.
+We are using two different corpora to build the datasets for our trainings. The first is the current version of the OpenSubtitles corpus \cite{Lison:2016} that contains subtitles from over $300,000$ movies. The second corpus contains all comments posted on the website Reddit\footnote{https://www.reddit.com/} from 2006 until 2015. Some general information can be found in Table~\ref{data:raw:table}.
 \\
 \begin{table}[H]
 	\centering
@@ -25,11 +25,11 @@ We are using two different corpora to build the datasets for our experiments. Th
 \end{table}
 \footnotetext{https://archive.org/details/2015\_reddit\_comments\_corpus}
 
-The two corpora differ in several aspects: Since the OpenSubtitles corpus is extracted from subtitles of a large number of movies, it represents a corpus of \emph{spoken} language. In contrast, the Reddit corpus only consists of comments posted on the website and hence represents written, partially colloquial, language. These two types of language usually differ greatly in how they are used\footnote{A good comparison can be found on the website of the University of Westminister: http://www2.wmin.ac.uk/eic/learning-skills/literacy/sp\_vs\_writ\_dif.shtml}.
+The two corpora differ in several aspects: Since the OpenSubtitles corpus is extracted from subtitles of a large number of movies, it represents a corpus of spoken language. In contrast, the Reddit corpus only consists of comments posted on the website and hence represents written, partially colloquial, language. These two types of language usually differ greatly in how they are used\footnote{A good comparison can be found on the website of the University of Westminister: http://www2.wmin.ac.uk/eic/learning-skills/literacy/sp\_vs\_writ\_dif.shtml}.
 
 \section{Structure of the Raw Corpora}
 \label{data:structure_of_corpora}
-The following two paragraphs explain how the raw corpora are structured and how the raw utterances are extracted from them.
+The following two paragraphs explain how the raw corpora are structured and how the raw utterances are extracted.
 
 \paragraph{OpenSubtitles} The OpenSubtitles corpus is structured via XML files, each one containing all utterances from a single movie (see Figure~\ref{data:opensubtitles:xml_example}). Each XML is structured the same way: It starts with the declaration of the \texttt{<document>} tag and an \texttt{id} attribute signifying which movie the subtitles are from. However, as our research has shown, the value of the \texttt{id} attribute cannot be used to decide whether subtitles of a certain movie have already been processed, because there are files with the same \texttt{id} but different content. After the \texttt{<document>} the actual utterances are listed in \texttt{<s>} tags. Each of these \texttt{<s>} contains multiple \texttt{<w>} tags that contain the actual words uttered in this utterance. Furthermore, one can see that there are also \texttt{<time>} tags that contains a timestamp when the utterance started and one when the utterance ended. These timestamps are later used for the time-lag analysis in the Chapter~\ref{data:opensubtitles:time_lag_analysis}. There is absolutely no indication on turn-taking, which forces us handle each utterance as an utterance by a different person, even though it could certainly be uttered by the same.\\
 
@@ -62,7 +62,7 @@ The following two paragraphs explain how the raw corpora are structured and how 
 	\label{data:opensubtitles:xml_example}
 \end{figure}
 
-\paragraph{Reddit} The Reddit corpus is structured in huge plain text files for each year, where comments are available. In our case, the comments available are from ranging from 2006 up to the year 2015. For each year, there is a separate plain text file containing one JSON object per line. Each of these JSON objects (see Figure~\ref{data:reddit:json_example}) contains a single comment posted on the Reddit website. There are several different values in each of the JSON objects, however, we only need four of them for our purposes: 
+\paragraph{Reddit} The Reddit corpus is structured in huge plain text files for each year, where comments are available. In our case, the comments available are ranging from 2006 to the year 2015. For each year, there is a separate plain text file containing one JSON object per line. Each of these JSON objects (see Figure~\ref{data:reddit:json_example}) contains a single comment posted on the Reddit website. There are several different values in each of the JSON objects, however, we only need four of them for our purposes: 
 
 \begin{itemize}[noitemsep]
 	\item \textbf{\texttt{body}}: This attribute contains the actual comment posted on Reddit.
@@ -73,7 +73,7 @@ The following two paragraphs explain how the raw corpora are structured and how 
 
 The shown attributes can be used to create a tree structure per thread, where the \texttt{link\_id} is used as the root node. The child nodes of the root are the comments where the \texttt{parent\_id} is equal to the \texttt{link\_id}. Each of these comments may have several comments answering the original comment; these are matched by comparing the \texttt{name} of the original comment and the \texttt{parent\_id} of all other comments. The same procedure applied to the comments on the topmost level of the tree is then also applied to their child comments in a recursive manner until a comment does not have any child comments anymore. This process leads to a tree like structure for the comments, which we store in a \texttt{shelve}\footnote{https://docs.python.org/3.4/library/shelve.html} file, which we then use for building the final dataset (see Chapter~\ref{data:preprocessing}).
 \\
-\begin{figure}[thp]
+\begin{figure}[H]
 	\centering
 	\begin{tabular}{c}  % the tabular makes the listing as small as possible and centers it
 		\begin{lstlisting}[style=json]
