@@ -18,10 +18,10 @@ The details on how dialogs are handled when training or doing inference with the
 One of the main restrictions of vanilla NNs is the following: assume a task in which the NN is conditioned to output a prediction on tomorrow's weather given yesterday's. Now, if one would use a vanilla NN as described in Appendix~\ref{fundamentals:neural_network}, the main restriction would be that the NN has to make its prediction solely based on the weather information of the day before. Such a model does not take into account, that weather is not only dependent on the weather of the previous day, but also on the days before. This could be solved by feeding, say, the weather of the last week to the network instead of just the weather of the previous day. But if new scientific evidence now shows, that weather is not only dependent on last week, but also on the last month, probably the last year, we quickly get into problems due to the sheer size of a NN performing such tasks, because the input size grows rapidly. Also, such a NN would still be static in the sense that one cannot simply change the time-window used to feed to the network. If one settles for one month, it will always be able predict the weather based on the last month, but not any different time-window, otherwise the NN has to be retrained using another time-window in order to work again as before. RNNs (see Figure~\ref{fundamentals:rnn:internal_structure}) solve this problem by introducing a recurrence into the network, which allows it to exploit information not only from the current input, but also from inputs of the past. It does this by transferring a state, usually called the \emph{hidden state}, through the recurrence between different time steps. In a more compact way, one could say that this recurrence allows RNNs to ``exhibit dynamic behavior across the temporal dimension of the input data''.
 
 \begin{figure}[h]
-	\label{fundamentals:rnn:internal_structure}
 	\centering
 	\includegraphics[width=10cm]{img/rnn_internal}
 	\caption{Internal structure of a vanilla RNN cell.\protect\footnotemark}
+	\label{fundamentals:rnn:internal_structure}
 \end{figure}
 
 
