@@ -62,8 +62,6 @@ The following two paragraphs explain how the raw corpora are structured and how 
 	\label{data:opensubtitles:xml_example}
 \end{figure}
 
-\todo{opus aufbau png}
-
 \paragraph{Reddit} The Reddit corpus is structured in huge plain text files for each year, where comments are available. In our case, the comments available are from ranging from 2006 up to the year 2015. For each year, there is a separate plain text file containing one JSON object per line. Each of these JSON objects (see Figure~\ref{data:reddit:json_example}) contains a single comment posted on the Reddit website. There are several different values in each of the JSON objects, however, we only need four of them for our purposes: 
 
 \begin{itemize}[noitemsep]
@@ -152,17 +150,17 @@ After the datasets for both corpora have been generated, we go on with generatin
 			&\specialcell{Size\\ {[Thousand]}}
 			&\specialcell{No. of Words\\ {[Thousand]}}
 			&\specialcell{No. of known Words\\ {[Thousand]}}
-			&\specialcell{Perc. of known Words \\ {[\%]}}
+			&\specialcell{Share of known Words \\ {[\%]}}
 			&\specialcell{No. of unknown Words \\ {[Thousand]}}
-			&\specialcell{Perc. of unknown Words \\ {[\%]}}\\
+			&\specialcell{Share of unknown Words \\ {[\%]}}\\
 			\midrule
 			OpenSubtitles	&$25$		&$2362$	&$2096$	&$88.73\%$ &$266$	&$11.27\%$\\
 							&$50$		&$2362$	&$2116$	&$89.57\%$	&$246$	&$10.43\%$\\
-							&$100$	&$2362$	&$2127$	&$90.03\%$	&$236$	&$9.97\%$\\
+							&$100$		&$2362$	&$2127$	&$90.03\%$	&$236$	&$9.97\%$\\
 			\midrule
-			Reddit		&$25$		&$1717$	&$1683$	&$98.00\%$	&$34$		&$2.00\%$\\
-						&$50$		&$1717$	&$1699$	&$98.98\%$	&$17$		&$1.02\%$\\
-						&$100$	&$1717$	&$1707$	&$99.42\%$	&$10$		&$0.58\%$\\
+			Reddit			&$25$		&$1717$	&$1683$	&$98.00\%$	&$34$	&$2.00\%$\\
+							&$50$		&$1717$	&$1699$	&$98.98\%$	&$17$	&$1.02\%$\\
+							&$100$		&$1717$	&$1707$	&$99.42\%$	&$10$	&$0.58\%$\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustbox}
@@ -170,7 +168,7 @@ After the datasets for both corpora have been generated, we go on with generatin
 	\label{tbl:data:split:corpus:analyze}
 \end{table}
 
-Figure~\ref{fig:data:reddit:vocab:analyze} shows what percentage of the words in an utterance is missing using the specified vocabulary. It shows that the coverage of the Reddit vocabularies is much bigger than the OpenSubtitles.\todo{Begründung? es befinden sich viele Sätze mehrfach im Datensatz.}
+Figure~\ref{fig:data:reddit:vocab:analyze} shows what percentage of the words in an utterance is missing using the specified vocabulary. It shows that the coverage of the Reddit vocabularies is much bigger than the OpenSubtitles.
 
 \begin{figure}[H]
 	\minipage{0.5\textwidth}
@@ -278,5 +276,3 @@ We also do an n-gram analysis of the used datasets. For this purpose, we generat
 	\endminipage\hfill
 	\caption{Occurrence frequencies of the 30 most used bi-grams in the OpenSubtitles~(left) and Reddit (right) datasets.}
 	\label{data:ngram:freq_top_30}
-\end{figure}\todo{ich habe hier minipage von 0.5 auf 1.0 erhöht. Stephan meinte man können die y-achse sonst nicht entiffern. Auch jetzt sind die Beschriftungen noch eher klein.}
-
