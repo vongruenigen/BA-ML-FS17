@@ -40,7 +40,6 @@ In the following table, we explain the structure of the repository and the conte
 	\end{tabularx}
 	\caption{Remarks regarding the structure of the repository.}
 \end{table}
-\todo{update}
 
 \clearpage
 \section{Using the Scripts}
@@ -69,7 +68,6 @@ In the following section, we are going to introduce the most important scripts n
 	\end{adjustbox}
 	\caption{Descriptions of the most important scripts to use the software system.}
 \end{table}
-\todo{update}
 
 There are much more scripts than the ones described above (e.g. for plotting, creation of vocabularies). Not all of them are necessary to conduct experiments, which is why only explain the most important.
 
@@ -97,7 +95,6 @@ In the following table there are exemplary calls for all scripts listed above:
 	\end{adjustbox}
 	\caption{Exemplary calls for the most important scripts to use the software system.}
 \end{table}
-\todo{update}
 
 \clearpage
 
@@ -165,6 +162,8 @@ To run experiments, one has to write a configuration file in the JSON format. Al
 	\end{adjustbox}
 	\caption{Explanation of the important configuration parameters of the software system (part 2).}
 \end{table}
+
+One peculiarity can be seen from the names of the configuration parameters: Some of them contain the word \emph{epoch}, but not necessarily refer to the definition of epoch found in the glossary. This is related to the way training works with TensorFlow, as it does use the term epoch differently. Instead of referring to one full iteration over the training corpus, it refers to a fixed number of batches being processed, because TensorFlow itself has no notion of epoch but rather uses the term \emph{step}. A fixed number of steps is then called an epoch.
 
 The descriptions above are neither complete nor concluding. We recommend consult the source code for the exact behavior of the additional parameters. Also, there are more model related parameters which are only applicable to the models stored in the source code file \texttt{other\_models.py}, where implemented, but now unused models reside.
 
