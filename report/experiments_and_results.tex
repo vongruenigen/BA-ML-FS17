@@ -19,13 +19,13 @@ First, we start by analyzing the evolution of the models with regard to the avai
 	\label{results:learning_process:metrics:opensubtitles}
 \end{figure}
 
-\paragraph{Reddit} The learning process of the Reddit model looks appropriate, but it also has a peculiarity, namely the dips in the training loss and perplexity. These dips occur about every $300,000$ to $400,000$ batches. They are also present in the development of the validation loss and perplexity, but are not as apparent as in the metrics on the training dataset. We currently cannot explain this behavior. We assume that this peculiarities are caused by the structure of the training dataset.\todo{Maybe explain a little bit more?} However, the variance is much smaller than with the OpenSubtitles model, which strengthens our argument that well-structured datasets are indeed favorable when training such systems as helps to avoid confusion due to perplexing samples.
+\paragraph{Reddit} The learning process of the Reddit model looks appropriate, but it also has a peculiarity, namely the dips in the training loss and perplexity. These dips occur about every $300,000$ to $400,000$ batches. They are also present in the development of the validation loss and perplexity, but are not as apparent as in the metrics on the training dataset. We currently cannot explain this behavior. We assume that this peculiarities are caused by the structure of the training dataset. However, the variance is much smaller than with the OpenSubtitles model, which strengthens our argument that well-structured datasets are indeed favorable when training such systems as helps to avoid confusion due to perplexing samples.
 
 \begin{figure}[H]
 	\includegraphics[width=\linewidth]{img/plots/reddit/train_metrics.png}
 	\caption{Development of the loss and perplexity on the training and validation datasets throughout the training of the Reddit model. One tick on the x-axis is equal to $100,000$ batches processed.}
 	\label{results:learning_process:metrics:reddit}
-\end{figure} \todo{Wollen wir beobachtung mitteilne, dass wenn train perplex extrem sinkt, val perplex analog steigt?}
+\end{figure}
 
 \paragraph{The Training Seems Successful} From the appearance of the plots, it looks like the training went fine for both models, as both of them exhibit decreasing loss and perplexity values. We see differences in how the models have evolved over the time span of the training, but we cannot derive any conclusion at the current time. After we have analyzed the training process, we are now focusing on the performance of the models on the test datasets.
 
