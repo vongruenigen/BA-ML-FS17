@@ -1,3 +1,6 @@
+#
+# BA ML FS17 - Dirk von Gruenigen & Martin Weilenmann
+#
 import os
 import sys
 import json
