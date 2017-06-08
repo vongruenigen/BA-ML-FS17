@@ -70,6 +70,6 @@ plt.scatter(proj_inp[:, 0], proj_inp[:, 1])
 
 for inp_seq, x, y in zip(input_seqs, proj_inp[:, 0], proj_inp[:, 1]):
     plt.annotate(inp_seq, xy=(x, y), xytext=(0, 0),
-                 textcoords='offset points', fontsize=7)
+                 textcoords='offset points', fontsize=8)
 
 plt.show()
